@@ -1,0 +1,8 @@
+/bin/
+/vendor/
+/*.log
+*.swp
+*.exe
+*.out
+.DS_Store
+.env
