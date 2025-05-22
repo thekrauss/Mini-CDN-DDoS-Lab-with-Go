@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package node;
+
+option go_package = "github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/api/proto/nodepb";
+
+import "google/api/annotations.proto";
+
+service NodeService {
+  // santé du nœud
+  rpc HealthCheck(HealthRequest) returns (HealthResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/node/health"
+    };
+  }
+
+  // enregistre le nœud auprès du Control Plane
+  rpc RegisterNode(RegisterRequest) returns (RegisterResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/node/register"
+      body: "*"
+    };
+  }
+
+  // envoi e métriques simples par le nœud
+  rpc SendMetrics(MetricsRequest) returns (MetricsResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/node/metrics"
+      body: "*"
+    };
+  }
+}
+
+message HealthRequest {}
+message HealthResponse {
+  string status = 1;
+  string version = 2;
+}
+
+message RegisterRequest {
+  string node_id = 1;
+  string ip = 2;
+  string location = 3;
+}
+
+message RegisterResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message MetricsRequest {
+  string node_id = 1;
+  float cpu_usage = 2;
+  float memory_usage = 3;
+  float bandwidth_in = 4;
+  float bandwidth_out = 5;
+}
+
+message MetricsResponse {
+  bool acknowledged = 1;
+}
