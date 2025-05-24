@@ -7,3 +7,4 @@
 .DS_Store
 .env
 *.mdworker-node/third_party/googleapis/
+.mdREADME.md
