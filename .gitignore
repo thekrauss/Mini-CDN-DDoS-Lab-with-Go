@@ -6,4 +6,4 @@
 *.out
 .DS_Store
 .env
-*.md
+*.mdworker-node/third_party/googleapis/

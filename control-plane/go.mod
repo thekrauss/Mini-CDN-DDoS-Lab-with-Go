@@ -1,8 +1,6 @@
-module github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go
+module github.com/thekrauss/control-plane
 
-go 1.23.0
-
-toolchain go1.23.9
+go 1.23.9
 
 require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.26.3

@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package worker;
+
+option go_package = "github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/shared-proto/workerpb";
+
+// API exposée par le worker-node
+service WorkerService {
+  rpc RestartService(RestartRequest) returns (RestartResponse);
+  rpc StopService(StopRequest) returns (StopResponse);
+  rpc UpdateConfig(UpdateConfigRequest) returns (UpdateConfigResponse);
+}
+
+message RestartRequest {
+  string service_id = 1;
+}
+
+message RestartResponse {
+  string status = 1; // "ok", "error"
+}
+
+message StopRequest {
+  string service_id = 1;
+}
+
+message StopResponse {
+  string status = 1;
+}
+
+message UpdateConfigRequest {
+  string service_id = 1;
+  string config_json = 2;
+}
+
+message UpdateConfigResponse {
+  string status = 1;
+}
