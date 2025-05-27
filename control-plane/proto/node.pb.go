@@ -4,7 +4,7 @@
 // 	protoc        v3.21.12
 // source: node.proto
 
-package nodepb
+package proto
 
 import (
 	_ "google.golang.org/genproto/googleapis/api/annotations"
@@ -331,7 +331,7 @@ var File_node_proto protoreflect.FileDescriptor
 const file_node_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"node.proto\x12\x04node\x1a\x1cgoogle/api/annotations.proto\"V\n" +
+	"node.proto\x12\x06nodepb\x1a\x1cgoogle/api/annotations.proto\"V\n" +
 	"\x0fRegisterRequest\x12\x17\n" +
 	"\anode_id\x18\x01 \x01(\tR\x06nodeId\x12\x0e\n" +
 	"\x02ip\x18\x02 \x01(\tR\x02ip\x12\x1a\n" +
@@ -348,11 +348,11 @@ const file_node_proto_rawDesc = "" +
 	"\x06memory\x18\x03 \x01(\x02R\x06memory\x12 \n" +
 	"\vconnections\x18\x04 \x01(\x05R\vconnections\")\n" +
 	"\x0fMetricsResponse\x12\x16\n" +
-	"\x06status\x18\x01 \x01(\tR\x06status2\x82\x02\n" +
-	"\vNodeService\x12[\n" +
-	"\fRegisterNode\x12\x15.node.RegisterRequest\x1a\x16.node.RegisterResponse\"\x1c\x82\xd3\xe4\x93\x02\x16:\x01*\"\x11/v1/register-node\x12B\n" +
-	"\x04Ping\x12\x11.node.PingRequest\x1a\x12.node.PingResponse\"\x13\x82\xd3\xe4\x93\x02\r:\x01*\"\b/v1/ping\x12R\n" +
-	"\vSendMetrics\x12\x14.node.MetricsRequest\x1a\x15.node.MetricsResponse\"\x16\x82\xd3\xe4\x93\x02\x10:\x01*\"\v/v1/metricsBDZBgithub.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/shared-proto/nodepbb\x06proto3"
+	"\x06status\x18\x01 \x01(\tR\x06status2\x8e\x02\n" +
+	"\vNodeService\x12_\n" +
+	"\fRegisterNode\x12\x17.nodepb.RegisterRequest\x1a\x18.nodepb.RegisterResponse\"\x1c\x82\xd3\xe4\x93\x02\x16:\x01*\"\x11/v1/register-node\x12F\n" +
+	"\x04Ping\x12\x13.nodepb.PingRequest\x1a\x14.nodepb.PingResponse\"\x13\x82\xd3\xe4\x93\x02\r:\x01*\"\b/v1/ping\x12V\n" +
+	"\vSendMetrics\x12\x16.nodepb.MetricsRequest\x1a\x17.nodepb.MetricsResponse\"\x16\x82\xd3\xe4\x93\x02\x10:\x01*\"\v/v1/metricsBDZBgithub.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/protob\x06proto3"
 
 var (
 	file_node_proto_rawDescOnce sync.Once
@@ -368,20 +368,20 @@ func file_node_proto_rawDescGZIP() []byte {
 
 var file_node_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_node_proto_goTypes = []any{
-	(*RegisterRequest)(nil),  // 0: node.RegisterRequest
-	(*RegisterResponse)(nil), // 1: node.RegisterResponse
-	(*PingRequest)(nil),      // 2: node.PingRequest
-	(*PingResponse)(nil),     // 3: node.PingResponse
-	(*MetricsRequest)(nil),   // 4: node.MetricsRequest
-	(*MetricsResponse)(nil),  // 5: node.MetricsResponse
+	(*RegisterRequest)(nil),  // 0: nodepb.RegisterRequest
+	(*RegisterResponse)(nil), // 1: nodepb.RegisterResponse
+	(*PingRequest)(nil),      // 2: nodepb.PingRequest
+	(*PingResponse)(nil),     // 3: nodepb.PingResponse
+	(*MetricsRequest)(nil),   // 4: nodepb.MetricsRequest
+	(*MetricsResponse)(nil),  // 5: nodepb.MetricsResponse
 }
 var file_node_proto_depIdxs = []int32{
-	0, // 0: node.NodeService.RegisterNode:input_type -> node.RegisterRequest
-	2, // 1: node.NodeService.Ping:input_type -> node.PingRequest
-	4, // 2: node.NodeService.SendMetrics:input_type -> node.MetricsRequest
-	1, // 3: node.NodeService.RegisterNode:output_type -> node.RegisterResponse
-	3, // 4: node.NodeService.Ping:output_type -> node.PingResponse
-	5, // 5: node.NodeService.SendMetrics:output_type -> node.MetricsResponse
+	0, // 0: nodepb.NodeService.RegisterNode:input_type -> nodepb.RegisterRequest
+	2, // 1: nodepb.NodeService.Ping:input_type -> nodepb.PingRequest
+	4, // 2: nodepb.NodeService.SendMetrics:input_type -> nodepb.MetricsRequest
+	1, // 3: nodepb.NodeService.RegisterNode:output_type -> nodepb.RegisterResponse
+	3, // 4: nodepb.NodeService.Ping:output_type -> nodepb.PingResponse
+	5, // 5: nodepb.NodeService.SendMetrics:output_type -> nodepb.MetricsResponse
 	3, // [3:6] is the sub-list for method output_type
 	0, // [0:3] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name

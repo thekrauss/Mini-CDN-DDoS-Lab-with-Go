@@ -1,0 +1,56 @@
+# configuration du Control Plane (control-plane/config/config.yaml)
+
+server:
+  grpc_port: 50061            # serveur gRPC
+  http_port: 8090             # serveur REST (via grpc-gateway)
+  tls_cert: "certs/server.crt" #  vers le certificat TLS (mTLS)
+  tls_key: "certs/server.key"  #  vers la clé privée TLS
+
+
+jwt:
+  secret_key: ""
+  refresh_secret: ""
+  access_token_expiry: 1h
+  refresh_token_expiry: 7d
+  issuer: control-plane
+
+database:
+  host: "localhost"
+  port: 5442
+  user: "cdnadmin"
+  password: "cdnpassword"
+  name: "cdn_control"
+  sslmode: "disable"  # disable | require | verify-ca | verify-full
+
+redis:
+  host: localhost #redis
+  port: 6379
+  password: ""
+  db: 0
+
+metrics:
+  prometheus_enabled: true
+  prometheus_port: 9090
+
+logging:
+  level: "info"     # info | debug | warn | error
+  format: "json"    # json | text
+  file: logs/app.log
+
+tenancy:
+  multi_tenant: true
+  default_tenant: "public"
+
+security:
+  max_failed_attempts: 5
+  lockout_duration: 15m
+  allowed_origins:
+    - "https://cdncdncdn.com"
+
+tracking:
+  enable_ip_logging: true
+  enable_user_agent_logging: true
+
+roles_b: ["admin", "viewer"]
+roles_a: ["superadmin"]
+

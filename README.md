@@ -20,9 +20,9 @@ Avoir une base fonctionnelle locale avec : control-plane, worker, load-balancer,
 ### ✅ Actions
 
 * Implémenter `proto/node.proto` avec : `RegisterNode`, `SendMetrics`, `Ping`
-* Créer `cmd/control-plane` : serveur gRPC + REST gateway (grpc-gateway)
-* Créer `cmd/worker-node` : client gRPC, s’enregistre et ping
-* Créer `cmd/load-balancer` : proxy HTTP avec round robin vers workers actifs
+* Créer `control-plane` : serveur gRPC + REST gateway (grpc-gateway)
+* Créer `worker-node` : client gRPC, s’enregistre et ping
+* Créer `load-balancer` : proxy HTTP avec round robin vers workers actifs
 * Ajouter `pkg/ddos` : flood naïf (req/s/IP), blocage temporaire
 * Ajouter `pkg/metrics` : intégration Prometheus
 * Créer un dashboard Grafana pour visualiser les stats
@@ -150,3 +150,156 @@ Une plateforme capable de :
 * Mitiger des attaques réseau simples à moyennes
 * Offrir un dashboard multi-tenant sécurisé et exploitable
 * Être utilisée par ton ESN comme service managé facturable
+
+
+
+---
+
+## 🧰 Stack technologique recommandée
+
+| Domaine        | Outils/Technos                        |
+|----------------|--------------------------------------|
+| Backend        | Go, gRPC, grpc-gateway, PostgreSQL   |
+| Frontend       | Next.js, Tailwind, React Query       |
+| Monitoring     | Prometheus, Grafana, Loki            |
+| Auth & Sécurité| OAuth2, JWT, mTLS, Casbin            |
+| Orchestration  | Docker, Helm, Terraform, K8s         |
+| CI/CD          | GitHub Actions, DockerHub            |
+| Cloud Providers| AWS, GCP, OVH, Scaleway, Hetzner     |
+
+
+                         ┌──────────────────────────┐
+                         │    Frontend / Dashboard   │
+                         │  (Next.js / React UI)     │
+                         └────────────┬─────────────┘
+                                      │
+                             HTTPS + JWT Auth
+                                      │
+                         ┌────────────▼─────────────┐
+                         │     Authentication        │
+                         │    (auth-service)         │
+                         │ - JWT login/register      │
+                         │ - OAuth2 / RBAC           │
+                         └────────────┬─────────────┘
+                                      │
+                             gRPC / REST APIs
+                                      │
+                    ┌────────────────▼────────────────┐
+                    │          Control Plane           │
+                    │     (Orchestrateur central)      │
+                    │ - Registre des nodes             │
+                    │ - Commandes vers worker-nodes    │
+                    │ - APIs REST/gRPC pour dashboard  │
+                    │ - Gestion tenants / métriques    │
+                    └──────┬───────────┬──────────────┘
+                           │           │
+                    gRPC/mTLS     Prometheus Push
+                           │           │
+               ┌───────────▼────────────┐
+               │       Worker Node      │
+               │ - Trafic HTTP          │
+               │ - Protection DDoS      │
+               │ - Exposition metrics   │
+               │ - Exécution de jobs    │
+               └────────────────────────┘
+
+
+
+# 🛰️ SentinelPlane – Plateforme d’orchestration sécurisée multi-tenant
+
+> Supervisez, déployez et sécurisez vos infrastructures distribuées avec un agent universel.
+
+---
+
+## 🎯 Objectif
+
+Construire une solution SaaS modulaire pour :
+- Superviser des services clients (nœuds, métriques, état)
+- Orchestrer à distance les applications déployées
+- Mitiger les attaques réseau (type DDoS) en environnement cloud ou on-premise
+- Supporter plusieurs clients (multi-tenant) dans une même plateforme
+
+---
+
+## 🧱 Architecture
+
+```
+         +-------------------+
+         |     Dashboard     |  ← Admins / Clients
+         +--------+----------+
+                  |
+        REST API / gRPC (auth mTLS + JWT)
+                  |
+         +--------▼---------+
+         |  Control-Plane   |  ← PostgreSQL, Prometheus
+         +----+--------+----+
+              |        |
+      gRPC + TLS   gRPC + TLS
+         +--▼--+    +--▼--+
+         |Node1|    |NodeN|  ← Worker nodes multi-cloud
+         +-----+    +-----+
+```
+
+---
+
+## 🧠 Fonctionnalités
+
+| Fonction                        | Description |
+|---------------------------------|-------------|
+| ✅ Orchestration distribuée     | Contrôle central des nœuds |
+| ✅ Supervision (Prometheus)     | Metrics, état, logs |
+| ✅ API REST + gRPC              | Interface CLI / UI front |
+| ✅ DDoS simplifié               | Détection req/s/IP, blocage, alerting |
+| ✅ Authentification JWT & mTLS  | Sécurité multi-tenant par défaut |
+| ✅ PostgreSQL durable           | Enregistrement, alertes, tenants |
+| ✅ Simulateur d’attaques        | Tests de résilience intégrés |
+| ✅ Cloud-agnostique             | Déploiement possible sur AWS, GCP, OVH… |
+
+---
+
+## ⚙️ Stack technique
+
+- Go, gRPC, grpc-gateway
+- PostgreSQL, Prometheus, Grafana
+- Docker, Terraform, GitHub Actions
+- Architecture modulaire : `control-plane`, `worker-node`, `simulator`, `dashboard`
+
+---
+
+## 🔐 Cas d’usage pour une ESN
+
+- Supervision de VM/containers multi-client
+- Orchestration d’API métiers chez les clients
+- Alerte automatique en cas de surcharge, DDoS, panne
+- Interface client personnalisable
+- Base pour un service managé / produit SaaS
+
+---
+
+## 📦 Modules
+
+```
+SentinelPlane/
+├── control-plane/      # Orchestrateur principal (gRPC + REST)
+├── worker-node/        # Agent distant (metrics + execution)
+├── simulator/          # Générateur de trafic (normal + attaque)
+├── shared-proto/       # Contrats gRPC partagés
+├── deploy/             # Docker Compose / K8s / Terraform
+├── config/             # Fichiers YAML + gestion Viper
+└── README.md           # Ce fichier
+```
+
+---
+
+## 🚀 Lancement (dev)
+
+```bash
+cd control-plane
+go run cmd/main.go --config=config/config.yaml
+```
+
+---
+
+## ✨ Nom du projet
+
+**SentinelPlane** – *A control plane to deploy, observe and protect cloud-native infrastructures across multi-tenant environments.*

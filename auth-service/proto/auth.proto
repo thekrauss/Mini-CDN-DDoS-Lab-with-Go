@@ -1,0 +1,310 @@
+syntax = "proto3";
+
+package nodepb;
+
+option go_package = "github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/proto";
+
+import "google/api/annotations.proto";
+
+service AuthService {
+
+  // Authentification : Permet à un utilisateur de se connecter avec ses identifiants
+  rpc Login (LoginRequest) returns (LoginResponse) {
+    option (google.api.http) = {
+      post: "/v1/auth/login"
+      body: "*"
+    };
+  }
+
+  // Déconnexion : Invalide le token de session d'un utilisateur
+  rpc Logout(LogoutRequest) returns (LogoutResponse) {
+    option (google.api.http) = {
+      post: "/v1/auth/logout"
+      body: "*"
+    };
+  }
+
+  // Inscription : Crée un nouveau compte utilisateur
+  rpc Register (RegisterRequest) returns (RegisterResponse) {
+    option (google.api.http) = {
+      post: "/v1/auth/register"
+      body: "*"
+    };
+  }
+
+  // Mise à jour des informations utilisateur
+  rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse) {
+    option (google.api.http) = {
+      put: "/v1/auth/users/{utilisateur_id}"
+      body: "*"
+    };
+  }
+
+  // Vérification de l'existence d'un utilisateur
+  rpc CheckUserExists(CheckUserExistsRequest) returns (CheckUserExistsResponse) {
+    option (google.api.http) = {
+      get: "/v1/auth/users/{utilisateur_id}/exists"
+    };
+  }
+
+  // Suppression d'un utilisateur par son ID
+  rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse) {
+    option (google.api.http) = {
+      delete: "/v1/auth/users/{utilisateur_id}"
+    };
+  }
+
+  // Validation d'un token JWT pour vérifier son authenticité
+  rpc ValidateToken (TokenRequest) returns (TokenResponse) {
+    option (google.api.http) = {
+      post: "/v1/auth/validate-token"
+      body: "*"
+    };
+  }
+
+  // Rafraîchissement du token JWT lorsqu'il expire
+  rpc RefreshToken (RefreshTokenRequest) returns (RefreshTokenResponse) {
+    option (google.api.http) = {
+      post: "/v1/auth/refresh-token"
+      body: "*"
+    };
+  }
+
+  // Vérification d'un OTP (One-Time Password) pour la double authentification
+  rpc VerifyOTP (VerifyOTPRequest) returns (VerifyOTPResponse) {
+    option (google.api.http) = {
+      post: "/v1/auth/verify-otp"
+      body: "*"
+    };
+  }
+
+  // Notification d'une nouvelle connexion sur un appareil inconnu
+  rpc NotifyNewDevice(NotifyNewDeviceRequest) returns (NotifyNewDeviceResponse){
+    option (google.api.http) = {
+      post: "/v1/auth/notify-device"
+      body: "*"
+    };
+  }
+
+  // Demande de réinitialisation de mot de passe (l'utilisateur recevra un email)
+  rpc RequestPasswordReset (PasswordResetRequest) returns (PasswordResetResponse) {
+    option (google.api.http) = {
+      post: "/v1/auth/request-password-reset"
+      body: "*"
+    };
+  }
+
+  // Activation de l'authentification multi-facteurs (MFA)
+  rpc EnableMFA (EnableMFARequest) returns (EnableMFAResponse) {
+    option (google.api.http) = {
+      post: "/v1/auth/enable-mfa"
+      body: "*"
+    };
+  }
+
+  // Désactivation de l'authentification multi-facteurs (MFA)
+  rpc DisableMFA (DisableMFARequest) returns (DisableMFAResponse) {
+    option (google.api.http) = {
+      post: "/v1/auth/disable-mfa"
+      body: "*"
+    };
+  }
+
+  // Modification du mot de passe d'un utilisateur (changement volontaire)
+  rpc UpdateUserPassword(UpdateUserPasswordRequest) returns (UpdateUserPasswordResponse) {
+    option (google.api.http) = {
+      put: "/api/users/password"
+      body: "*"
+    };
+  }
+
+  rpc GetUserProfile(GetUserProfileRequest) returns (GetUserProfileResponse) {
+    option (google.api.http) = {
+      get: "/v1/auth/users/{utilisateur_id}/profile"
+    };
+  }
+
+  // Demande de réinitialisation de mot de passe en cas d'oubli
+  rpc ForgotPassword(ForgotPasswordRequest) returns (ForgotPasswordResponse) {
+    option (google.api.http) = {
+      post: "/api/users/forgot-password"
+      body: "*"
+    };
+  }
+}
+
+
+enum Role {
+  SYK_ADMIN = 0;
+  SUPER_ADMIN = 1;
+  ADMIN = 2;
+  ELEVE = 3;
+  PARENT = 4; 
+}
+
+message LoginRequest {
+  string identifier = 1;
+  string password = 2;
+  string ip_address = 3;
+  string user_agent = 4;
+  bool requires_otp = 5;
+}
+
+message LoginResponse {
+  string token = 1;
+  string refresh_token = 2;
+  string message = 3;
+  Role role = 4;
+  string userId = 5;
+  bool requires_otp = 6;
+}
+message LogoutRequest {
+  string refresh_token = 1;
+}
+
+message LogoutResponse {
+  string message = 1;
+}
+
+message RegisterRequest {
+  string nom = 1;
+  string prenom = 2;
+  string email = 3;
+  string genre = 4;
+  string telephone = 5;
+  string mot_de_passe = 6;
+  string role = 7;
+  string id_ecole = 8;
+  string classe_id = 9;
+  string photo_profil = 10;
+}
+
+message RegisterResponse {
+  string userId = 1;
+  string message = 2;
+  bool success = 3;
+  string login_id = 4;
+}
+
+message UpdateUserRequest {
+	string utilisateur_id = 1;
+	string nom = 2;
+	string prenom = 3;
+	string email = 4;
+	string telephone = 5;
+	Role role = 6;
+	string id_ecole = 7;
+	string mot_de_passe = 8; 
+  string photo_profil = 9; 
+}
+
+message CheckUserExistsRequest {
+  string utilisateur_id = 1;
+}
+
+message CheckUserExistsResponse {
+  bool exists = 1;
+}
+
+message UpdateUserResponse {
+	string message = 1;
+}
+
+message DeleteUserRequest {
+  string utilisateur_id = 1;
+}
+
+message DeleteUserResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message TokenRequest {
+  string token = 1;
+}
+
+message TokenResponse {
+  bool valid = 1;
+}
+
+message RefreshTokenRequest {
+  string refresh_token = 1;
+}
+
+message RefreshTokenResponse {
+  string token = 1;
+  string refresh_token = 2;
+}
+
+message VerifyOTPRequest {
+  string email = 1;
+  string otp = 2;
+}
+
+message VerifyOTPResponse {
+  string message = 1;
+}
+
+message NotifyNewDeviceRequest {
+  string telephone = 1;
+  string device_info = 2;
+}
+
+message NotifyNewDeviceResponse {
+  string message = 1;
+}
+
+
+message PasswordResetRequest {
+  string email = 1;
+}
+
+message PasswordResetResponse {
+  string otp = 1;
+  string message = 2;
+}
+
+message EnableMFARequest {
+  string email = 1;
+}
+
+message EnableMFAResponse {
+  string message = 1;
+}
+
+message DisableMFARequest {
+  string email = 1;
+}
+
+message DisableMFAResponse {
+  string message = 1;
+}
+
+message UpdateUserPasswordRequest {
+  string utilisateur_id = 1;
+  string new_password = 2;
+}
+
+message UpdateUserPasswordResponse {
+  string message = 1;
+}
+
+message ForgotPasswordRequest {
+  string email = 1;
+}
+
+message ForgotPasswordResponse {
+  string message = 1;
+}
+
+message GetUserProfileRequest {
+  string utilisateur_id = 1;
+}
+
+message GetUserProfileResponse {
+  string utilisateur_id = 1;
+  string nom = 2;
+  string prenom = 3;
+  string email = 4;
+  string photo_profil = 5;
+}

@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package node;
+package nodepb;
 
-option go_package = "github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/shared-proto/nodepb";
+option go_package = "github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/proto";
 
 import "google/api/annotations.proto";
 

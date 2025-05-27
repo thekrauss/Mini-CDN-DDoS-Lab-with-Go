@@ -4,7 +4,7 @@
 // - protoc             v3.21.12
 // source: node.proto
 
-package nodepb
+package proto
 
 import (
 	context "context"
@@ -19,9 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	NodeService_RegisterNode_FullMethodName = "/node.NodeService/RegisterNode"
-	NodeService_Ping_FullMethodName         = "/node.NodeService/Ping"
-	NodeService_SendMetrics_FullMethodName  = "/node.NodeService/SendMetrics"
+	NodeService_RegisterNode_FullMethodName = "/nodepb.NodeService/RegisterNode"
+	NodeService_Ping_FullMethodName         = "/nodepb.NodeService/Ping"
+	NodeService_SendMetrics_FullMethodName  = "/nodepb.NodeService/SendMetrics"
 )
 
 // NodeServiceClient is the client API for NodeService service.
@@ -176,7 +176,7 @@ func _NodeService_SendMetrics_Handler(srv interface{}, ctx context.Context, dec 
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var NodeService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "node.NodeService",
+	ServiceName: "nodepb.NodeService",
 	HandlerType: (*NodeServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
