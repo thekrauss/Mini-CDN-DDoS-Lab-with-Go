@@ -21,7 +21,7 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	AuthService_Login_FullMethodName                = "/nodepb.AuthService/Login"
 	AuthService_Logout_FullMethodName               = "/nodepb.AuthService/Logout"
-	AuthService_Register_FullMethodName             = "/nodepb.AuthService/Register"
+	AuthService_CreateAdmin_FullMethodName          = "/nodepb.AuthService/CreateAdmin"
 	AuthService_UpdateUser_FullMethodName           = "/nodepb.AuthService/UpdateUser"
 	AuthService_CheckUserExists_FullMethodName      = "/nodepb.AuthService/CheckUserExists"
 	AuthService_DeleteUser_FullMethodName           = "/nodepb.AuthService/DeleteUser"
@@ -35,6 +35,9 @@ const (
 	AuthService_UpdateUserPassword_FullMethodName   = "/nodepb.AuthService/UpdateUserPassword"
 	AuthService_GetUserProfile_FullMethodName       = "/nodepb.AuthService/GetUserProfile"
 	AuthService_ForgotPassword_FullMethodName       = "/nodepb.AuthService/ForgotPassword"
+	AuthService_SetCdnPermissions_FullMethodName    = "/nodepb.AuthService/SetCdnPermissions"
+	AuthService_ListAllAdmins_FullMethodName        = "/nodepb.AuthService/ListAllAdmins"
+	AuthService_GetAdminByID_FullMethodName         = "/nodepb.AuthService/GetAdminByID"
 )
 
 // AuthServiceClient is the client API for AuthService service.
@@ -45,8 +48,8 @@ type AuthServiceClient interface {
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 	// Déconnexion : Invalide le token de session d'un utilisateur
 	Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*LogoutResponse, error)
-	// Inscription : Crée un nouveau compte utilisateur
-	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
+	// ➤ Création d'un administrateur Syk
+	CreateAdmin(ctx context.Context, in *CreateAdminRequest, opts ...grpc.CallOption) (*CreateAdminResponse, error)
 	// Mise à jour des informations utilisateur
 	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UpdateUserResponse, error)
 	// Vérification de l'existence d'un utilisateur
@@ -72,6 +75,11 @@ type AuthServiceClient interface {
 	GetUserProfile(ctx context.Context, in *GetUserProfileRequest, opts ...grpc.CallOption) (*GetUserProfileResponse, error)
 	// Demande de réinitialisation de mot de passe en cas d'oubli
 	ForgotPassword(ctx context.Context, in *ForgotPasswordRequest, opts ...grpc.CallOption) (*ForgotPasswordResponse, error)
+	// Définir les permissions d'un administrateur
+	SetCdnPermissions(ctx context.Context, in *SetCdnPermissionsRequest, opts ...grpc.CallOption) (*SetCdnPermissionsResponse, error)
+	// Lister tous les administrateurs
+	ListAllAdmins(ctx context.Context, in *ListAllAdminsRequest, opts ...grpc.CallOption) (*ListAllAdminsResponse, error)
+	GetAdminByID(ctx context.Context, in *GetAdminByIDRequest, opts ...grpc.CallOption) (*GetAdminInfoResponse, error)
 }
 
 type authServiceClient struct {
@@ -102,10 +110,10 @@ func (c *authServiceClient) Logout(ctx context.Context, in *LogoutRequest, opts 
 	return out, nil
 }
 
-func (c *authServiceClient) Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error) {
+func (c *authServiceClient) CreateAdmin(ctx context.Context, in *CreateAdminRequest, opts ...grpc.CallOption) (*CreateAdminResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(RegisterResponse)
-	err := c.cc.Invoke(ctx, AuthService_Register_FullMethodName, in, out, cOpts...)
+	out := new(CreateAdminResponse)
+	err := c.cc.Invoke(ctx, AuthService_CreateAdmin_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -242,6 +250,36 @@ func (c *authServiceClient) ForgotPassword(ctx context.Context, in *ForgotPasswo
 	return out, nil
 }
 
+func (c *authServiceClient) SetCdnPermissions(ctx context.Context, in *SetCdnPermissionsRequest, opts ...grpc.CallOption) (*SetCdnPermissionsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SetCdnPermissionsResponse)
+	err := c.cc.Invoke(ctx, AuthService_SetCdnPermissions_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) ListAllAdmins(ctx context.Context, in *ListAllAdminsRequest, opts ...grpc.CallOption) (*ListAllAdminsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListAllAdminsResponse)
+	err := c.cc.Invoke(ctx, AuthService_ListAllAdmins_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) GetAdminByID(ctx context.Context, in *GetAdminByIDRequest, opts ...grpc.CallOption) (*GetAdminInfoResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetAdminInfoResponse)
+	err := c.cc.Invoke(ctx, AuthService_GetAdminByID_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthServiceServer is the server API for AuthService service.
 // All implementations must embed UnimplementedAuthServiceServer
 // for forward compatibility.
@@ -250,8 +288,8 @@ type AuthServiceServer interface {
 	Login(context.Context, *LoginRequest) (*LoginResponse, error)
 	// Déconnexion : Invalide le token de session d'un utilisateur
 	Logout(context.Context, *LogoutRequest) (*LogoutResponse, error)
-	// Inscription : Crée un nouveau compte utilisateur
-	Register(context.Context, *RegisterRequest) (*RegisterResponse, error)
+	// ➤ Création d'un administrateur Syk
+	CreateAdmin(context.Context, *CreateAdminRequest) (*CreateAdminResponse, error)
 	// Mise à jour des informations utilisateur
 	UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error)
 	// Vérification de l'existence d'un utilisateur
@@ -277,6 +315,11 @@ type AuthServiceServer interface {
 	GetUserProfile(context.Context, *GetUserProfileRequest) (*GetUserProfileResponse, error)
 	// Demande de réinitialisation de mot de passe en cas d'oubli
 	ForgotPassword(context.Context, *ForgotPasswordRequest) (*ForgotPasswordResponse, error)
+	// Définir les permissions d'un administrateur
+	SetCdnPermissions(context.Context, *SetCdnPermissionsRequest) (*SetCdnPermissionsResponse, error)
+	// Lister tous les administrateurs
+	ListAllAdmins(context.Context, *ListAllAdminsRequest) (*ListAllAdminsResponse, error)
+	GetAdminByID(context.Context, *GetAdminByIDRequest) (*GetAdminInfoResponse, error)
 	mustEmbedUnimplementedAuthServiceServer()
 }
 
@@ -293,8 +336,8 @@ func (UnimplementedAuthServiceServer) Login(context.Context, *LoginRequest) (*Lo
 func (UnimplementedAuthServiceServer) Logout(context.Context, *LogoutRequest) (*LogoutResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Logout not implemented")
 }
-func (UnimplementedAuthServiceServer) Register(context.Context, *RegisterRequest) (*RegisterResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Register not implemented")
+func (UnimplementedAuthServiceServer) CreateAdmin(context.Context, *CreateAdminRequest) (*CreateAdminResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateAdmin not implemented")
 }
 func (UnimplementedAuthServiceServer) UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUser not implemented")
@@ -334,6 +377,15 @@ func (UnimplementedAuthServiceServer) GetUserProfile(context.Context, *GetUserPr
 }
 func (UnimplementedAuthServiceServer) ForgotPassword(context.Context, *ForgotPasswordRequest) (*ForgotPasswordResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ForgotPassword not implemented")
+}
+func (UnimplementedAuthServiceServer) SetCdnPermissions(context.Context, *SetCdnPermissionsRequest) (*SetCdnPermissionsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetCdnPermissions not implemented")
+}
+func (UnimplementedAuthServiceServer) ListAllAdmins(context.Context, *ListAllAdminsRequest) (*ListAllAdminsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListAllAdmins not implemented")
+}
+func (UnimplementedAuthServiceServer) GetAdminByID(context.Context, *GetAdminByIDRequest) (*GetAdminInfoResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAdminByID not implemented")
 }
 func (UnimplementedAuthServiceServer) mustEmbedUnimplementedAuthServiceServer() {}
 func (UnimplementedAuthServiceServer) testEmbeddedByValue()                     {}
@@ -392,20 +444,20 @@ func _AuthService_Logout_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AuthService_Register_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RegisterRequest)
+func _AuthService_CreateAdmin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateAdminRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AuthServiceServer).Register(ctx, in)
+		return srv.(AuthServiceServer).CreateAdmin(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: AuthService_Register_FullMethodName,
+		FullMethod: AuthService_CreateAdmin_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServiceServer).Register(ctx, req.(*RegisterRequest))
+		return srv.(AuthServiceServer).CreateAdmin(ctx, req.(*CreateAdminRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -644,6 +696,60 @@ func _AuthService_ForgotPassword_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthService_SetCdnPermissions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetCdnPermissionsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).SetCdnPermissions(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_SetCdnPermissions_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).SetCdnPermissions(ctx, req.(*SetCdnPermissionsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_ListAllAdmins_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListAllAdminsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).ListAllAdmins(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_ListAllAdmins_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).ListAllAdmins(ctx, req.(*ListAllAdminsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_GetAdminByID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAdminByIDRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).GetAdminByID(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_GetAdminByID_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).GetAdminByID(ctx, req.(*GetAdminByIDRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AuthService_ServiceDesc is the grpc.ServiceDesc for AuthService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -660,8 +766,8 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _AuthService_Logout_Handler,
 		},
 		{
-			MethodName: "Register",
-			Handler:    _AuthService_Register_Handler,
+			MethodName: "CreateAdmin",
+			Handler:    _AuthService_CreateAdmin_Handler,
 		},
 		{
 			MethodName: "UpdateUser",
@@ -714,6 +820,18 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ForgotPassword",
 			Handler:    _AuthService_ForgotPassword_Handler,
+		},
+		{
+			MethodName: "SetCdnPermissions",
+			Handler:    _AuthService_SetCdnPermissions_Handler,
+		},
+		{
+			MethodName: "ListAllAdmins",
+			Handler:    _AuthService_ListAllAdmins_Handler,
+		},
+		{
+			MethodName: "GetAdminByID",
+			Handler:    _AuthService_GetAdminByID_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

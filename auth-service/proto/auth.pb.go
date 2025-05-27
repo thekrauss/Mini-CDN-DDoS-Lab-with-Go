@@ -25,28 +25,22 @@ const (
 type Role int32
 
 const (
-	Role_SYK_ADMIN   Role = 0
-	Role_SUPER_ADMIN Role = 1
-	Role_ADMIN       Role = 2
-	Role_ELEVE       Role = 3
-	Role_PARENT      Role = 4
+	Role_admin      Role = 0
+	Role_viewer     Role = 1
+	Role_superadmin Role = 2
 )
 
 // Enum value maps for Role.
 var (
 	Role_name = map[int32]string{
-		0: "SYK_ADMIN",
-		1: "SUPER_ADMIN",
-		2: "ADMIN",
-		3: "ELEVE",
-		4: "PARENT",
+		0: "admin",
+		1: "viewer",
+		2: "superadmin",
 	}
 	Role_value = map[string]int32{
-		"SYK_ADMIN":   0,
-		"SUPER_ADMIN": 1,
-		"ADMIN":       2,
-		"ELEVE":       3,
-		"PARENT":      4,
+		"admin":      0,
+		"viewer":     1,
+		"superadmin": 2,
 	}
 )
 
@@ -220,7 +214,7 @@ func (x *LoginResponse) GetRole() Role {
 	if x != nil {
 		return x.Role
 	}
-	return Role_SYK_ADMIN
+	return Role_admin
 }
 
 func (x *LoginResponse) GetUserId() string {
@@ -334,8 +328,6 @@ type RegisterRequest struct {
 	Telephone     string                 `protobuf:"bytes,5,opt,name=telephone,proto3" json:"telephone,omitempty"`
 	MotDePasse    string                 `protobuf:"bytes,6,opt,name=mot_de_passe,json=motDePasse,proto3" json:"mot_de_passe,omitempty"`
 	Role          string                 `protobuf:"bytes,7,opt,name=role,proto3" json:"role,omitempty"`
-	IdEcole       string                 `protobuf:"bytes,8,opt,name=id_ecole,json=idEcole,proto3" json:"id_ecole,omitempty"`
-	ClasseId      string                 `protobuf:"bytes,9,opt,name=classe_id,json=classeId,proto3" json:"classe_id,omitempty"`
 	PhotoProfil   string                 `protobuf:"bytes,10,opt,name=photo_profil,json=photoProfil,proto3" json:"photo_profil,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -416,20 +408,6 @@ func (x *RegisterRequest) GetMotDePasse() string {
 func (x *RegisterRequest) GetRole() string {
 	if x != nil {
 		return x.Role
-	}
-	return ""
-}
-
-func (x *RegisterRequest) GetIdEcole() string {
-	if x != nil {
-		return x.IdEcole
-	}
-	return ""
-}
-
-func (x *RegisterRequest) GetClasseId() string {
-	if x != nil {
-		return x.ClasseId
 	}
 	return ""
 }
@@ -517,7 +495,6 @@ type UpdateUserRequest struct {
 	Email         string                 `protobuf:"bytes,4,opt,name=email,proto3" json:"email,omitempty"`
 	Telephone     string                 `protobuf:"bytes,5,opt,name=telephone,proto3" json:"telephone,omitempty"`
 	Role          Role                   `protobuf:"varint,6,opt,name=role,proto3,enum=nodepb.Role" json:"role,omitempty"`
-	IdEcole       string                 `protobuf:"bytes,7,opt,name=id_ecole,json=idEcole,proto3" json:"id_ecole,omitempty"`
 	MotDePasse    string                 `protobuf:"bytes,8,opt,name=mot_de_passe,json=motDePasse,proto3" json:"mot_de_passe,omitempty"`
 	PhotoProfil   string                 `protobuf:"bytes,9,opt,name=photo_profil,json=photoProfil,proto3" json:"photo_profil,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -593,14 +570,7 @@ func (x *UpdateUserRequest) GetRole() Role {
 	if x != nil {
 		return x.Role
 	}
-	return Role_SYK_ADMIN
-}
-
-func (x *UpdateUserRequest) GetIdEcole() string {
-	if x != nil {
-		return x.IdEcole
-	}
-	return ""
+	return Role_admin
 }
 
 func (x *UpdateUserRequest) GetMotDePasse() string {
@@ -1797,6 +1767,494 @@ func (x *GetUserProfileResponse) GetPhotoProfil() string {
 	return ""
 }
 
+type SetCdnPermissionsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UtilisateurId string                 `protobuf:"bytes,1,opt,name=utilisateur_id,json=utilisateurId,proto3" json:"utilisateur_id,omitempty"`
+	Permissions   []string               `protobuf:"bytes,2,rep,name=permissions,proto3" json:"permissions,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SetCdnPermissionsRequest) Reset() {
+	*x = SetCdnPermissionsRequest{}
+	mi := &file_auth_proto_msgTypes[32]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SetCdnPermissionsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetCdnPermissionsRequest) ProtoMessage() {}
+
+func (x *SetCdnPermissionsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_auth_proto_msgTypes[32]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetCdnPermissionsRequest.ProtoReflect.Descriptor instead.
+func (*SetCdnPermissionsRequest) Descriptor() ([]byte, []int) {
+	return file_auth_proto_rawDescGZIP(), []int{32}
+}
+
+func (x *SetCdnPermissionsRequest) GetUtilisateurId() string {
+	if x != nil {
+		return x.UtilisateurId
+	}
+	return ""
+}
+
+func (x *SetCdnPermissionsRequest) GetPermissions() []string {
+	if x != nil {
+		return x.Permissions
+	}
+	return nil
+}
+
+type SetCdnPermissionsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Message       string                 `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SetCdnPermissionsResponse) Reset() {
+	*x = SetCdnPermissionsResponse{}
+	mi := &file_auth_proto_msgTypes[33]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SetCdnPermissionsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetCdnPermissionsResponse) ProtoMessage() {}
+
+func (x *SetCdnPermissionsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_auth_proto_msgTypes[33]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetCdnPermissionsResponse.ProtoReflect.Descriptor instead.
+func (*SetCdnPermissionsResponse) Descriptor() ([]byte, []int) {
+	return file_auth_proto_rawDescGZIP(), []int{33}
+}
+
+func (x *SetCdnPermissionsResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+type CreateAdminRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Nom           string                 `protobuf:"bytes,1,opt,name=nom,proto3" json:"nom,omitempty"`
+	Prenom        string                 `protobuf:"bytes,2,opt,name=prenom,proto3" json:"prenom,omitempty"`
+	Email         string                 `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
+	Genre         string                 `protobuf:"bytes,4,opt,name=genre,proto3" json:"genre,omitempty"`
+	Telephone     string                 `protobuf:"bytes,5,opt,name=telephone,proto3" json:"telephone,omitempty"`
+	Role          string                 `protobuf:"bytes,6,opt,name=role,proto3" json:"role,omitempty"`
+	Permissions   []string               `protobuf:"bytes,7,rep,name=permissions,proto3" json:"permissions,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateAdminRequest) Reset() {
+	*x = CreateAdminRequest{}
+	mi := &file_auth_proto_msgTypes[34]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateAdminRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateAdminRequest) ProtoMessage() {}
+
+func (x *CreateAdminRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_auth_proto_msgTypes[34]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateAdminRequest.ProtoReflect.Descriptor instead.
+func (*CreateAdminRequest) Descriptor() ([]byte, []int) {
+	return file_auth_proto_rawDescGZIP(), []int{34}
+}
+
+func (x *CreateAdminRequest) GetNom() string {
+	if x != nil {
+		return x.Nom
+	}
+	return ""
+}
+
+func (x *CreateAdminRequest) GetPrenom() string {
+	if x != nil {
+		return x.Prenom
+	}
+	return ""
+}
+
+func (x *CreateAdminRequest) GetEmail() string {
+	if x != nil {
+		return x.Email
+	}
+	return ""
+}
+
+func (x *CreateAdminRequest) GetGenre() string {
+	if x != nil {
+		return x.Genre
+	}
+	return ""
+}
+
+func (x *CreateAdminRequest) GetTelephone() string {
+	if x != nil {
+		return x.Telephone
+	}
+	return ""
+}
+
+func (x *CreateAdminRequest) GetRole() string {
+	if x != nil {
+		return x.Role
+	}
+	return ""
+}
+
+func (x *CreateAdminRequest) GetPermissions() []string {
+	if x != nil {
+		return x.Permissions
+	}
+	return nil
+}
+
+type CreateAdminResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Message       string                 `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateAdminResponse) Reset() {
+	*x = CreateAdminResponse{}
+	mi := &file_auth_proto_msgTypes[35]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateAdminResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateAdminResponse) ProtoMessage() {}
+
+func (x *CreateAdminResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_auth_proto_msgTypes[35]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateAdminResponse.ProtoReflect.Descriptor instead.
+func (*CreateAdminResponse) Descriptor() ([]byte, []int) {
+	return file_auth_proto_rawDescGZIP(), []int{35}
+}
+
+func (x *CreateAdminResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+type GetAdminInfoResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UtilisateurId string                 `protobuf:"bytes,1,opt,name=utilisateur_id,json=utilisateurId,proto3" json:"utilisateur_id,omitempty"`
+	Nom           string                 `protobuf:"bytes,2,opt,name=nom,proto3" json:"nom,omitempty"`
+	Prenom        string                 `protobuf:"bytes,3,opt,name=prenom,proto3" json:"prenom,omitempty"`
+	Email         string                 `protobuf:"bytes,4,opt,name=email,proto3" json:"email,omitempty"`
+	Telephone     string                 `protobuf:"bytes,5,opt,name=telephone,proto3" json:"telephone,omitempty"`
+	Role          string                 `protobuf:"bytes,6,opt,name=role,proto3" json:"role,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetAdminInfoResponse) Reset() {
+	*x = GetAdminInfoResponse{}
+	mi := &file_auth_proto_msgTypes[36]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetAdminInfoResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetAdminInfoResponse) ProtoMessage() {}
+
+func (x *GetAdminInfoResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_auth_proto_msgTypes[36]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetAdminInfoResponse.ProtoReflect.Descriptor instead.
+func (*GetAdminInfoResponse) Descriptor() ([]byte, []int) {
+	return file_auth_proto_rawDescGZIP(), []int{36}
+}
+
+func (x *GetAdminInfoResponse) GetUtilisateurId() string {
+	if x != nil {
+		return x.UtilisateurId
+	}
+	return ""
+}
+
+func (x *GetAdminInfoResponse) GetNom() string {
+	if x != nil {
+		return x.Nom
+	}
+	return ""
+}
+
+func (x *GetAdminInfoResponse) GetPrenom() string {
+	if x != nil {
+		return x.Prenom
+	}
+	return ""
+}
+
+func (x *GetAdminInfoResponse) GetEmail() string {
+	if x != nil {
+		return x.Email
+	}
+	return ""
+}
+
+func (x *GetAdminInfoResponse) GetTelephone() string {
+	if x != nil {
+		return x.Telephone
+	}
+	return ""
+}
+
+func (x *GetAdminInfoResponse) GetRole() string {
+	if x != nil {
+		return x.Role
+	}
+	return ""
+}
+
+type ListAllAdminsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Limit         int32                  `protobuf:"varint,1,opt,name=limit,proto3" json:"limit,omitempty"`
+	Offset        int32                  `protobuf:"varint,2,opt,name=offset,proto3" json:"offset,omitempty"`
+	Query         string                 `protobuf:"bytes,3,opt,name=query,proto3" json:"query,omitempty"`
+	TenantId      string                 `protobuf:"bytes,4,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
+	IsActive      bool                   `protobuf:"varint,5,opt,name=is_active,json=isActive,proto3" json:"is_active,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListAllAdminsRequest) Reset() {
+	*x = ListAllAdminsRequest{}
+	mi := &file_auth_proto_msgTypes[37]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListAllAdminsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListAllAdminsRequest) ProtoMessage() {}
+
+func (x *ListAllAdminsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_auth_proto_msgTypes[37]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListAllAdminsRequest.ProtoReflect.Descriptor instead.
+func (*ListAllAdminsRequest) Descriptor() ([]byte, []int) {
+	return file_auth_proto_rawDescGZIP(), []int{37}
+}
+
+func (x *ListAllAdminsRequest) GetLimit() int32 {
+	if x != nil {
+		return x.Limit
+	}
+	return 0
+}
+
+func (x *ListAllAdminsRequest) GetOffset() int32 {
+	if x != nil {
+		return x.Offset
+	}
+	return 0
+}
+
+func (x *ListAllAdminsRequest) GetQuery() string {
+	if x != nil {
+		return x.Query
+	}
+	return ""
+}
+
+func (x *ListAllAdminsRequest) GetTenantId() string {
+	if x != nil {
+		return x.TenantId
+	}
+	return ""
+}
+
+func (x *ListAllAdminsRequest) GetIsActive() bool {
+	if x != nil {
+		return x.IsActive
+	}
+	return false
+}
+
+type ListAllAdminsResponse struct {
+	state         protoimpl.MessageState  `protogen:"open.v1"`
+	Admins        []*GetAdminInfoResponse `protobuf:"bytes,1,rep,name=admins,proto3" json:"admins,omitempty"`
+	Total         int32                   `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListAllAdminsResponse) Reset() {
+	*x = ListAllAdminsResponse{}
+	mi := &file_auth_proto_msgTypes[38]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListAllAdminsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListAllAdminsResponse) ProtoMessage() {}
+
+func (x *ListAllAdminsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_auth_proto_msgTypes[38]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListAllAdminsResponse.ProtoReflect.Descriptor instead.
+func (*ListAllAdminsResponse) Descriptor() ([]byte, []int) {
+	return file_auth_proto_rawDescGZIP(), []int{38}
+}
+
+func (x *ListAllAdminsResponse) GetAdmins() []*GetAdminInfoResponse {
+	if x != nil {
+		return x.Admins
+	}
+	return nil
+}
+
+func (x *ListAllAdminsResponse) GetTotal() int32 {
+	if x != nil {
+		return x.Total
+	}
+	return 0
+}
+
+type GetAdminByIDRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UtilisateurId string                 `protobuf:"bytes,1,opt,name=utilisateur_id,json=utilisateurId,proto3" json:"utilisateur_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetAdminByIDRequest) Reset() {
+	*x = GetAdminByIDRequest{}
+	mi := &file_auth_proto_msgTypes[39]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetAdminByIDRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetAdminByIDRequest) ProtoMessage() {}
+
+func (x *GetAdminByIDRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_auth_proto_msgTypes[39]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetAdminByIDRequest.ProtoReflect.Descriptor instead.
+func (*GetAdminByIDRequest) Descriptor() ([]byte, []int) {
+	return file_auth_proto_rawDescGZIP(), []int{39}
+}
+
+func (x *GetAdminByIDRequest) GetUtilisateurId() string {
+	if x != nil {
+		return x.UtilisateurId
+	}
+	return ""
+}
+
 var File_auth_proto protoreflect.FileDescriptor
 
 const file_auth_proto_rawDesc = "" +
@@ -1823,7 +2281,7 @@ const file_auth_proto_rawDesc = "" +
 	"\rLogoutRequest\x12#\n" +
 	"\rrefresh_token\x18\x01 \x01(\tR\frefreshToken\"*\n" +
 	"\x0eLogoutResponse\x12\x18\n" +
-	"\amessage\x18\x01 \x01(\tR\amessage\"\x96\x02\n" +
+	"\amessage\x18\x01 \x01(\tR\amessage\"\xde\x01\n" +
 	"\x0fRegisterRequest\x12\x10\n" +
 	"\x03nom\x18\x01 \x01(\tR\x03nom\x12\x16\n" +
 	"\x06prenom\x18\x02 \x01(\tR\x06prenom\x12\x14\n" +
@@ -1832,24 +2290,21 @@ const file_auth_proto_rawDesc = "" +
 	"\ttelephone\x18\x05 \x01(\tR\ttelephone\x12 \n" +
 	"\fmot_de_passe\x18\x06 \x01(\tR\n" +
 	"motDePasse\x12\x12\n" +
-	"\x04role\x18\a \x01(\tR\x04role\x12\x19\n" +
-	"\bid_ecole\x18\b \x01(\tR\aidEcole\x12\x1b\n" +
-	"\tclasse_id\x18\t \x01(\tR\bclasseId\x12!\n" +
+	"\x04role\x18\a \x01(\tR\x04role\x12!\n" +
 	"\fphoto_profil\x18\n" +
 	" \x01(\tR\vphotoProfil\"y\n" +
 	"\x10RegisterResponse\x12\x16\n" +
 	"\x06userId\x18\x01 \x01(\tR\x06userId\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12\x18\n" +
 	"\asuccess\x18\x03 \x01(\bR\asuccess\x12\x19\n" +
-	"\blogin_id\x18\x04 \x01(\tR\aloginId\"\x9a\x02\n" +
+	"\blogin_id\x18\x04 \x01(\tR\aloginId\"\xff\x01\n" +
 	"\x11UpdateUserRequest\x12%\n" +
 	"\x0eutilisateur_id\x18\x01 \x01(\tR\rutilisateurId\x12\x10\n" +
 	"\x03nom\x18\x02 \x01(\tR\x03nom\x12\x16\n" +
 	"\x06prenom\x18\x03 \x01(\tR\x06prenom\x12\x14\n" +
 	"\x05email\x18\x04 \x01(\tR\x05email\x12\x1c\n" +
 	"\ttelephone\x18\x05 \x01(\tR\ttelephone\x12 \n" +
-	"\x04role\x18\x06 \x01(\x0e2\f.nodepb.RoleR\x04role\x12\x19\n" +
-	"\bid_ecole\x18\a \x01(\tR\aidEcole\x12 \n" +
+	"\x04role\x18\x06 \x01(\x0e2\f.nodepb.RoleR\x04role\x12 \n" +
 	"\fmot_de_passe\x18\b \x01(\tR\n" +
 	"motDePasse\x12!\n" +
 	"\fphoto_profil\x18\t \x01(\tR\vphotoProfil\"?\n" +
@@ -1913,18 +2368,51 @@ const file_auth_proto_rawDesc = "" +
 	"\x03nom\x18\x02 \x01(\tR\x03nom\x12\x16\n" +
 	"\x06prenom\x18\x03 \x01(\tR\x06prenom\x12\x14\n" +
 	"\x05email\x18\x04 \x01(\tR\x05email\x12!\n" +
-	"\fphoto_profil\x18\x05 \x01(\tR\vphotoProfil*H\n" +
-	"\x04Role\x12\r\n" +
-	"\tSYK_ADMIN\x10\x00\x12\x0f\n" +
-	"\vSUPER_ADMIN\x10\x01\x12\t\n" +
-	"\x05ADMIN\x10\x02\x12\t\n" +
-	"\x05ELEVE\x10\x03\x12\n" +
+	"\fphoto_profil\x18\x05 \x01(\tR\vphotoProfil\"c\n" +
+	"\x18SetCdnPermissionsRequest\x12%\n" +
+	"\x0eutilisateur_id\x18\x01 \x01(\tR\rutilisateurId\x12 \n" +
+	"\vpermissions\x18\x02 \x03(\tR\vpermissions\"5\n" +
+	"\x19SetCdnPermissionsResponse\x12\x18\n" +
+	"\amessage\x18\x01 \x01(\tR\amessage\"\xbe\x01\n" +
+	"\x12CreateAdminRequest\x12\x10\n" +
+	"\x03nom\x18\x01 \x01(\tR\x03nom\x12\x16\n" +
+	"\x06prenom\x18\x02 \x01(\tR\x06prenom\x12\x14\n" +
+	"\x05email\x18\x03 \x01(\tR\x05email\x12\x14\n" +
+	"\x05genre\x18\x04 \x01(\tR\x05genre\x12\x1c\n" +
+	"\ttelephone\x18\x05 \x01(\tR\ttelephone\x12\x12\n" +
+	"\x04role\x18\x06 \x01(\tR\x04role\x12 \n" +
+	"\vpermissions\x18\a \x03(\tR\vpermissions\"/\n" +
+	"\x13CreateAdminResponse\x12\x18\n" +
+	"\amessage\x18\x01 \x01(\tR\amessage\"\xaf\x01\n" +
+	"\x14GetAdminInfoResponse\x12%\n" +
+	"\x0eutilisateur_id\x18\x01 \x01(\tR\rutilisateurId\x12\x10\n" +
+	"\x03nom\x18\x02 \x01(\tR\x03nom\x12\x16\n" +
+	"\x06prenom\x18\x03 \x01(\tR\x06prenom\x12\x14\n" +
+	"\x05email\x18\x04 \x01(\tR\x05email\x12\x1c\n" +
+	"\ttelephone\x18\x05 \x01(\tR\ttelephone\x12\x12\n" +
+	"\x04role\x18\x06 \x01(\tR\x04role\"\x94\x01\n" +
+	"\x14ListAllAdminsRequest\x12\x14\n" +
+	"\x05limit\x18\x01 \x01(\x05R\x05limit\x12\x16\n" +
+	"\x06offset\x18\x02 \x01(\x05R\x06offset\x12\x14\n" +
+	"\x05query\x18\x03 \x01(\tR\x05query\x12\x1b\n" +
+	"\ttenant_id\x18\x04 \x01(\tR\btenantId\x12\x1b\n" +
+	"\tis_active\x18\x05 \x01(\bR\bisActive\"c\n" +
+	"\x15ListAllAdminsResponse\x124\n" +
+	"\x06admins\x18\x01 \x03(\v2\x1c.nodepb.GetAdminInfoResponseR\x06admins\x12\x14\n" +
+	"\x05total\x18\x02 \x01(\x05R\x05total\"<\n" +
+	"\x13GetAdminByIDRequest\x12%\n" +
+	"\x0eutilisateur_id\x18\x01 \x01(\tR\rutilisateurId*-\n" +
+	"\x04Role\x12\t\n" +
+	"\x05admin\x10\x00\x12\n" +
 	"\n" +
-	"\x06PARENT\x10\x042\xde\r\n" +
+	"\x06viewer\x10\x01\x12\x0e\n" +
+	"\n" +
+	"superadmin\x10\x022\xcb\x10\n" +
 	"\vAuthService\x12O\n" +
 	"\x05Login\x12\x14.nodepb.LoginRequest\x1a\x15.nodepb.LoginResponse\"\x19\x82\xd3\xe4\x93\x02\x13:\x01*\"\x0e/v1/auth/login\x12S\n" +
-	"\x06Logout\x12\x15.nodepb.LogoutRequest\x1a\x16.nodepb.LogoutResponse\"\x1a\x82\xd3\xe4\x93\x02\x14:\x01*\"\x0f/v1/auth/logout\x12[\n" +
-	"\bRegister\x12\x17.nodepb.RegisterRequest\x1a\x18.nodepb.RegisterResponse\"\x1c\x82\xd3\xe4\x93\x02\x16:\x01*\"\x11/v1/auth/register\x12o\n" +
+	"\x06Logout\x12\x15.nodepb.LogoutRequest\x1a\x16.nodepb.LogoutResponse\"\x1a\x82\xd3\xe4\x93\x02\x14:\x01*\"\x0f/v1/auth/logout\x12]\n" +
+	"\vCreateAdmin\x12\x1a.nodepb.CreateAdminRequest\x1a\x1b.nodepb.CreateAdminResponse\"\x15\x82\xd3\xe4\x93\x02\x0f:\x01*\"\n" +
+	"/v1/admins\x12o\n" +
 	"\n" +
 	"UpdateUser\x12\x19.nodepb.UpdateUserRequest\x1a\x1a.nodepb.UpdateUserResponse\"*\x82\xd3\xe4\x93\x02$:\x01*\x1a\x1f/v1/auth/users/{utilisateur_id}\x12\x82\x01\n" +
 	"\x0fCheckUserExists\x12\x1e.nodepb.CheckUserExistsRequest\x1a\x1f.nodepb.CheckUserExistsResponse\".\x82\xd3\xe4\x93\x02(\x12&/v1/auth/users/{utilisateur_id}/exists\x12l\n" +
@@ -1940,7 +2428,11 @@ const file_auth_proto_rawDesc = "" +
 	"DisableMFA\x12\x19.nodepb.DisableMFARequest\x1a\x1a.nodepb.DisableMFAResponse\"\x1f\x82\xd3\xe4\x93\x02\x19:\x01*\"\x14/v1/auth/disable-mfa\x12{\n" +
 	"\x12UpdateUserPassword\x12!.nodepb.UpdateUserPasswordRequest\x1a\".nodepb.UpdateUserPasswordResponse\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\x1a\x13/api/users/password\x12\x80\x01\n" +
 	"\x0eGetUserProfile\x12\x1d.nodepb.GetUserProfileRequest\x1a\x1e.nodepb.GetUserProfileResponse\"/\x82\xd3\xe4\x93\x02)\x12'/v1/auth/users/{utilisateur_id}/profile\x12v\n" +
-	"\x0eForgotPassword\x12\x1d.nodepb.ForgotPasswordRequest\x1a\x1e.nodepb.ForgotPasswordResponse\"%\x82\xd3\xe4\x93\x02\x1f:\x01*\"\x1a/api/users/forgot-passwordBDZBgithub.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/protob\x06proto3"
+	"\x0eForgotPassword\x12\x1d.nodepb.ForgotPasswordRequest\x1a\x1e.nodepb.ForgotPasswordResponse\"%\x82\xd3\xe4\x93\x02\x1f:\x01*\"\x1a/api/users/forgot-password\x12\x96\x01\n" +
+	"\x11SetCdnPermissions\x12 .nodepb.SetCdnPermissionsRequest\x1a!.nodepb.SetCdnPermissionsResponse\"<\x82\xd3\xe4\x93\x026:\x01*\"1/v1/admin/cdn-admins/{utilisateur_id}/permissions\x12`\n" +
+	"\rListAllAdmins\x12\x1c.nodepb.ListAllAdminsRequest\x1a\x1d.nodepb.ListAllAdminsResponse\"\x12\x82\xd3\xe4\x93\x02\f\x12\n" +
+	"/v1/admins\x12n\n" +
+	"\fGetAdminByID\x12\x1b.nodepb.GetAdminByIDRequest\x1a\x1c.nodepb.GetAdminInfoResponse\"#\x82\xd3\xe4\x93\x02\x1d\x12\x1b/v1/admins/{utilisateur_id}BDZBgithub.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/protob\x06proto3"
 
 var (
 	file_auth_proto_rawDescOnce sync.Once
@@ -1955,7 +2447,7 @@ func file_auth_proto_rawDescGZIP() []byte {
 }
 
 var file_auth_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 32)
+var file_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 40)
 var file_auth_proto_goTypes = []any{
 	(Role)(0),                          // 0: nodepb.Role
 	(*LoginRequest)(nil),               // 1: nodepb.LoginRequest
@@ -1990,47 +2482,62 @@ var file_auth_proto_goTypes = []any{
 	(*ForgotPasswordResponse)(nil),     // 30: nodepb.ForgotPasswordResponse
 	(*GetUserProfileRequest)(nil),      // 31: nodepb.GetUserProfileRequest
 	(*GetUserProfileResponse)(nil),     // 32: nodepb.GetUserProfileResponse
+	(*SetCdnPermissionsRequest)(nil),   // 33: nodepb.SetCdnPermissionsRequest
+	(*SetCdnPermissionsResponse)(nil),  // 34: nodepb.SetCdnPermissionsResponse
+	(*CreateAdminRequest)(nil),         // 35: nodepb.CreateAdminRequest
+	(*CreateAdminResponse)(nil),        // 36: nodepb.CreateAdminResponse
+	(*GetAdminInfoResponse)(nil),       // 37: nodepb.GetAdminInfoResponse
+	(*ListAllAdminsRequest)(nil),       // 38: nodepb.ListAllAdminsRequest
+	(*ListAllAdminsResponse)(nil),      // 39: nodepb.ListAllAdminsResponse
+	(*GetAdminByIDRequest)(nil),        // 40: nodepb.GetAdminByIDRequest
 }
 var file_auth_proto_depIdxs = []int32{
 	0,  // 0: nodepb.LoginResponse.role:type_name -> nodepb.Role
 	0,  // 1: nodepb.UpdateUserRequest.role:type_name -> nodepb.Role
-	1,  // 2: nodepb.AuthService.Login:input_type -> nodepb.LoginRequest
-	3,  // 3: nodepb.AuthService.Logout:input_type -> nodepb.LogoutRequest
-	5,  // 4: nodepb.AuthService.Register:input_type -> nodepb.RegisterRequest
-	7,  // 5: nodepb.AuthService.UpdateUser:input_type -> nodepb.UpdateUserRequest
-	8,  // 6: nodepb.AuthService.CheckUserExists:input_type -> nodepb.CheckUserExistsRequest
-	11, // 7: nodepb.AuthService.DeleteUser:input_type -> nodepb.DeleteUserRequest
-	13, // 8: nodepb.AuthService.ValidateToken:input_type -> nodepb.TokenRequest
-	15, // 9: nodepb.AuthService.RefreshToken:input_type -> nodepb.RefreshTokenRequest
-	17, // 10: nodepb.AuthService.VerifyOTP:input_type -> nodepb.VerifyOTPRequest
-	19, // 11: nodepb.AuthService.NotifyNewDevice:input_type -> nodepb.NotifyNewDeviceRequest
-	21, // 12: nodepb.AuthService.RequestPasswordReset:input_type -> nodepb.PasswordResetRequest
-	23, // 13: nodepb.AuthService.EnableMFA:input_type -> nodepb.EnableMFARequest
-	25, // 14: nodepb.AuthService.DisableMFA:input_type -> nodepb.DisableMFARequest
-	27, // 15: nodepb.AuthService.UpdateUserPassword:input_type -> nodepb.UpdateUserPasswordRequest
-	31, // 16: nodepb.AuthService.GetUserProfile:input_type -> nodepb.GetUserProfileRequest
-	29, // 17: nodepb.AuthService.ForgotPassword:input_type -> nodepb.ForgotPasswordRequest
-	2,  // 18: nodepb.AuthService.Login:output_type -> nodepb.LoginResponse
-	4,  // 19: nodepb.AuthService.Logout:output_type -> nodepb.LogoutResponse
-	6,  // 20: nodepb.AuthService.Register:output_type -> nodepb.RegisterResponse
-	10, // 21: nodepb.AuthService.UpdateUser:output_type -> nodepb.UpdateUserResponse
-	9,  // 22: nodepb.AuthService.CheckUserExists:output_type -> nodepb.CheckUserExistsResponse
-	12, // 23: nodepb.AuthService.DeleteUser:output_type -> nodepb.DeleteUserResponse
-	14, // 24: nodepb.AuthService.ValidateToken:output_type -> nodepb.TokenResponse
-	16, // 25: nodepb.AuthService.RefreshToken:output_type -> nodepb.RefreshTokenResponse
-	18, // 26: nodepb.AuthService.VerifyOTP:output_type -> nodepb.VerifyOTPResponse
-	20, // 27: nodepb.AuthService.NotifyNewDevice:output_type -> nodepb.NotifyNewDeviceResponse
-	22, // 28: nodepb.AuthService.RequestPasswordReset:output_type -> nodepb.PasswordResetResponse
-	24, // 29: nodepb.AuthService.EnableMFA:output_type -> nodepb.EnableMFAResponse
-	26, // 30: nodepb.AuthService.DisableMFA:output_type -> nodepb.DisableMFAResponse
-	28, // 31: nodepb.AuthService.UpdateUserPassword:output_type -> nodepb.UpdateUserPasswordResponse
-	32, // 32: nodepb.AuthService.GetUserProfile:output_type -> nodepb.GetUserProfileResponse
-	30, // 33: nodepb.AuthService.ForgotPassword:output_type -> nodepb.ForgotPasswordResponse
-	18, // [18:34] is the sub-list for method output_type
-	2,  // [2:18] is the sub-list for method input_type
-	2,  // [2:2] is the sub-list for extension type_name
-	2,  // [2:2] is the sub-list for extension extendee
-	0,  // [0:2] is the sub-list for field type_name
+	37, // 2: nodepb.ListAllAdminsResponse.admins:type_name -> nodepb.GetAdminInfoResponse
+	1,  // 3: nodepb.AuthService.Login:input_type -> nodepb.LoginRequest
+	3,  // 4: nodepb.AuthService.Logout:input_type -> nodepb.LogoutRequest
+	35, // 5: nodepb.AuthService.CreateAdmin:input_type -> nodepb.CreateAdminRequest
+	7,  // 6: nodepb.AuthService.UpdateUser:input_type -> nodepb.UpdateUserRequest
+	8,  // 7: nodepb.AuthService.CheckUserExists:input_type -> nodepb.CheckUserExistsRequest
+	11, // 8: nodepb.AuthService.DeleteUser:input_type -> nodepb.DeleteUserRequest
+	13, // 9: nodepb.AuthService.ValidateToken:input_type -> nodepb.TokenRequest
+	15, // 10: nodepb.AuthService.RefreshToken:input_type -> nodepb.RefreshTokenRequest
+	17, // 11: nodepb.AuthService.VerifyOTP:input_type -> nodepb.VerifyOTPRequest
+	19, // 12: nodepb.AuthService.NotifyNewDevice:input_type -> nodepb.NotifyNewDeviceRequest
+	21, // 13: nodepb.AuthService.RequestPasswordReset:input_type -> nodepb.PasswordResetRequest
+	23, // 14: nodepb.AuthService.EnableMFA:input_type -> nodepb.EnableMFARequest
+	25, // 15: nodepb.AuthService.DisableMFA:input_type -> nodepb.DisableMFARequest
+	27, // 16: nodepb.AuthService.UpdateUserPassword:input_type -> nodepb.UpdateUserPasswordRequest
+	31, // 17: nodepb.AuthService.GetUserProfile:input_type -> nodepb.GetUserProfileRequest
+	29, // 18: nodepb.AuthService.ForgotPassword:input_type -> nodepb.ForgotPasswordRequest
+	33, // 19: nodepb.AuthService.SetCdnPermissions:input_type -> nodepb.SetCdnPermissionsRequest
+	38, // 20: nodepb.AuthService.ListAllAdmins:input_type -> nodepb.ListAllAdminsRequest
+	40, // 21: nodepb.AuthService.GetAdminByID:input_type -> nodepb.GetAdminByIDRequest
+	2,  // 22: nodepb.AuthService.Login:output_type -> nodepb.LoginResponse
+	4,  // 23: nodepb.AuthService.Logout:output_type -> nodepb.LogoutResponse
+	36, // 24: nodepb.AuthService.CreateAdmin:output_type -> nodepb.CreateAdminResponse
+	10, // 25: nodepb.AuthService.UpdateUser:output_type -> nodepb.UpdateUserResponse
+	9,  // 26: nodepb.AuthService.CheckUserExists:output_type -> nodepb.CheckUserExistsResponse
+	12, // 27: nodepb.AuthService.DeleteUser:output_type -> nodepb.DeleteUserResponse
+	14, // 28: nodepb.AuthService.ValidateToken:output_type -> nodepb.TokenResponse
+	16, // 29: nodepb.AuthService.RefreshToken:output_type -> nodepb.RefreshTokenResponse
+	18, // 30: nodepb.AuthService.VerifyOTP:output_type -> nodepb.VerifyOTPResponse
+	20, // 31: nodepb.AuthService.NotifyNewDevice:output_type -> nodepb.NotifyNewDeviceResponse
+	22, // 32: nodepb.AuthService.RequestPasswordReset:output_type -> nodepb.PasswordResetResponse
+	24, // 33: nodepb.AuthService.EnableMFA:output_type -> nodepb.EnableMFAResponse
+	26, // 34: nodepb.AuthService.DisableMFA:output_type -> nodepb.DisableMFAResponse
+	28, // 35: nodepb.AuthService.UpdateUserPassword:output_type -> nodepb.UpdateUserPasswordResponse
+	32, // 36: nodepb.AuthService.GetUserProfile:output_type -> nodepb.GetUserProfileResponse
+	30, // 37: nodepb.AuthService.ForgotPassword:output_type -> nodepb.ForgotPasswordResponse
+	34, // 38: nodepb.AuthService.SetCdnPermissions:output_type -> nodepb.SetCdnPermissionsResponse
+	39, // 39: nodepb.AuthService.ListAllAdmins:output_type -> nodepb.ListAllAdminsResponse
+	37, // 40: nodepb.AuthService.GetAdminByID:output_type -> nodepb.GetAdminInfoResponse
+	22, // [22:41] is the sub-list for method output_type
+	3,  // [3:22] is the sub-list for method input_type
+	3,  // [3:3] is the sub-list for extension type_name
+	3,  // [3:3] is the sub-list for extension extendee
+	0,  // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_auth_proto_init() }
@@ -2044,7 +2551,7 @@ func file_auth_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_auth_proto_rawDesc), len(file_auth_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   32,
+			NumMessages:   40,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

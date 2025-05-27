@@ -43,7 +43,6 @@ func StoreUserSessionInRedis(ctx context.Context, user *repositories.Utilisateur
 		"telephone":          user.Telephone,
 		"role":               user.Role,
 		"permissions":        user.Permissions,
-		"id_ecole":           user.IDEcole.String(),
 		"mfa_enabled":        user.MFAEnabled,
 		"photo_profil":       user.PhotoProfil,
 		"adresse_ip":         ipAddress,
@@ -62,4 +61,36 @@ func StoreUserSessionInRedis(ctx context.Context, user *repositories.Utilisateur
 
 	log.Printf("Session utilisateur enregistrée en Redis [ID: %s]", user.IDUtilisateur.String())
 	return nil
+}
+
+func GetUserInfoFromRedis(ctx context.Context, userID string) (*repositories.UtilisateurRedis, error) {
+	redisKey := fmt.Sprintf("user:session:%s", userID)
+
+	// Récupérer toutes les valeurs stockées sous cette clé
+	data, err := RedisClient.HGetAll(ctx, redisKey).Result()
+	if err != nil {
+		log.Printf("Erreur Redis lors de la récupération des infos utilisateur [ID: %s]: %v", userID, err)
+		return nil, err
+	}
+
+	if len(data) == 0 {
+		log.Printf(" Aucun enregistrement trouvé en Redis pour [ID: %s]", userID)
+		return nil, fmt.Errorf("utilisateur non trouvé en cache")
+	}
+
+	// Convertir les valeurs récupérées en une struct `Utilisateur`
+	user := &repositories.UtilisateurRedis{
+		IDUtilisateur: data["id_utilisateur"],
+		Nom:           data["nom"],
+		Prenom:        data["prenom"],
+		Email:         data["email"],
+		Telephone:     data["telephone"],
+		Role:          data["role"],
+		Permissions:   data["permissions"],
+		TenantID:      data["id_tenant"],
+		MFAEnabled:    data["mfa_enabled"] == "true",
+	}
+
+	log.Printf("Infos utilisateur récupérées depuis Redis [ID: %s]", userID)
+	return user, nil
 }

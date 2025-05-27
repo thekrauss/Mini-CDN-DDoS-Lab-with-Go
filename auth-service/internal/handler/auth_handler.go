@@ -93,13 +93,12 @@ func (s *AuthServer) Login(ctx context.Context, req *pb.LoginRequest) (*pb.Login
 	if err != nil {
 		return nil, fmt.Errorf("failed to generate refresh token: %w", err)
 	}
-
-	err = s.Store.SaveRefreshToken(userID, refreshToken)
+	err = s.Service.SaveRefreshToken(userID, refreshToken)
 	if err != nil {
 		return nil, fmt.Errorf("failed to store refresh token: %w", err)
 	}
 
-	user, err := s.Store.GetUserByID(ctx, userID)
+	user, err := s.Service.GetUserByID(ctx, userID)
 	if err != nil {
 		log.Printf("Impossible de récupérer les infos ... pour %s: %v", userID.String(), err)
 	} else {

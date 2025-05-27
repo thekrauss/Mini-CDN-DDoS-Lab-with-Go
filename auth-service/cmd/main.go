@@ -9,16 +9,19 @@ import (
 	"os/signal"
 	"strconv"
 	"syscall"
+	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/auth-service/config"
 	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/auth-service/db"
 	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/auth-service/internal/handler"
+	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/auth-service/internal/middleware"
 	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/auth-service/internal/services"
 
 	pb "github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/auth-service/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/keepalive"
 )
 
 func main() {
@@ -56,7 +59,7 @@ func main() {
 		log.Fatalf("Échec écoute sur %s : %v", grpcAddr, err)
 	}
 
-	grpcServer := grpc.NewServer()
+	grpcServer := initializeGRPCServer(cfg)
 	authServer := &handler.AuthServer{Store: store}
 	pb.RegisterAuthServiceServer(grpcServer, authServer)
 
@@ -109,4 +112,20 @@ func waitForShutdown(grpcServer *grpc.Server, gwServer *http.Server) {
 	} else {
 		log.Println(" Serveur HTTP arrêté")
 	}
+}
+
+func initializeGRPCServer(cfg *config.Config) *grpc.Server {
+	return grpc.NewServer(
+		grpc.ChainUnaryInterceptor(
+			middleware.LoggingMiddleware(),
+			middleware.AuthMiddleware(cfg),
+			middleware.RateLimitingMiddleware(),
+			middleware.TimeoutMiddleware(),
+		),
+		grpc.KeepaliveParams(keepalive.ServerParameters{
+			MaxConnectionIdle:     15 * time.Minute,
+			Timeout:               5 * time.Second,
+			MaxConnectionAgeGrace: 5 * time.Second,
+		}),
+	)
 }

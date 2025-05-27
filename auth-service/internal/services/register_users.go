@@ -1,63 +1,175 @@
 package services
 
 import (
-	"database/sql"
+	"context"
 	"fmt"
 	"log"
-	"strings"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/auth-service/internal/repositories"
+	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/auth-service/pkg/auth"
 	pb "github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/auth-service/proto"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
-func RegisterUser(db *sql.DB, req *pb.RegisterRequest) (uuid.UUID, string, error) {
+func (s *AuthService) CreateAdmin(ctx context.Context, req *pb.CreateAdminRequest, claims *auth.Claims) (*pb.CreateAdminResponse, error) {
 
-	// Génération de l'ID de connexion (`login_id`)
+	adminUser, err := GetUserInfoFromRedis(ctx, claims.UserID.String())
+	if err != nil {
+		log.Printf("Échec récupération infos admin depuis Redis: %v", err)
+		return nil, status.Errorf(codes.Internal, "Impossible de récupérer les informations de l'administrateur.")
+	}
+
+	if err := s.CheckAdminPermissions(ctx, claims, "ASSIGNE_ADMIN"); err != nil {
+		return nil, err
+	}
+
+	// Génère un identifiant de connexion
 	loginID := GenerateLoginID(req.Prenom, req.Nom)
 
-	newUser := repositories.Utilisateur{
+	// Prépare les données utilisateur
+	adminData := &repositories.Utilisateur{
 		IDUtilisateur:   uuid.New(),
 		Nom:             req.Nom,
 		Prenom:          req.Prenom,
 		Email:           req.Email,
 		Genre:           req.Genre,
 		Telephone:       req.Telephone,
-		MotDePasse:      req.MotDePasse,
 		Role:            req.Role,
-		IDEcole:         uuid.MustParse(req.IdEcole),
 		DateInscription: time.Now(),
 		LoginID:         loginID,
+		PhotoProfil:     "https://storage.googleapis.com/mon-bucket/profil-default.jpg",
 	}
 
-	query := `INSERT INTO utilisateurs (id_utilisateur, nom, prenom, email, genre, telephone, mot_de_passe, role, id_ecole, date_inscription, login_id, photo_profil) 
-			  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`
-
-	_, err := db.Exec(query, newUser.IDUtilisateur, newUser.Nom, newUser.Prenom, newUser.Email, newUser.Genre,
-		newUser.Telephone, newUser.MotDePasse, newUser.Role, newUser.IDEcole, newUser.DateInscription, newUser.LoginID, newUser.PhotoProfil)
-
+	// Crée l'utilisateur ou récupère un existant
+	userID, tempPassword, err := s.ensureOrCreateAdmin(ctx, adminData)
 	if err != nil {
-		log.Printf("Database error: %v", err)
-		return uuid.Nil, "", fmt.Errorf("failed to register user")
+		s.RollbackAdminCreation(ctx, userID)
+		log.Printf("Erreur lors de la création de l'administrateur : %v", err)
+		return nil, status.Errorf(codes.Internal, "Impossible de créer l'administrateur.")
 	}
 
-	return newUser.IDUtilisateur, newUser.LoginID, nil
+	var count int
+	if err := s.Store.DB.QueryRowContext(ctx, `
+		SELECT COUNT(*) FROM utilisateurs WHERE id_utilisateur = $1
+	`, adminData.IDUtilisateur).Scan(&count); err != nil {
+		log.Printf("Erreur de vérification de l'existence : %v", err)
+		return nil, status.Errorf(codes.Internal, "Erreur lors de la vérification de l'existence.")
+	}
+	if count > 0 {
+		return nil, status.Errorf(codes.AlreadyExists, "L'utilisateur %s est déjà administrateur.", userID)
+	}
+
+	// Ajout des permissions si nécessaires
+	if len(req.Permissions) > 0 {
+		for _, permission := range req.Permissions {
+			_, err := s.Store.DB.ExecContext(ctx, `
+				INSERT INTO utilisateurs_permissions (id_utilisateur, permission)
+				VALUES ($1, $2)
+			`, adminData.IDUtilisateur, permission)
+			if err != nil {
+				s.RollbackAdminCreation(ctx, userID)
+				log.Printf(" Erreur insertion permission %s : %v", permission, err)
+				return nil, status.Errorf(codes.Internal, "Erreur lors de l'ajout des permissions.")
+			}
+		}
+
+		if err := CachCdnPermissionsInRedis(ctx, userID, req.Permissions); err != nil {
+			log.Printf("Erreur cache permissions : %v", err)
+		}
+	}
+
+	// Audit log
+	ip, userAgent := GetRequestMetadata(ctx)
+	_ = s.LogAction(ctx, AuditLog{
+		AdminID:    claims.UserID,
+		Role:       adminUser.Role,
+		Action:     "Création administrateur",
+		TargetID:   adminData.IDUtilisateur,
+		TargetType: "Administrateur",
+		Details:    fmt.Sprintf("L'utilisateur %s a été assigné comme administrateur.", adminData.Email),
+		IPAddress:  ip,
+		UserAgent:  userAgent,
+		ActionTime: time.Now(),
+		Status:     "succès",
+	})
+
+	// Envoi email
+	go s.SendAdminSecurityAlertEmail(
+		adminUser.Email,
+		adminData.Email,
+		adminData.Nom,
+		adminData.Prenom,
+		adminData.LoginID,
+		tempPassword,
+		"Administration CDN",
+		ip,
+		userAgent,
+	)
+
+	log.Printf("administrateur créé avec succès : %s", adminData.IDUtilisateur)
+	return &pb.CreateAdminResponse{
+		Message: fmt.Sprintf("Administrateur %s créé avec succès.", adminData.IDUtilisateur),
+	}, nil
 }
 
-func GenerateLoginID(prenom, nom string) string {
-
-	prenomParts := strings.Fields(prenom)
-	nomParts := strings.Fields(nom)
-
-	if len(prenomParts) == 0 || len(nomParts) == 0 {
-		log.Println("Erreur: prénom ou nom vide")
-		return ""
+func (s *AuthService) ensureOrCreateAdmin(ctx context.Context, data *repositories.Utilisateur) (string, string, error) {
+	exists, err := EmailExists(s.Store.DB, data.Email)
+	if err != nil {
+		return "", "", fmt.Errorf("erreur de vérification de l'existence de l'utilisateur : %w", err)
 	}
 
-	initialePrenom := strings.ToLower(string(prenomParts[0][0]))
-	premierNom := strings.ToLower(nomParts[0])
+	if exists {
+		user, err := s.GetUserByEmail(ctx, data.Email)
+		if err != nil {
+			return "", "", fmt.Errorf("utilisateur existant non récupérable : %w", err)
+		}
 
-	loginID := initialePrenom + premierNom
-	return loginID //"Marie Claire", "Ngoma Mbemba" --> Résultat : mngoma
+		return user.IDUtilisateur.String(), "", nil
+	}
+
+	password, err := GeneratePassword(12)
+	if err != nil {
+		return "", "", fmt.Errorf("échec génération mot de passe : %w", err)
+	}
+
+	hashedPassword, err := auth.HashPassword(password)
+	if err != nil {
+		return "", "", fmt.Errorf("échec hashage mot de passe : %w", err)
+	}
+
+	data.MotDePasseHash = hashedPassword
+
+	query := `
+		INSERT INTO utilisateurs (
+			id_utilisateur, login_id, nom, prenom, email, genre,
+			telephone, mot_de_passe_hash, role, date_inscription, photo_profil
+		)
+		VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
+	`
+
+	_, err = s.Store.DB.ExecContext(ctx, query,
+		data.IDUtilisateur, data.LoginID, data.Nom, data.Prenom,
+		data.Email, data.Genre, data.Telephone,
+		data.MotDePasseHash, data.Role, data.DateInscription, data.PhotoProfil)
+
+	if err != nil {
+		return "", "", fmt.Errorf("échec insertion base : %w", err)
+	}
+
+	return data.IDUtilisateur.String(), password, nil
+}
+
+// supprime un utilisateur localement en cas d’échec
+func (s *AuthService) RollbackAdminCreation(ctx context.Context, userID string) {
+	query := `DELETE FROM utilisateurs WHERE id_utilisateur = $1`
+
+	_, err := s.Store.DB.ExecContext(ctx, query, userID)
+	if err != nil {
+		log.Printf("Impossible de supprimer l'utilisateur %s après rollback: %v", userID, err)
+	} else {
+		log.Printf("Rollback réussi : utilisateur %s supprimé", userID)
+	}
 }

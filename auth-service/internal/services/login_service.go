@@ -9,11 +9,16 @@ import (
 
 	"github.com/google/uuid"
 
+	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/auth-service/db"
 	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/auth-service/internal/repositories"
 	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/auth-service/pkg/auth"
 )
 
 var ErrMFARequired = errors.New("MFA_REQUIRED")
+
+type AuthService struct {
+	Store *db.DBStore
+}
 
 func AuthenticateUser(db *sql.DB, identifier, password, ipAddress, userAgent string) (string, uuid.UUID, string, error) {
 	var user repositories.Utilisateur
@@ -36,7 +41,7 @@ func AuthenticateUser(db *sql.DB, identifier, password, ipAddress, userAgent str
 	log.Printf("Executing query: %s with identifier: %s", query, identifier)
 
 	err := db.QueryRow(query, identifier).Scan(
-		&user.IDUtilisateur, &user.MotDePasse, &user.Role,
+		&user.IDUtilisateur, &user.MotDePasseHash, &user.Role,
 		&user.Email, &user.Telephone, &user.MFAEnabled,
 		&user.Prenom, &user.Nom, &user.LoginID,
 	)
@@ -50,7 +55,7 @@ func AuthenticateUser(db *sql.DB, identifier, password, ipAddress, userAgent str
 
 	log.Printf("User found: ID=%s, Role=%s, MFA=%t, LoginID=%s", user.IDUtilisateur.String(), user.Role, user.MFAEnabled, user.LoginID)
 
-	if !auth.CheckPasswordHash(password, user.MotDePasse) {
+	if !auth.CheckPasswordHash(password, user.MotDePasseHash) {
 		logFailedAttempt(db, identifier, ipAddress, userAgent, user.Role)
 		if isNewDevice(db, identifier, ipAddress, userAgent) {
 			go SendSecurityAlerteEmail(user.Email, ipAddress, userAgent)
