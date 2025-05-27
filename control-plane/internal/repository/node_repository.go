@@ -6,14 +6,19 @@ import (
 )
 
 type Node struct {
-	ID        string
-	Name      string
-	IP        string
-	TenantID  string
-	Status    string
-	LastSeen  time.Time
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID              string    `json:"id"`
+	Name            string    `json:"name"`             //  (ex: "cdn-eu-west-1")
+	IP              string    `json:"ip"`               //  IP publique ou interne du nœud
+	TenantID        string    `json:"tenant_id"`        // ID du client propriétaire (multi-tenant)
+	Status          string    `json:"status"`           // statut du node (alive, unreachable, disabled)
+	LastSeen        time.Time `json:"last_seen"`        // date du dernier heartbeat reçu
+	CreatedAt       time.Time `json:"created_at"`       // date d'enregistrement du nœud
+	UpdatedAt       time.Time `json:"updated_at"`       // date de dernière mise à jour
+	Location        string    `json:"location"`         // (ex: "Paris", "eu-west-1")
+	Provider        string    `json:"provider"`         //  (aws, gcp, ovh, on-prem)
+	SoftwareVersion string    `json:"software_version"` // version de l'agent exécuté sur le nœud
+	IsBlacklisted   bool      `json:"is_blacklisted"`   //  si le nœud est temporairement désactivé (DDoS, infra)
+	Tags            []string  `json:"tags"`             // mots-clés libres pour filtrage, UI, regroupement logique
 }
 
 type NodeFilter struct {

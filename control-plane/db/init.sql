@@ -11,12 +11,18 @@ CREATE TABLE IF NOT EXISTS nodes (
     id UUID PRIMARY KEY,
     name TEXT NOT NULL,
     ip INET NOT NULL,
-    tenant_id UUID REFERENCES tenants(id) ON DELETE CASCADE,
-    status TEXT DEFAULT 'offline',
-    tags JSONB DEFAULT '{}'::jsonb,
-    last_seen TIMESTAMP,
-    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+    tenant_id UUID NOT NULL,
+    status TEXT DEFAULT 'unknown',
+    last_seen TIMESTAMP WITH TIME ZONE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    location TEXT,
+    provider TEXT,
+    software_version TEXT,
+    is_blacklisted BOOLEAN DEFAULT FALSE,
+    tags TEXT[],
+
+    CONSTRAINT fk_tenant FOREIGN KEY (tenant_id) REFERENCES tenants(id) ON DELETE CASCADE
 );
 
 -- Index pour les recherches fréquentes
