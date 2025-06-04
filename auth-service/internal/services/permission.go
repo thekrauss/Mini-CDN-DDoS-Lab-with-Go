@@ -29,7 +29,7 @@ func (s *AuthService) SetCdnPermissions(ctx context.Context, req *pb.SetCdnPermi
 	}
 
 	// Supprime les permissions existantes
-	_, err = s.Store.DB.ExecContext(ctx, `DELETE FROM admin_permissions WHERE id_utilisateur = $1`, req.UtilisateurId)
+	_, err = s.Store.DB.ExecContext(ctx, `DELETE FROM utilisateurs_permissions WHERE id_utilisateur = $1`, req.UtilisateurId)
 	if err != nil {
 		log.Printf("Erreur SQL lors de la suppression des anciennes permissions : %v", err)
 		return nil, status.Errorf(codes.Internal, "Erreur lors de la mise à jour des permissions")
@@ -38,7 +38,7 @@ func (s *AuthService) SetCdnPermissions(ctx context.Context, req *pb.SetCdnPermi
 	// Ajoute les nouvelles permissions
 	for _, permission := range req.Permissions {
 		_, err := s.Store.DB.ExecContext(ctx,
-			`INSERT INTO admin_permissions (id_utilisateur, permission) VALUES ($1, $2)`,
+			`INSERT INTO utilisateurs_permissions (id_utilisateur, permission) VALUES ($1, $2)`,
 			req.UtilisateurId, permission)
 		if err != nil {
 			log.Printf("Erreur SQL lors de l'ajout de la permission %s : %v", permission, err)
@@ -63,20 +63,28 @@ func (s *AuthService) CheckAdminPermissions(ctx context.Context, claims *auth.Cl
 
 	adminUser, err := GetUserInfoFromRedis(ctx, claims.UserID.String())
 	if err != nil {
-		log.Printf("Échec récupération infos admin depuis Redis: %v", err)
 		return status.Errorf(codes.Internal, "Impossible de récupérer les informations de l'administrateur.")
 	}
 
-	// if l'utilisateur a un Role A, il a accès à tout
+	// spéciale : aucun admin encore existant pour ce tenant ?
+	count := 0
+	_ = s.Store.DB.QueryRowContext(ctx, `
+		SELECT COUNT(*) FROM utilisateurs WHERE id_tenant = $1
+	`, adminUser.TenantID).Scan(&count)
+
+	if count == 0 {
+		log.Println("Bypass de permission : premier admin du tenant")
+		return nil
+	}
+
+	// Cas classiques
 	if config.IsRoleA(adminUser.Role) {
 		return nil
 	}
 
-	// if l'utilisateur un Role B, il doit avoir la permission spécifique
 	if config.IsRoleB(adminUser.Role) {
-		hasPerm, err := s.HasSykPermission(ctx, adminUser.IDUtilisateur, permission)
+		hasPerm, err := s.HasPermission(ctx, adminUser.IDUtilisateur, permission)
 		if err != nil {
-			log.Printf("Erreur lors de la vérification des permissions: %v", err)
 			return status.Errorf(codes.Internal, "Erreur interne lors de la vérification des permissions")
 		}
 		if !hasPerm {
@@ -85,11 +93,10 @@ func (s *AuthService) CheckAdminPermissions(ctx context.Context, claims *auth.Cl
 		return nil
 	}
 
-	// if l'utilisateur n'est ni A ni B, accès refusé
 	return status.Errorf(codes.PermissionDenied, "Accès refusé")
 }
 
-func (s *AuthService) HasSykPermission(ctx context.Context, userID, requiredPermission string) (bool, error) {
+func (s *AuthService) HasPermission(ctx context.Context, userID, requiredPermission string) (bool, error) {
 	permissionsKey := fmt.Sprintf("cdn-permissions:%s", userID)
 
 	// verifi d'abord dans Redis
@@ -101,7 +108,7 @@ func (s *AuthService) HasSykPermission(ctx context.Context, userID, requiredPerm
 
 	//  dans PostgreSQL si la permission n'est pas en cache
 	var count int
-	err = s.Store.DB.QueryRowContext(ctx, `SELECT COUNT(*) FROM admin_permissions WHERE id_utilisateur = $1 AND permission = $2`,
+	err = s.Store.DB.QueryRowContext(ctx, `SELECT COUNT(*) FROM utilisateurs_permissions WHERE id_utilisateur = $1 AND permission = $2`,
 		userID, requiredPermission).Scan(&count)
 	if err != nil {
 		return false, status.Errorf(codes.Internal, "Erreur lors de la vérification de la permission")

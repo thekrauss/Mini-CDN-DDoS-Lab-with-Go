@@ -18,7 +18,7 @@ var rateLimit = make(map[string]int)
 var mutex = sync.Mutex{}
 
 // requêtes par minute par utilisateur
-const requestLimit = 10
+const requestLimit = 5
 const duration = time.Minute
 
 func LoggingMiddleware() grpc.UnaryServerInterceptor {
@@ -71,6 +71,7 @@ func RateLimitingMiddleware() grpc.UnaryServerInterceptor {
 }
 
 func CheckPermissionMiddleware(service *services.AuthService, requiredPermission string) grpc.UnaryServerInterceptor {
+
 	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
 		claims, err := auth.ExtractJWTFromContext(ctx)
 		if err != nil {
@@ -79,7 +80,7 @@ func CheckPermissionMiddleware(service *services.AuthService, requiredPermission
 		}
 
 		// vérification des permissions
-		hasPerm, err := service.HasSykPermission(ctx, claims.UserID.String(), requiredPermission)
+		hasPerm, err := service.HasPermission(ctx, claims.UserID.String(), requiredPermission)
 		if err != nil {
 			log.Printf("Erreur lors de la vérification des permissions: %v", err)
 			return nil, status.Errorf(codes.Internal, "Erreur interne")
@@ -92,6 +93,7 @@ func CheckPermissionMiddleware(service *services.AuthService, requiredPermission
 		// l'utilisateur a la permission, on continue l'exécution de la requête
 		return handler(ctx, req)
 	}
+
 }
 
 // Réinitialise le compteur après une durée donnée

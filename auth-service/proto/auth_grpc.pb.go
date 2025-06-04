@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -38,6 +39,11 @@ const (
 	AuthService_SetCdnPermissions_FullMethodName    = "/nodepb.AuthService/SetCdnPermissions"
 	AuthService_ListAllAdmins_FullMethodName        = "/nodepb.AuthService/ListAllAdmins"
 	AuthService_GetAdminByID_FullMethodName         = "/nodepb.AuthService/GetAdminByID"
+	AuthService_CreateTenant_FullMethodName         = "/nodepb.AuthService/CreateTenant"
+	AuthService_GetTenantByID_FullMethodName        = "/nodepb.AuthService/GetTenantByID"
+	AuthService_ListTenants_FullMethodName          = "/nodepb.AuthService/ListTenants"
+	AuthService_UpdateSchool_FullMethodName         = "/nodepb.AuthService/UpdateSchool"
+	AuthService_DeleteTenant_FullMethodName         = "/nodepb.AuthService/DeleteTenant"
 )
 
 // AuthServiceClient is the client API for AuthService service.
@@ -80,6 +86,15 @@ type AuthServiceClient interface {
 	// Lister tous les administrateurs
 	ListAllAdmins(ctx context.Context, in *ListAllAdminsRequest, opts ...grpc.CallOption) (*ListAllAdminsResponse, error)
 	GetAdminByID(ctx context.Context, in *GetAdminByIDRequest, opts ...grpc.CallOption) (*GetAdminInfoResponse, error)
+	CreateTenant(ctx context.Context, in *CreateTenantRequest, opts ...grpc.CallOption) (*CreateTenantResponse, error)
+	// ➤ Récupération d'une école par ID
+	GetTenantByID(ctx context.Context, in *GetTenantRequest, opts ...grpc.CallOption) (*Tenant, error)
+	// ➤ Lister toutes les écoles
+	ListTenants(ctx context.Context, in *ListTenantRequest, opts ...grpc.CallOption) (*ListTenantResponse, error)
+	// ➤ Mise à jour d'une école
+	UpdateSchool(ctx context.Context, in *UpdateTenantRequest, opts ...grpc.CallOption) (*UpdateTenantResponse, error)
+	// ➤ Suppression d'une école
+	DeleteTenant(ctx context.Context, in *DeleteTenantRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type authServiceClient struct {
@@ -280,6 +295,56 @@ func (c *authServiceClient) GetAdminByID(ctx context.Context, in *GetAdminByIDRe
 	return out, nil
 }
 
+func (c *authServiceClient) CreateTenant(ctx context.Context, in *CreateTenantRequest, opts ...grpc.CallOption) (*CreateTenantResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateTenantResponse)
+	err := c.cc.Invoke(ctx, AuthService_CreateTenant_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) GetTenantByID(ctx context.Context, in *GetTenantRequest, opts ...grpc.CallOption) (*Tenant, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Tenant)
+	err := c.cc.Invoke(ctx, AuthService_GetTenantByID_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) ListTenants(ctx context.Context, in *ListTenantRequest, opts ...grpc.CallOption) (*ListTenantResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListTenantResponse)
+	err := c.cc.Invoke(ctx, AuthService_ListTenants_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) UpdateSchool(ctx context.Context, in *UpdateTenantRequest, opts ...grpc.CallOption) (*UpdateTenantResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateTenantResponse)
+	err := c.cc.Invoke(ctx, AuthService_UpdateSchool_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) DeleteTenant(ctx context.Context, in *DeleteTenantRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, AuthService_DeleteTenant_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthServiceServer is the server API for AuthService service.
 // All implementations must embed UnimplementedAuthServiceServer
 // for forward compatibility.
@@ -320,6 +385,15 @@ type AuthServiceServer interface {
 	// Lister tous les administrateurs
 	ListAllAdmins(context.Context, *ListAllAdminsRequest) (*ListAllAdminsResponse, error)
 	GetAdminByID(context.Context, *GetAdminByIDRequest) (*GetAdminInfoResponse, error)
+	CreateTenant(context.Context, *CreateTenantRequest) (*CreateTenantResponse, error)
+	// ➤ Récupération d'une école par ID
+	GetTenantByID(context.Context, *GetTenantRequest) (*Tenant, error)
+	// ➤ Lister toutes les écoles
+	ListTenants(context.Context, *ListTenantRequest) (*ListTenantResponse, error)
+	// ➤ Mise à jour d'une école
+	UpdateSchool(context.Context, *UpdateTenantRequest) (*UpdateTenantResponse, error)
+	// ➤ Suppression d'une école
+	DeleteTenant(context.Context, *DeleteTenantRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedAuthServiceServer()
 }
 
@@ -386,6 +460,21 @@ func (UnimplementedAuthServiceServer) ListAllAdmins(context.Context, *ListAllAdm
 }
 func (UnimplementedAuthServiceServer) GetAdminByID(context.Context, *GetAdminByIDRequest) (*GetAdminInfoResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAdminByID not implemented")
+}
+func (UnimplementedAuthServiceServer) CreateTenant(context.Context, *CreateTenantRequest) (*CreateTenantResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateTenant not implemented")
+}
+func (UnimplementedAuthServiceServer) GetTenantByID(context.Context, *GetTenantRequest) (*Tenant, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTenantByID not implemented")
+}
+func (UnimplementedAuthServiceServer) ListTenants(context.Context, *ListTenantRequest) (*ListTenantResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListTenants not implemented")
+}
+func (UnimplementedAuthServiceServer) UpdateSchool(context.Context, *UpdateTenantRequest) (*UpdateTenantResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateSchool not implemented")
+}
+func (UnimplementedAuthServiceServer) DeleteTenant(context.Context, *DeleteTenantRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteTenant not implemented")
 }
 func (UnimplementedAuthServiceServer) mustEmbedUnimplementedAuthServiceServer() {}
 func (UnimplementedAuthServiceServer) testEmbeddedByValue()                     {}
@@ -750,6 +839,96 @@ func _AuthService_GetAdminByID_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthService_CreateTenant_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateTenantRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).CreateTenant(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_CreateTenant_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).CreateTenant(ctx, req.(*CreateTenantRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_GetTenantByID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetTenantRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).GetTenantByID(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_GetTenantByID_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).GetTenantByID(ctx, req.(*GetTenantRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_ListTenants_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListTenantRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).ListTenants(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_ListTenants_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).ListTenants(ctx, req.(*ListTenantRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_UpdateSchool_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateTenantRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).UpdateSchool(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_UpdateSchool_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).UpdateSchool(ctx, req.(*UpdateTenantRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_DeleteTenant_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteTenantRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).DeleteTenant(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthService_DeleteTenant_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).DeleteTenant(ctx, req.(*DeleteTenantRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AuthService_ServiceDesc is the grpc.ServiceDesc for AuthService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -832,6 +1011,26 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetAdminByID",
 			Handler:    _AuthService_GetAdminByID_Handler,
+		},
+		{
+			MethodName: "CreateTenant",
+			Handler:    _AuthService_CreateTenant_Handler,
+		},
+		{
+			MethodName: "GetTenantByID",
+			Handler:    _AuthService_GetTenantByID_Handler,
+		},
+		{
+			MethodName: "ListTenants",
+			Handler:    _AuthService_ListTenants_Handler,
+		},
+		{
+			MethodName: "UpdateSchool",
+			Handler:    _AuthService_UpdateSchool_Handler,
+		},
+		{
+			MethodName: "DeleteTenant",
+			Handler:    _AuthService_DeleteTenant_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -10,6 +10,8 @@ import (
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
+	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -1865,13 +1867,14 @@ func (x *SetCdnPermissionsResponse) GetMessage() string {
 
 type CreateAdminRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Nom           string                 `protobuf:"bytes,1,opt,name=nom,proto3" json:"nom,omitempty"`
-	Prenom        string                 `protobuf:"bytes,2,opt,name=prenom,proto3" json:"prenom,omitempty"`
-	Email         string                 `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
-	Genre         string                 `protobuf:"bytes,4,opt,name=genre,proto3" json:"genre,omitempty"`
-	Telephone     string                 `protobuf:"bytes,5,opt,name=telephone,proto3" json:"telephone,omitempty"`
-	Role          string                 `protobuf:"bytes,6,opt,name=role,proto3" json:"role,omitempty"`
-	Permissions   []string               `protobuf:"bytes,7,rep,name=permissions,proto3" json:"permissions,omitempty"`
+	IdTenant      string                 `protobuf:"bytes,1,opt,name=id_tenant,json=idTenant,proto3" json:"id_tenant,omitempty"`
+	Nom           string                 `protobuf:"bytes,2,opt,name=nom,proto3" json:"nom,omitempty"`
+	Prenom        string                 `protobuf:"bytes,3,opt,name=prenom,proto3" json:"prenom,omitempty"`
+	Email         string                 `protobuf:"bytes,4,opt,name=email,proto3" json:"email,omitempty"`
+	Genre         string                 `protobuf:"bytes,5,opt,name=genre,proto3" json:"genre,omitempty"`
+	Telephone     string                 `protobuf:"bytes,6,opt,name=telephone,proto3" json:"telephone,omitempty"`
+	Role          string                 `protobuf:"bytes,7,opt,name=role,proto3" json:"role,omitempty"`
+	Permissions   []string               `protobuf:"bytes,8,rep,name=permissions,proto3" json:"permissions,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1904,6 +1907,13 @@ func (x *CreateAdminRequest) ProtoReflect() protoreflect.Message {
 // Deprecated: Use CreateAdminRequest.ProtoReflect.Descriptor instead.
 func (*CreateAdminRequest) Descriptor() ([]byte, []int) {
 	return file_auth_proto_rawDescGZIP(), []int{34}
+}
+
+func (x *CreateAdminRequest) GetIdTenant() string {
+	if x != nil {
+		return x.IdTenant
+	}
+	return ""
 }
 
 func (x *CreateAdminRequest) GetNom() string {
@@ -2255,12 +2265,768 @@ func (x *GetAdminByIDRequest) GetUtilisateurId() string {
 	return ""
 }
 
+type Tenant struct {
+	state                 protoimpl.MessageState `protogen:"open.v1"`
+	IdTenant              string                 `protobuf:"bytes,1,opt,name=id_tenant,json=idTenant,proto3" json:"id_tenant,omitempty"`
+	Nom                   string                 `protobuf:"bytes,2,opt,name=nom,proto3" json:"nom,omitempty"`
+	Adresse               string                 `protobuf:"bytes,3,opt,name=adresse,proto3" json:"adresse,omitempty"`
+	Ville                 string                 `protobuf:"bytes,4,opt,name=ville,proto3" json:"ville,omitempty"`
+	CodePostal            string                 `protobuf:"bytes,5,opt,name=code_postal,json=codePostal,proto3" json:"code_postal,omitempty"`
+	ContactTelephone      string                 `protobuf:"bytes,6,opt,name=contact_telephone,json=contactTelephone,proto3" json:"contact_telephone,omitempty"`
+	ContactEmail          string                 `protobuf:"bytes,7,opt,name=contact_email,json=contactEmail,proto3" json:"contact_email,omitempty"`
+	DirecteurNom          string                 `protobuf:"bytes,8,opt,name=directeur_nom,json=directeurNom,proto3" json:"directeur_nom,omitempty"`
+	DirecteurContact      string                 `protobuf:"bytes,9,opt,name=directeur_contact,json=directeurContact,proto3" json:"directeur_contact,omitempty"`
+	TypeEtablissement     string                 `protobuf:"bytes,10,opt,name=type_etablissement,json=typeEtablissement,proto3" json:"type_etablissement,omitempty"`
+	ParametresSpecifiques string                 `protobuf:"bytes,11,opt,name=parametres_specifiques,json=parametresSpecifiques,proto3" json:"parametres_specifiques,omitempty"`
+	DateCreation          *timestamppb.Timestamp `protobuf:"bytes,12,opt,name=date_creation,json=dateCreation,proto3" json:"date_creation,omitempty"`
+	ValidationStatus      string                 `protobuf:"bytes,14,opt,name=validation_status,json=validationStatus,proto3" json:"validation_status,omitempty"`
+	LogoUrl               string                 `protobuf:"bytes,15,opt,name=logo_url,json=logoUrl,proto3" json:"logo_url,omitempty"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
+}
+
+func (x *Tenant) Reset() {
+	*x = Tenant{}
+	mi := &file_auth_proto_msgTypes[40]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Tenant) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Tenant) ProtoMessage() {}
+
+func (x *Tenant) ProtoReflect() protoreflect.Message {
+	mi := &file_auth_proto_msgTypes[40]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Tenant.ProtoReflect.Descriptor instead.
+func (*Tenant) Descriptor() ([]byte, []int) {
+	return file_auth_proto_rawDescGZIP(), []int{40}
+}
+
+func (x *Tenant) GetIdTenant() string {
+	if x != nil {
+		return x.IdTenant
+	}
+	return ""
+}
+
+func (x *Tenant) GetNom() string {
+	if x != nil {
+		return x.Nom
+	}
+	return ""
+}
+
+func (x *Tenant) GetAdresse() string {
+	if x != nil {
+		return x.Adresse
+	}
+	return ""
+}
+
+func (x *Tenant) GetVille() string {
+	if x != nil {
+		return x.Ville
+	}
+	return ""
+}
+
+func (x *Tenant) GetCodePostal() string {
+	if x != nil {
+		return x.CodePostal
+	}
+	return ""
+}
+
+func (x *Tenant) GetContactTelephone() string {
+	if x != nil {
+		return x.ContactTelephone
+	}
+	return ""
+}
+
+func (x *Tenant) GetContactEmail() string {
+	if x != nil {
+		return x.ContactEmail
+	}
+	return ""
+}
+
+func (x *Tenant) GetDirecteurNom() string {
+	if x != nil {
+		return x.DirecteurNom
+	}
+	return ""
+}
+
+func (x *Tenant) GetDirecteurContact() string {
+	if x != nil {
+		return x.DirecteurContact
+	}
+	return ""
+}
+
+func (x *Tenant) GetTypeEtablissement() string {
+	if x != nil {
+		return x.TypeEtablissement
+	}
+	return ""
+}
+
+func (x *Tenant) GetParametresSpecifiques() string {
+	if x != nil {
+		return x.ParametresSpecifiques
+	}
+	return ""
+}
+
+func (x *Tenant) GetDateCreation() *timestamppb.Timestamp {
+	if x != nil {
+		return x.DateCreation
+	}
+	return nil
+}
+
+func (x *Tenant) GetValidationStatus() string {
+	if x != nil {
+		return x.ValidationStatus
+	}
+	return ""
+}
+
+func (x *Tenant) GetLogoUrl() string {
+	if x != nil {
+		return x.LogoUrl
+	}
+	return ""
+}
+
+type CreateTenantRequest struct {
+	state                 protoimpl.MessageState `protogen:"open.v1"`
+	Nom                   string                 `protobuf:"bytes,1,opt,name=nom,proto3" json:"nom,omitempty"`
+	Adresse               string                 `protobuf:"bytes,2,opt,name=adresse,proto3" json:"adresse,omitempty"`
+	Ville                 string                 `protobuf:"bytes,3,opt,name=ville,proto3" json:"ville,omitempty"`
+	CodePostal            string                 `protobuf:"bytes,4,opt,name=code_postal,json=codePostal,proto3" json:"code_postal,omitempty"`
+	ContactTelephone      string                 `protobuf:"bytes,5,opt,name=contact_telephone,json=contactTelephone,proto3" json:"contact_telephone,omitempty"`
+	ContactEmail          string                 `protobuf:"bytes,6,opt,name=contact_email,json=contactEmail,proto3" json:"contact_email,omitempty"`
+	DirecteurNom          string                 `protobuf:"bytes,7,opt,name=directeur_nom,json=directeurNom,proto3" json:"directeur_nom,omitempty"`
+	DirecteurContact      string                 `protobuf:"bytes,8,opt,name=directeur_contact,json=directeurContact,proto3" json:"directeur_contact,omitempty"`
+	TypeEtablissement     string                 `protobuf:"bytes,9,opt,name=type_etablissement,json=typeEtablissement,proto3" json:"type_etablissement,omitempty"`
+	ParametresSpecifiques string                 `protobuf:"bytes,10,opt,name=parametres_specifiques,json=parametresSpecifiques,proto3" json:"parametres_specifiques,omitempty"`
+	LogoUrl               string                 `protobuf:"bytes,11,opt,name=logo_url,json=logoUrl,proto3" json:"logo_url,omitempty"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
+}
+
+func (x *CreateTenantRequest) Reset() {
+	*x = CreateTenantRequest{}
+	mi := &file_auth_proto_msgTypes[41]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateTenantRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateTenantRequest) ProtoMessage() {}
+
+func (x *CreateTenantRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_auth_proto_msgTypes[41]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateTenantRequest.ProtoReflect.Descriptor instead.
+func (*CreateTenantRequest) Descriptor() ([]byte, []int) {
+	return file_auth_proto_rawDescGZIP(), []int{41}
+}
+
+func (x *CreateTenantRequest) GetNom() string {
+	if x != nil {
+		return x.Nom
+	}
+	return ""
+}
+
+func (x *CreateTenantRequest) GetAdresse() string {
+	if x != nil {
+		return x.Adresse
+	}
+	return ""
+}
+
+func (x *CreateTenantRequest) GetVille() string {
+	if x != nil {
+		return x.Ville
+	}
+	return ""
+}
+
+func (x *CreateTenantRequest) GetCodePostal() string {
+	if x != nil {
+		return x.CodePostal
+	}
+	return ""
+}
+
+func (x *CreateTenantRequest) GetContactTelephone() string {
+	if x != nil {
+		return x.ContactTelephone
+	}
+	return ""
+}
+
+func (x *CreateTenantRequest) GetContactEmail() string {
+	if x != nil {
+		return x.ContactEmail
+	}
+	return ""
+}
+
+func (x *CreateTenantRequest) GetDirecteurNom() string {
+	if x != nil {
+		return x.DirecteurNom
+	}
+	return ""
+}
+
+func (x *CreateTenantRequest) GetDirecteurContact() string {
+	if x != nil {
+		return x.DirecteurContact
+	}
+	return ""
+}
+
+func (x *CreateTenantRequest) GetTypeEtablissement() string {
+	if x != nil {
+		return x.TypeEtablissement
+	}
+	return ""
+}
+
+func (x *CreateTenantRequest) GetParametresSpecifiques() string {
+	if x != nil {
+		return x.ParametresSpecifiques
+	}
+	return ""
+}
+
+func (x *CreateTenantRequest) GetLogoUrl() string {
+	if x != nil {
+		return x.LogoUrl
+	}
+	return ""
+}
+
+type CreateTenantResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Message       string                 `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+	IdTenant      string                 `protobuf:"bytes,2,opt,name=id_tenant,json=idTenant,proto3" json:"id_tenant,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateTenantResponse) Reset() {
+	*x = CreateTenantResponse{}
+	mi := &file_auth_proto_msgTypes[42]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateTenantResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateTenantResponse) ProtoMessage() {}
+
+func (x *CreateTenantResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_auth_proto_msgTypes[42]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateTenantResponse.ProtoReflect.Descriptor instead.
+func (*CreateTenantResponse) Descriptor() ([]byte, []int) {
+	return file_auth_proto_rawDescGZIP(), []int{42}
+}
+
+func (x *CreateTenantResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *CreateTenantResponse) GetIdTenant() string {
+	if x != nil {
+		return x.IdTenant
+	}
+	return ""
+}
+
+type DeleteTenantRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	IdTenant      string                 `protobuf:"bytes,1,opt,name=id_tenant,json=idTenant,proto3" json:"id_tenant,omitempty"`
+	UtilisateurId string                 `protobuf:"bytes,2,opt,name=utilisateur_id,json=utilisateurId,proto3" json:"utilisateur_id,omitempty"`
+	Raison        string                 `protobuf:"bytes,3,opt,name=raison,proto3" json:"raison,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteTenantRequest) Reset() {
+	*x = DeleteTenantRequest{}
+	mi := &file_auth_proto_msgTypes[43]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteTenantRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteTenantRequest) ProtoMessage() {}
+
+func (x *DeleteTenantRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_auth_proto_msgTypes[43]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteTenantRequest.ProtoReflect.Descriptor instead.
+func (*DeleteTenantRequest) Descriptor() ([]byte, []int) {
+	return file_auth_proto_rawDescGZIP(), []int{43}
+}
+
+func (x *DeleteTenantRequest) GetIdTenant() string {
+	if x != nil {
+		return x.IdTenant
+	}
+	return ""
+}
+
+func (x *DeleteTenantRequest) GetUtilisateurId() string {
+	if x != nil {
+		return x.UtilisateurId
+	}
+	return ""
+}
+
+func (x *DeleteTenantRequest) GetRaison() string {
+	if x != nil {
+		return x.Raison
+	}
+	return ""
+}
+
+type UpdateTenantRequest struct {
+	state                 protoimpl.MessageState `protogen:"open.v1"`
+	IdTenant              string                 `protobuf:"bytes,1,opt,name=id_tenant,json=idTenant,proto3" json:"id_tenant,omitempty"`
+	Nom                   string                 `protobuf:"bytes,2,opt,name=nom,proto3" json:"nom,omitempty"`
+	Adresse               string                 `protobuf:"bytes,3,opt,name=adresse,proto3" json:"adresse,omitempty"`
+	Ville                 string                 `protobuf:"bytes,4,opt,name=ville,proto3" json:"ville,omitempty"`
+	CodePostal            string                 `protobuf:"bytes,5,opt,name=code_postal,json=codePostal,proto3" json:"code_postal,omitempty"`
+	ContactTelephone      string                 `protobuf:"bytes,6,opt,name=contact_telephone,json=contactTelephone,proto3" json:"contact_telephone,omitempty"`
+	ContactEmail          string                 `protobuf:"bytes,7,opt,name=contact_email,json=contactEmail,proto3" json:"contact_email,omitempty"`
+	DirecteurNom          string                 `protobuf:"bytes,8,opt,name=directeur_nom,json=directeurNom,proto3" json:"directeur_nom,omitempty"`
+	DirecteurContact      string                 `protobuf:"bytes,9,opt,name=directeur_contact,json=directeurContact,proto3" json:"directeur_contact,omitempty"`
+	TypeEtablissement     string                 `protobuf:"bytes,10,opt,name=type_etablissement,json=typeEtablissement,proto3" json:"type_etablissement,omitempty"`
+	ModulesDisponibles    []string               `protobuf:"bytes,11,rep,name=modules_disponibles,json=modulesDisponibles,proto3" json:"modules_disponibles,omitempty"`
+	ParametresSpecifiques string                 `protobuf:"bytes,12,opt,name=parametres_specifiques,json=parametresSpecifiques,proto3" json:"parametres_specifiques,omitempty"`
+	unknownFields         protoimpl.UnknownFields
+	sizeCache             protoimpl.SizeCache
+}
+
+func (x *UpdateTenantRequest) Reset() {
+	*x = UpdateTenantRequest{}
+	mi := &file_auth_proto_msgTypes[44]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateTenantRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateTenantRequest) ProtoMessage() {}
+
+func (x *UpdateTenantRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_auth_proto_msgTypes[44]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateTenantRequest.ProtoReflect.Descriptor instead.
+func (*UpdateTenantRequest) Descriptor() ([]byte, []int) {
+	return file_auth_proto_rawDescGZIP(), []int{44}
+}
+
+func (x *UpdateTenantRequest) GetIdTenant() string {
+	if x != nil {
+		return x.IdTenant
+	}
+	return ""
+}
+
+func (x *UpdateTenantRequest) GetNom() string {
+	if x != nil {
+		return x.Nom
+	}
+	return ""
+}
+
+func (x *UpdateTenantRequest) GetAdresse() string {
+	if x != nil {
+		return x.Adresse
+	}
+	return ""
+}
+
+func (x *UpdateTenantRequest) GetVille() string {
+	if x != nil {
+		return x.Ville
+	}
+	return ""
+}
+
+func (x *UpdateTenantRequest) GetCodePostal() string {
+	if x != nil {
+		return x.CodePostal
+	}
+	return ""
+}
+
+func (x *UpdateTenantRequest) GetContactTelephone() string {
+	if x != nil {
+		return x.ContactTelephone
+	}
+	return ""
+}
+
+func (x *UpdateTenantRequest) GetContactEmail() string {
+	if x != nil {
+		return x.ContactEmail
+	}
+	return ""
+}
+
+func (x *UpdateTenantRequest) GetDirecteurNom() string {
+	if x != nil {
+		return x.DirecteurNom
+	}
+	return ""
+}
+
+func (x *UpdateTenantRequest) GetDirecteurContact() string {
+	if x != nil {
+		return x.DirecteurContact
+	}
+	return ""
+}
+
+func (x *UpdateTenantRequest) GetTypeEtablissement() string {
+	if x != nil {
+		return x.TypeEtablissement
+	}
+	return ""
+}
+
+func (x *UpdateTenantRequest) GetModulesDisponibles() []string {
+	if x != nil {
+		return x.ModulesDisponibles
+	}
+	return nil
+}
+
+func (x *UpdateTenantRequest) GetParametresSpecifiques() string {
+	if x != nil {
+		return x.ParametresSpecifiques
+	}
+	return ""
+}
+
+type UpdateTenantResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Message       string                 `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateTenantResponse) Reset() {
+	*x = UpdateTenantResponse{}
+	mi := &file_auth_proto_msgTypes[45]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateTenantResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateTenantResponse) ProtoMessage() {}
+
+func (x *UpdateTenantResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_auth_proto_msgTypes[45]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateTenantResponse.ProtoReflect.Descriptor instead.
+func (*UpdateTenantResponse) Descriptor() ([]byte, []int) {
+	return file_auth_proto_rawDescGZIP(), []int{45}
+}
+
+func (x *UpdateTenantResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+type GetTenantRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	IdTenant      string                 `protobuf:"bytes,1,opt,name=id_tenant,json=idTenant,proto3" json:"id_tenant,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetTenantRequest) Reset() {
+	*x = GetTenantRequest{}
+	mi := &file_auth_proto_msgTypes[46]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetTenantRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetTenantRequest) ProtoMessage() {}
+
+func (x *GetTenantRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_auth_proto_msgTypes[46]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetTenantRequest.ProtoReflect.Descriptor instead.
+func (*GetTenantRequest) Descriptor() ([]byte, []int) {
+	return file_auth_proto_rawDescGZIP(), []int{46}
+}
+
+func (x *GetTenantRequest) GetIdTenant() string {
+	if x != nil {
+		return x.IdTenant
+	}
+	return ""
+}
+
+type ListTenantRequest struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	Page             int32                  `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
+	Limit            int32                  `protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`
+	Query            string                 `protobuf:"bytes,3,opt,name=query,proto3" json:"query,omitempty"`
+	Types            []string               `protobuf:"bytes,4,rep,name=types,proto3" json:"types,omitempty"`
+	ValidationStatus string                 `protobuf:"bytes,5,opt,name=validation_status,json=validationStatus,proto3" json:"validation_status,omitempty"` // Filtre : statut de validation (ex: "En attente", "Validé")
+	OrderBy          string                 `protobuf:"bytes,6,opt,name=order_by,json=orderBy,proto3" json:"order_by,omitempty"`                            // Tri (ex: "nom", "ville", "date_creation", "validation_status")
+	Desc             bool                   `protobuf:"varint,7,opt,name=desc,proto3" json:"desc,omitempty"`                                                // Tri descendant si `true`
+	MinCreationDate  string                 `protobuf:"bytes,8,opt,name=min_creation_date,json=minCreationDate,proto3" json:"min_creation_date,omitempty"`  // Filtre : récupérer les écoles après cette date (YYYY-MM-DD)
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *ListTenantRequest) Reset() {
+	*x = ListTenantRequest{}
+	mi := &file_auth_proto_msgTypes[47]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListTenantRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListTenantRequest) ProtoMessage() {}
+
+func (x *ListTenantRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_auth_proto_msgTypes[47]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListTenantRequest.ProtoReflect.Descriptor instead.
+func (*ListTenantRequest) Descriptor() ([]byte, []int) {
+	return file_auth_proto_rawDescGZIP(), []int{47}
+}
+
+func (x *ListTenantRequest) GetPage() int32 {
+	if x != nil {
+		return x.Page
+	}
+	return 0
+}
+
+func (x *ListTenantRequest) GetLimit() int32 {
+	if x != nil {
+		return x.Limit
+	}
+	return 0
+}
+
+func (x *ListTenantRequest) GetQuery() string {
+	if x != nil {
+		return x.Query
+	}
+	return ""
+}
+
+func (x *ListTenantRequest) GetTypes() []string {
+	if x != nil {
+		return x.Types
+	}
+	return nil
+}
+
+func (x *ListTenantRequest) GetValidationStatus() string {
+	if x != nil {
+		return x.ValidationStatus
+	}
+	return ""
+}
+
+func (x *ListTenantRequest) GetOrderBy() string {
+	if x != nil {
+		return x.OrderBy
+	}
+	return ""
+}
+
+func (x *ListTenantRequest) GetDesc() bool {
+	if x != nil {
+		return x.Desc
+	}
+	return false
+}
+
+func (x *ListTenantRequest) GetMinCreationDate() string {
+	if x != nil {
+		return x.MinCreationDate
+	}
+	return ""
+}
+
+type ListTenantResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Tenant        []*Tenant              `protobuf:"bytes,1,rep,name=tenant,proto3" json:"tenant,omitempty"`
+	Total         int32                  `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListTenantResponse) Reset() {
+	*x = ListTenantResponse{}
+	mi := &file_auth_proto_msgTypes[48]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListTenantResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListTenantResponse) ProtoMessage() {}
+
+func (x *ListTenantResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_auth_proto_msgTypes[48]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListTenantResponse.ProtoReflect.Descriptor instead.
+func (*ListTenantResponse) Descriptor() ([]byte, []int) {
+	return file_auth_proto_rawDescGZIP(), []int{48}
+}
+
+func (x *ListTenantResponse) GetTenant() []*Tenant {
+	if x != nil {
+		return x.Tenant
+	}
+	return nil
+}
+
+func (x *ListTenantResponse) GetTotal() int32 {
+	if x != nil {
+		return x.Total
+	}
+	return 0
+}
+
 var File_auth_proto protoreflect.FileDescriptor
 
 const file_auth_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"auth.proto\x12\x06nodepb\x1a\x1cgoogle/api/annotations.proto\"\xab\x01\n" +
+	"auth.proto\x12\x06nodepb\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1cgoogle/api/annotations.proto\"\xab\x01\n" +
 	"\fLoginRequest\x12\x1e\n" +
 	"\n" +
 	"identifier\x18\x01 \x01(\tR\n" +
@@ -2373,15 +3139,16 @@ const file_auth_proto_rawDesc = "" +
 	"\x0eutilisateur_id\x18\x01 \x01(\tR\rutilisateurId\x12 \n" +
 	"\vpermissions\x18\x02 \x03(\tR\vpermissions\"5\n" +
 	"\x19SetCdnPermissionsResponse\x12\x18\n" +
-	"\amessage\x18\x01 \x01(\tR\amessage\"\xbe\x01\n" +
-	"\x12CreateAdminRequest\x12\x10\n" +
-	"\x03nom\x18\x01 \x01(\tR\x03nom\x12\x16\n" +
-	"\x06prenom\x18\x02 \x01(\tR\x06prenom\x12\x14\n" +
-	"\x05email\x18\x03 \x01(\tR\x05email\x12\x14\n" +
-	"\x05genre\x18\x04 \x01(\tR\x05genre\x12\x1c\n" +
-	"\ttelephone\x18\x05 \x01(\tR\ttelephone\x12\x12\n" +
-	"\x04role\x18\x06 \x01(\tR\x04role\x12 \n" +
-	"\vpermissions\x18\a \x03(\tR\vpermissions\"/\n" +
+	"\amessage\x18\x01 \x01(\tR\amessage\"\xdb\x01\n" +
+	"\x12CreateAdminRequest\x12\x1b\n" +
+	"\tid_tenant\x18\x01 \x01(\tR\bidTenant\x12\x10\n" +
+	"\x03nom\x18\x02 \x01(\tR\x03nom\x12\x16\n" +
+	"\x06prenom\x18\x03 \x01(\tR\x06prenom\x12\x14\n" +
+	"\x05email\x18\x04 \x01(\tR\x05email\x12\x14\n" +
+	"\x05genre\x18\x05 \x01(\tR\x05genre\x12\x1c\n" +
+	"\ttelephone\x18\x06 \x01(\tR\ttelephone\x12\x12\n" +
+	"\x04role\x18\a \x01(\tR\x04role\x12 \n" +
+	"\vpermissions\x18\b \x03(\tR\vpermissions\"/\n" +
 	"\x13CreateAdminResponse\x12\x18\n" +
 	"\amessage\x18\x01 \x01(\tR\amessage\"\xaf\x01\n" +
 	"\x14GetAdminInfoResponse\x12%\n" +
@@ -2401,13 +3168,82 @@ const file_auth_proto_rawDesc = "" +
 	"\x06admins\x18\x01 \x03(\v2\x1c.nodepb.GetAdminInfoResponseR\x06admins\x12\x14\n" +
 	"\x05total\x18\x02 \x01(\x05R\x05total\"<\n" +
 	"\x13GetAdminByIDRequest\x12%\n" +
-	"\x0eutilisateur_id\x18\x01 \x01(\tR\rutilisateurId*-\n" +
+	"\x0eutilisateur_id\x18\x01 \x01(\tR\rutilisateurId\"\x9b\x04\n" +
+	"\x06Tenant\x12\x1b\n" +
+	"\tid_tenant\x18\x01 \x01(\tR\bidTenant\x12\x10\n" +
+	"\x03nom\x18\x02 \x01(\tR\x03nom\x12\x18\n" +
+	"\aadresse\x18\x03 \x01(\tR\aadresse\x12\x14\n" +
+	"\x05ville\x18\x04 \x01(\tR\x05ville\x12\x1f\n" +
+	"\vcode_postal\x18\x05 \x01(\tR\n" +
+	"codePostal\x12+\n" +
+	"\x11contact_telephone\x18\x06 \x01(\tR\x10contactTelephone\x12#\n" +
+	"\rcontact_email\x18\a \x01(\tR\fcontactEmail\x12#\n" +
+	"\rdirecteur_nom\x18\b \x01(\tR\fdirecteurNom\x12+\n" +
+	"\x11directeur_contact\x18\t \x01(\tR\x10directeurContact\x12-\n" +
+	"\x12type_etablissement\x18\n" +
+	" \x01(\tR\x11typeEtablissement\x125\n" +
+	"\x16parametres_specifiques\x18\v \x01(\tR\x15parametresSpecifiques\x12?\n" +
+	"\rdate_creation\x18\f \x01(\v2\x1a.google.protobuf.TimestampR\fdateCreation\x12+\n" +
+	"\x11validation_status\x18\x0e \x01(\tR\x10validationStatus\x12\x19\n" +
+	"\blogo_url\x18\x0f \x01(\tR\alogoUrl\"\x9d\x03\n" +
+	"\x13CreateTenantRequest\x12\x10\n" +
+	"\x03nom\x18\x01 \x01(\tR\x03nom\x12\x18\n" +
+	"\aadresse\x18\x02 \x01(\tR\aadresse\x12\x14\n" +
+	"\x05ville\x18\x03 \x01(\tR\x05ville\x12\x1f\n" +
+	"\vcode_postal\x18\x04 \x01(\tR\n" +
+	"codePostal\x12+\n" +
+	"\x11contact_telephone\x18\x05 \x01(\tR\x10contactTelephone\x12#\n" +
+	"\rcontact_email\x18\x06 \x01(\tR\fcontactEmail\x12#\n" +
+	"\rdirecteur_nom\x18\a \x01(\tR\fdirecteurNom\x12+\n" +
+	"\x11directeur_contact\x18\b \x01(\tR\x10directeurContact\x12-\n" +
+	"\x12type_etablissement\x18\t \x01(\tR\x11typeEtablissement\x125\n" +
+	"\x16parametres_specifiques\x18\n" +
+	" \x01(\tR\x15parametresSpecifiques\x12\x19\n" +
+	"\blogo_url\x18\v \x01(\tR\alogoUrl\"M\n" +
+	"\x14CreateTenantResponse\x12\x18\n" +
+	"\amessage\x18\x01 \x01(\tR\amessage\x12\x1b\n" +
+	"\tid_tenant\x18\x02 \x01(\tR\bidTenant\"q\n" +
+	"\x13DeleteTenantRequest\x12\x1b\n" +
+	"\tid_tenant\x18\x01 \x01(\tR\bidTenant\x12%\n" +
+	"\x0eutilisateur_id\x18\x02 \x01(\tR\rutilisateurId\x12\x16\n" +
+	"\x06raison\x18\x03 \x01(\tR\x06raison\"\xd0\x03\n" +
+	"\x13UpdateTenantRequest\x12\x1b\n" +
+	"\tid_tenant\x18\x01 \x01(\tR\bidTenant\x12\x10\n" +
+	"\x03nom\x18\x02 \x01(\tR\x03nom\x12\x18\n" +
+	"\aadresse\x18\x03 \x01(\tR\aadresse\x12\x14\n" +
+	"\x05ville\x18\x04 \x01(\tR\x05ville\x12\x1f\n" +
+	"\vcode_postal\x18\x05 \x01(\tR\n" +
+	"codePostal\x12+\n" +
+	"\x11contact_telephone\x18\x06 \x01(\tR\x10contactTelephone\x12#\n" +
+	"\rcontact_email\x18\a \x01(\tR\fcontactEmail\x12#\n" +
+	"\rdirecteur_nom\x18\b \x01(\tR\fdirecteurNom\x12+\n" +
+	"\x11directeur_contact\x18\t \x01(\tR\x10directeurContact\x12-\n" +
+	"\x12type_etablissement\x18\n" +
+	" \x01(\tR\x11typeEtablissement\x12/\n" +
+	"\x13modules_disponibles\x18\v \x03(\tR\x12modulesDisponibles\x125\n" +
+	"\x16parametres_specifiques\x18\f \x01(\tR\x15parametresSpecifiques\"0\n" +
+	"\x14UpdateTenantResponse\x12\x18\n" +
+	"\amessage\x18\x01 \x01(\tR\amessage\"/\n" +
+	"\x10GetTenantRequest\x12\x1b\n" +
+	"\tid_tenant\x18\x01 \x01(\tR\bidTenant\"\xf1\x01\n" +
+	"\x11ListTenantRequest\x12\x12\n" +
+	"\x04page\x18\x01 \x01(\x05R\x04page\x12\x14\n" +
+	"\x05limit\x18\x02 \x01(\x05R\x05limit\x12\x14\n" +
+	"\x05query\x18\x03 \x01(\tR\x05query\x12\x14\n" +
+	"\x05types\x18\x04 \x03(\tR\x05types\x12+\n" +
+	"\x11validation_status\x18\x05 \x01(\tR\x10validationStatus\x12\x19\n" +
+	"\border_by\x18\x06 \x01(\tR\aorderBy\x12\x12\n" +
+	"\x04desc\x18\a \x01(\bR\x04desc\x12*\n" +
+	"\x11min_creation_date\x18\b \x01(\tR\x0fminCreationDate\"R\n" +
+	"\x12ListTenantResponse\x12&\n" +
+	"\x06tenant\x18\x01 \x03(\v2\x0e.nodepb.TenantR\x06tenant\x12\x14\n" +
+	"\x05total\x18\x02 \x01(\x05R\x05total*-\n" +
 	"\x04Role\x12\t\n" +
 	"\x05admin\x10\x00\x12\n" +
 	"\n" +
 	"\x06viewer\x10\x01\x12\x0e\n" +
 	"\n" +
-	"superadmin\x10\x022\xcb\x10\n" +
+	"superadmin\x10\x022\xd8\x14\n" +
 	"\vAuthService\x12O\n" +
 	"\x05Login\x12\x14.nodepb.LoginRequest\x1a\x15.nodepb.LoginResponse\"\x19\x82\xd3\xe4\x93\x02\x13:\x01*\"\x0e/v1/auth/login\x12S\n" +
 	"\x06Logout\x12\x15.nodepb.LogoutRequest\x1a\x16.nodepb.LogoutResponse\"\x1a\x82\xd3\xe4\x93\x02\x14:\x01*\"\x0f/v1/auth/logout\x12]\n" +
@@ -2432,7 +3268,12 @@ const file_auth_proto_rawDesc = "" +
 	"\x11SetCdnPermissions\x12 .nodepb.SetCdnPermissionsRequest\x1a!.nodepb.SetCdnPermissionsResponse\"<\x82\xd3\xe4\x93\x026:\x01*\"1/v1/admin/cdn-admins/{utilisateur_id}/permissions\x12`\n" +
 	"\rListAllAdmins\x12\x1c.nodepb.ListAllAdminsRequest\x1a\x1d.nodepb.ListAllAdminsResponse\"\x12\x82\xd3\xe4\x93\x02\f\x12\n" +
 	"/v1/admins\x12n\n" +
-	"\fGetAdminByID\x12\x1b.nodepb.GetAdminByIDRequest\x1a\x1c.nodepb.GetAdminInfoResponse\"#\x82\xd3\xe4\x93\x02\x1d\x12\x1b/v1/admins/{utilisateur_id}BDZBgithub.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/protob\x06proto3"
+	"\fGetAdminByID\x12\x1b.nodepb.GetAdminByIDRequest\x1a\x1c.nodepb.GetAdminInfoResponse\"#\x82\xd3\xe4\x93\x02\x1d\x12\x1b/v1/admins/{utilisateur_id}\x12g\n" +
+	"\fCreateTenant\x12\x1b.nodepb.CreateTenantRequest\x1a\x1c.nodepb.CreateTenantResponse\"\x1c\x82\xd3\xe4\x93\x02\x16:\x01*\"\x11/v1/admin/tenants\x12`\n" +
+	"\rGetTenantByID\x12\x18.nodepb.GetTenantRequest\x1a\x0e.nodepb.Tenant\"%\x82\xd3\xe4\x93\x02\x1f\x12\x1d/v1/admin/tenants/{id_tenant}\x12_\n" +
+	"\vListTenants\x12\x19.nodepb.ListTenantRequest\x1a\x1a.nodepb.ListTenantResponse\"\x19\x82\xd3\xe4\x93\x02\x13\x12\x11/v1/admin/schools\x12s\n" +
+	"\fUpdateSchool\x12\x1b.nodepb.UpdateTenantRequest\x1a\x1c.nodepb.UpdateTenantResponse\"(\x82\xd3\xe4\x93\x02\":\x01*\x1a\x1d/v1/admin/schools/{id_tenant}\x12j\n" +
+	"\fDeleteTenant\x12\x1b.nodepb.DeleteTenantRequest\x1a\x16.google.protobuf.Empty\"%\x82\xd3\xe4\x93\x02\x1f*\x1d/v1/admin/tenants/{id_tenant}BDZBgithub.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/protob\x06proto3"
 
 var (
 	file_auth_proto_rawDescOnce sync.Once
@@ -2447,7 +3288,7 @@ func file_auth_proto_rawDescGZIP() []byte {
 }
 
 var file_auth_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 40)
+var file_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 49)
 var file_auth_proto_goTypes = []any{
 	(Role)(0),                          // 0: nodepb.Role
 	(*LoginRequest)(nil),               // 1: nodepb.LoginRequest
@@ -2490,54 +3331,77 @@ var file_auth_proto_goTypes = []any{
 	(*ListAllAdminsRequest)(nil),       // 38: nodepb.ListAllAdminsRequest
 	(*ListAllAdminsResponse)(nil),      // 39: nodepb.ListAllAdminsResponse
 	(*GetAdminByIDRequest)(nil),        // 40: nodepb.GetAdminByIDRequest
+	(*Tenant)(nil),                     // 41: nodepb.Tenant
+	(*CreateTenantRequest)(nil),        // 42: nodepb.CreateTenantRequest
+	(*CreateTenantResponse)(nil),       // 43: nodepb.CreateTenantResponse
+	(*DeleteTenantRequest)(nil),        // 44: nodepb.DeleteTenantRequest
+	(*UpdateTenantRequest)(nil),        // 45: nodepb.UpdateTenantRequest
+	(*UpdateTenantResponse)(nil),       // 46: nodepb.UpdateTenantResponse
+	(*GetTenantRequest)(nil),           // 47: nodepb.GetTenantRequest
+	(*ListTenantRequest)(nil),          // 48: nodepb.ListTenantRequest
+	(*ListTenantResponse)(nil),         // 49: nodepb.ListTenantResponse
+	(*timestamppb.Timestamp)(nil),      // 50: google.protobuf.Timestamp
+	(*emptypb.Empty)(nil),              // 51: google.protobuf.Empty
 }
 var file_auth_proto_depIdxs = []int32{
 	0,  // 0: nodepb.LoginResponse.role:type_name -> nodepb.Role
 	0,  // 1: nodepb.UpdateUserRequest.role:type_name -> nodepb.Role
 	37, // 2: nodepb.ListAllAdminsResponse.admins:type_name -> nodepb.GetAdminInfoResponse
-	1,  // 3: nodepb.AuthService.Login:input_type -> nodepb.LoginRequest
-	3,  // 4: nodepb.AuthService.Logout:input_type -> nodepb.LogoutRequest
-	35, // 5: nodepb.AuthService.CreateAdmin:input_type -> nodepb.CreateAdminRequest
-	7,  // 6: nodepb.AuthService.UpdateUser:input_type -> nodepb.UpdateUserRequest
-	8,  // 7: nodepb.AuthService.CheckUserExists:input_type -> nodepb.CheckUserExistsRequest
-	11, // 8: nodepb.AuthService.DeleteUser:input_type -> nodepb.DeleteUserRequest
-	13, // 9: nodepb.AuthService.ValidateToken:input_type -> nodepb.TokenRequest
-	15, // 10: nodepb.AuthService.RefreshToken:input_type -> nodepb.RefreshTokenRequest
-	17, // 11: nodepb.AuthService.VerifyOTP:input_type -> nodepb.VerifyOTPRequest
-	19, // 12: nodepb.AuthService.NotifyNewDevice:input_type -> nodepb.NotifyNewDeviceRequest
-	21, // 13: nodepb.AuthService.RequestPasswordReset:input_type -> nodepb.PasswordResetRequest
-	23, // 14: nodepb.AuthService.EnableMFA:input_type -> nodepb.EnableMFARequest
-	25, // 15: nodepb.AuthService.DisableMFA:input_type -> nodepb.DisableMFARequest
-	27, // 16: nodepb.AuthService.UpdateUserPassword:input_type -> nodepb.UpdateUserPasswordRequest
-	31, // 17: nodepb.AuthService.GetUserProfile:input_type -> nodepb.GetUserProfileRequest
-	29, // 18: nodepb.AuthService.ForgotPassword:input_type -> nodepb.ForgotPasswordRequest
-	33, // 19: nodepb.AuthService.SetCdnPermissions:input_type -> nodepb.SetCdnPermissionsRequest
-	38, // 20: nodepb.AuthService.ListAllAdmins:input_type -> nodepb.ListAllAdminsRequest
-	40, // 21: nodepb.AuthService.GetAdminByID:input_type -> nodepb.GetAdminByIDRequest
-	2,  // 22: nodepb.AuthService.Login:output_type -> nodepb.LoginResponse
-	4,  // 23: nodepb.AuthService.Logout:output_type -> nodepb.LogoutResponse
-	36, // 24: nodepb.AuthService.CreateAdmin:output_type -> nodepb.CreateAdminResponse
-	10, // 25: nodepb.AuthService.UpdateUser:output_type -> nodepb.UpdateUserResponse
-	9,  // 26: nodepb.AuthService.CheckUserExists:output_type -> nodepb.CheckUserExistsResponse
-	12, // 27: nodepb.AuthService.DeleteUser:output_type -> nodepb.DeleteUserResponse
-	14, // 28: nodepb.AuthService.ValidateToken:output_type -> nodepb.TokenResponse
-	16, // 29: nodepb.AuthService.RefreshToken:output_type -> nodepb.RefreshTokenResponse
-	18, // 30: nodepb.AuthService.VerifyOTP:output_type -> nodepb.VerifyOTPResponse
-	20, // 31: nodepb.AuthService.NotifyNewDevice:output_type -> nodepb.NotifyNewDeviceResponse
-	22, // 32: nodepb.AuthService.RequestPasswordReset:output_type -> nodepb.PasswordResetResponse
-	24, // 33: nodepb.AuthService.EnableMFA:output_type -> nodepb.EnableMFAResponse
-	26, // 34: nodepb.AuthService.DisableMFA:output_type -> nodepb.DisableMFAResponse
-	28, // 35: nodepb.AuthService.UpdateUserPassword:output_type -> nodepb.UpdateUserPasswordResponse
-	32, // 36: nodepb.AuthService.GetUserProfile:output_type -> nodepb.GetUserProfileResponse
-	30, // 37: nodepb.AuthService.ForgotPassword:output_type -> nodepb.ForgotPasswordResponse
-	34, // 38: nodepb.AuthService.SetCdnPermissions:output_type -> nodepb.SetCdnPermissionsResponse
-	39, // 39: nodepb.AuthService.ListAllAdmins:output_type -> nodepb.ListAllAdminsResponse
-	37, // 40: nodepb.AuthService.GetAdminByID:output_type -> nodepb.GetAdminInfoResponse
-	22, // [22:41] is the sub-list for method output_type
-	3,  // [3:22] is the sub-list for method input_type
-	3,  // [3:3] is the sub-list for extension type_name
-	3,  // [3:3] is the sub-list for extension extendee
-	0,  // [0:3] is the sub-list for field type_name
+	50, // 3: nodepb.Tenant.date_creation:type_name -> google.protobuf.Timestamp
+	41, // 4: nodepb.ListTenantResponse.tenant:type_name -> nodepb.Tenant
+	1,  // 5: nodepb.AuthService.Login:input_type -> nodepb.LoginRequest
+	3,  // 6: nodepb.AuthService.Logout:input_type -> nodepb.LogoutRequest
+	35, // 7: nodepb.AuthService.CreateAdmin:input_type -> nodepb.CreateAdminRequest
+	7,  // 8: nodepb.AuthService.UpdateUser:input_type -> nodepb.UpdateUserRequest
+	8,  // 9: nodepb.AuthService.CheckUserExists:input_type -> nodepb.CheckUserExistsRequest
+	11, // 10: nodepb.AuthService.DeleteUser:input_type -> nodepb.DeleteUserRequest
+	13, // 11: nodepb.AuthService.ValidateToken:input_type -> nodepb.TokenRequest
+	15, // 12: nodepb.AuthService.RefreshToken:input_type -> nodepb.RefreshTokenRequest
+	17, // 13: nodepb.AuthService.VerifyOTP:input_type -> nodepb.VerifyOTPRequest
+	19, // 14: nodepb.AuthService.NotifyNewDevice:input_type -> nodepb.NotifyNewDeviceRequest
+	21, // 15: nodepb.AuthService.RequestPasswordReset:input_type -> nodepb.PasswordResetRequest
+	23, // 16: nodepb.AuthService.EnableMFA:input_type -> nodepb.EnableMFARequest
+	25, // 17: nodepb.AuthService.DisableMFA:input_type -> nodepb.DisableMFARequest
+	27, // 18: nodepb.AuthService.UpdateUserPassword:input_type -> nodepb.UpdateUserPasswordRequest
+	31, // 19: nodepb.AuthService.GetUserProfile:input_type -> nodepb.GetUserProfileRequest
+	29, // 20: nodepb.AuthService.ForgotPassword:input_type -> nodepb.ForgotPasswordRequest
+	33, // 21: nodepb.AuthService.SetCdnPermissions:input_type -> nodepb.SetCdnPermissionsRequest
+	38, // 22: nodepb.AuthService.ListAllAdmins:input_type -> nodepb.ListAllAdminsRequest
+	40, // 23: nodepb.AuthService.GetAdminByID:input_type -> nodepb.GetAdminByIDRequest
+	42, // 24: nodepb.AuthService.CreateTenant:input_type -> nodepb.CreateTenantRequest
+	47, // 25: nodepb.AuthService.GetTenantByID:input_type -> nodepb.GetTenantRequest
+	48, // 26: nodepb.AuthService.ListTenants:input_type -> nodepb.ListTenantRequest
+	45, // 27: nodepb.AuthService.UpdateSchool:input_type -> nodepb.UpdateTenantRequest
+	44, // 28: nodepb.AuthService.DeleteTenant:input_type -> nodepb.DeleteTenantRequest
+	2,  // 29: nodepb.AuthService.Login:output_type -> nodepb.LoginResponse
+	4,  // 30: nodepb.AuthService.Logout:output_type -> nodepb.LogoutResponse
+	36, // 31: nodepb.AuthService.CreateAdmin:output_type -> nodepb.CreateAdminResponse
+	10, // 32: nodepb.AuthService.UpdateUser:output_type -> nodepb.UpdateUserResponse
+	9,  // 33: nodepb.AuthService.CheckUserExists:output_type -> nodepb.CheckUserExistsResponse
+	12, // 34: nodepb.AuthService.DeleteUser:output_type -> nodepb.DeleteUserResponse
+	14, // 35: nodepb.AuthService.ValidateToken:output_type -> nodepb.TokenResponse
+	16, // 36: nodepb.AuthService.RefreshToken:output_type -> nodepb.RefreshTokenResponse
+	18, // 37: nodepb.AuthService.VerifyOTP:output_type -> nodepb.VerifyOTPResponse
+	20, // 38: nodepb.AuthService.NotifyNewDevice:output_type -> nodepb.NotifyNewDeviceResponse
+	22, // 39: nodepb.AuthService.RequestPasswordReset:output_type -> nodepb.PasswordResetResponse
+	24, // 40: nodepb.AuthService.EnableMFA:output_type -> nodepb.EnableMFAResponse
+	26, // 41: nodepb.AuthService.DisableMFA:output_type -> nodepb.DisableMFAResponse
+	28, // 42: nodepb.AuthService.UpdateUserPassword:output_type -> nodepb.UpdateUserPasswordResponse
+	32, // 43: nodepb.AuthService.GetUserProfile:output_type -> nodepb.GetUserProfileResponse
+	30, // 44: nodepb.AuthService.ForgotPassword:output_type -> nodepb.ForgotPasswordResponse
+	34, // 45: nodepb.AuthService.SetCdnPermissions:output_type -> nodepb.SetCdnPermissionsResponse
+	39, // 46: nodepb.AuthService.ListAllAdmins:output_type -> nodepb.ListAllAdminsResponse
+	37, // 47: nodepb.AuthService.GetAdminByID:output_type -> nodepb.GetAdminInfoResponse
+	43, // 48: nodepb.AuthService.CreateTenant:output_type -> nodepb.CreateTenantResponse
+	41, // 49: nodepb.AuthService.GetTenantByID:output_type -> nodepb.Tenant
+	49, // 50: nodepb.AuthService.ListTenants:output_type -> nodepb.ListTenantResponse
+	46, // 51: nodepb.AuthService.UpdateSchool:output_type -> nodepb.UpdateTenantResponse
+	51, // 52: nodepb.AuthService.DeleteTenant:output_type -> google.protobuf.Empty
+	29, // [29:53] is the sub-list for method output_type
+	5,  // [5:29] is the sub-list for method input_type
+	5,  // [5:5] is the sub-list for extension type_name
+	5,  // [5:5] is the sub-list for extension extendee
+	0,  // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_auth_proto_init() }
@@ -2551,7 +3415,7 @@ func file_auth_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_auth_proto_rawDesc), len(file_auth_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   40,
+			NumMessages:   49,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

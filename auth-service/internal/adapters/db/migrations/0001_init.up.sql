@@ -1,3 +1,4 @@
+-- Enable uuid extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
@@ -47,12 +48,6 @@ CREATE TABLE IF NOT EXISTS utilisateurs_permissions (
     PRIMARY KEY (id_utilisateur, permission)
 );
 
-CREATE TABLE IF NOT EXISTS admin_permissions (
-    id_utilisateur UUID REFERENCES utilisateurs(id_utilisateur) ON DELETE CASCADE,
-    permission TEXT NOT NULL,
-    PRIMARY KEY (id_utilisateur, permission)
-);
-
 CREATE TABLE IF NOT EXISTS audit_logs (
     id_audit UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     admin_id UUID REFERENCES utilisateurs(id_utilisateur) ON DELETE SET NULL,
@@ -74,4 +69,6 @@ CREATE TABLE IF NOT EXISTS refresh_tokens (
     token TEXT NOT NULL,
     expires_at TIMESTAMP NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ip_address VARCHAR(50),
+    user_agent TEXT,
 );

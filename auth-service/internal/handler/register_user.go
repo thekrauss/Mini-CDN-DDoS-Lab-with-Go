@@ -130,7 +130,7 @@ func (s *AuthServer) DeleteUser(ctx context.Context, req *pb.DeleteUserRequest) 
 }
 
 func (s *AuthServer) ListAllAdmins(ctx context.Context, req *pb.ListAllAdminsRequest) (*pb.ListAllAdminsResponse, error) {
-	log.Println("🔍 Récupération des administrateurs avec filtres...")
+	log.Println("Récupération des administrateurs avec filtres...")
 
 	cacheKey := fmt.Sprintf("all_admins:limit=%d:offset=%d:query=%s:tenant=%s:active=%t", req.Limit, req.Offset, req.Query, req.TenantId, req.IsActive)
 

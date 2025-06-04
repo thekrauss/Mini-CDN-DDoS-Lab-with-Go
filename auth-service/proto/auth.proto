@@ -4,7 +4,11 @@ package nodepb;
 
 option go_package = "github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/proto";
 
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
 import "google/api/annotations.proto";
+
 
 service AuthService {
 
@@ -152,6 +156,45 @@ service AuthService {
       get: "/v1/admins/{utilisateur_id}"
     };
   }
+
+  rpc CreateTenant(CreateTenantRequest) returns (CreateTenantResponse) {
+    option (google.api.http) = {
+      post: "/v1/admin/tenants"
+      body: "*"
+    };
+  }
+
+    // ➤ Récupération d'une école par ID
+  rpc GetTenantByID(GetTenantRequest) returns (Tenant) {
+    option (google.api.http) = {
+      get: "/v1/admin/tenants/{id_tenant}"
+    };
+  }
+
+    // ➤ Lister toutes les écoles
+    rpc ListTenants(ListTenantRequest) returns (ListTenantResponse) {
+      option (google.api.http) = {
+        get: "/v1/admin/schools"
+      };
+    }
+  
+    // ➤ Mise à jour d'une école
+    rpc UpdateSchool(UpdateTenantRequest) returns (UpdateTenantResponse) {
+      option (google.api.http) = {
+        put: "/v1/admin/schools/{id_tenant}"
+        body: "*"
+      };
+    }
+  
+    // ➤ Suppression d'une école
+    rpc DeleteTenant(DeleteTenantRequest) returns (google.protobuf.Empty) {
+      option (google.api.http) = {
+        delete: "/v1/admin/tenants/{id_tenant}"
+      };
+    }
+  
+  
+
 }
 
 
@@ -336,14 +379,16 @@ message SetCdnPermissionsResponse {
 
 
 message CreateAdminRequest {
-  string nom = 1;
-  string prenom = 2;
-  string email = 3;
-  string genre = 4;
-  string telephone = 5;
-  string role = 6;
-  repeated string permissions = 7;
+  string id_tenant = 1;        
+  string nom = 2;
+  string prenom = 3;
+  string email = 4;
+  string genre = 5;
+  string telephone = 6;
+  string role = 7;
+  repeated string permissions = 8;
 }
+
 
 message CreateAdminResponse {
   string message = 1;             
@@ -375,5 +420,84 @@ message GetAdminByIDRequest {
   string utilisateur_id = 1;
 }
 
+message Tenant {
+  string id_tenant = 1;
+  string nom = 2;
+  string adresse = 3;
+  string ville = 4;
+  string code_postal = 5;
+  string contact_telephone = 6;
+  string contact_email = 7;
+  string directeur_nom = 8;
+  string directeur_contact = 9;
+  string type_etablissement = 10;
+  string parametres_specifiques = 11;
+  google.protobuf.Timestamp date_creation = 12;
+  string validation_status = 14;
+  string logo_url = 15;
+}
 
+message CreateTenantRequest {
+  string nom = 1;
+  string adresse = 2;
+  string ville = 3;
+  string code_postal = 4;
+  string contact_telephone = 5;
+  string contact_email = 6;
+  string directeur_nom = 7;
+  string directeur_contact = 8;
+  string type_etablissement = 9;
+  string parametres_specifiques = 10;
+  string logo_url = 11;
+}
+
+message CreateTenantResponse {
+  string message = 1;
+  string id_tenant = 2;
+}
+
+message DeleteTenantRequest {
+  string id_tenant = 1;
+  string utilisateur_id = 2;
+  string raison = 3;
+}
+
+message UpdateTenantRequest {
+    string id_tenant = 1;
+    string nom = 2;
+    string adresse = 3;
+    string ville = 4;
+    string code_postal = 5;
+    string contact_telephone = 6;
+    string contact_email = 7;
+    string directeur_nom = 8;
+    string directeur_contact = 9;
+    string type_etablissement = 10;
+    repeated string modules_disponibles = 11;
+    string parametres_specifiques = 12;
+}
+
+message UpdateTenantResponse {
+  string message = 1;
+}
+
+message GetTenantRequest {
+  string id_tenant = 1;
+}
+
+message ListTenantRequest {
+	int32 page = 1;
+	int32 limit = 2;
+	string query = 3;                 
+	repeated string types = 4;        
+	string validation_status = 5;      // Filtre : statut de validation (ex: "En attente", "Validé")
+	string order_by = 6;               // Tri (ex: "nom", "ville", "date_creation", "validation_status")
+	bool desc = 7;                     // Tri descendant si `true`
+	string min_creation_date = 8;      // Filtre : récupérer les écoles après cette date (YYYY-MM-DD)
+}
+
+message ListTenantResponse {
+  repeated Tenant tenant = 1;
+  int32 total = 2;
+}
 

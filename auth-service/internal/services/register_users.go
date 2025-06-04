@@ -16,20 +16,34 @@ import (
 
 func (s *AuthService) CreateAdmin(ctx context.Context, req *pb.CreateAdminRequest, claims *auth.Claims) (*pb.CreateAdminResponse, error) {
 
+	if req.IdTenant == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "id_tenant requis pour créer un administrateur")
+	}
+
+	tenantID, err := uuid.Parse(req.IdTenant)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "id_tenant invalide : %v", err)
+	}
+
+	var exists bool
+	err = s.Store.DB.QueryRowContext(ctx, `SELECT EXISTS (SELECT 1 FROM tenant WHERE id_tenant = $1)`, tenantID).Scan(&exists)
+	if err != nil || !exists {
+		return nil, status.Errorf(codes.NotFound, "Le tenant %s est introuvable", req.IdTenant)
+	}
+
 	adminUser, err := GetUserInfoFromRedis(ctx, claims.UserID.String())
 	if err != nil {
 		log.Printf("Échec récupération infos admin depuis Redis: %v", err)
 		return nil, status.Errorf(codes.Internal, "Impossible de récupérer les informations de l'administrateur.")
 	}
 
-	if err := s.CheckAdminPermissions(ctx, claims, "ASSIGNE_ADMIN"); err != nil {
+	if err := s.CheckAdminPermissions(ctx, claims, "MANAGE_ADMIN"); err != nil {
 		return nil, err
 	}
 
-	// Génère un identifiant de connexion
+	// identifiant de connexion
 	loginID := GenerateLoginID(req.Prenom, req.Nom)
 
-	// Prépare les données utilisateur
 	adminData := &repositories.Utilisateur{
 		IDUtilisateur:   uuid.New(),
 		Nom:             req.Nom,
@@ -40,10 +54,11 @@ func (s *AuthService) CreateAdmin(ctx context.Context, req *pb.CreateAdminReques
 		Role:            req.Role,
 		DateInscription: time.Now(),
 		LoginID:         loginID,
+		TenantID:        tenantID,
 		PhotoProfil:     "https://storage.googleapis.com/mon-bucket/profil-default.jpg",
 	}
 
-	// Crée l'utilisateur ou récupère un existant
+	// crée l'utilisateur ou récupère un existant
 	userID, tempPassword, err := s.ensureOrCreateAdmin(ctx, adminData)
 	if err != nil {
 		s.RollbackAdminCreation(ctx, userID)
@@ -62,7 +77,7 @@ func (s *AuthService) CreateAdmin(ctx context.Context, req *pb.CreateAdminReques
 		return nil, status.Errorf(codes.AlreadyExists, "L'utilisateur %s est déjà administrateur.", userID)
 	}
 
-	// Ajout des permissions si nécessaires
+	// ajout des permissions si nécessaires
 	if len(req.Permissions) > 0 {
 		for _, permission := range req.Permissions {
 			_, err := s.Store.DB.ExecContext(ctx, `
@@ -81,7 +96,7 @@ func (s *AuthService) CreateAdmin(ctx context.Context, req *pb.CreateAdminReques
 		}
 	}
 
-	// Audit log
+	// audit log
 	ip, userAgent := GetRequestMetadata(ctx)
 	_ = s.LogAction(ctx, AuditLog{
 		AdminID:    claims.UserID,
@@ -96,7 +111,7 @@ func (s *AuthService) CreateAdmin(ctx context.Context, req *pb.CreateAdminReques
 		Status:     "succès",
 	})
 
-	// Envoi email
+	// envoi email
 	go s.SendAdminSecurityAlertEmail(
 		adminUser.Email,
 		adminData.Email,
@@ -109,7 +124,7 @@ func (s *AuthService) CreateAdmin(ctx context.Context, req *pb.CreateAdminReques
 		userAgent,
 	)
 
-	log.Printf("administrateur créé avec succès : %s", adminData.IDUtilisateur)
+	log.Printf("Administrateur %s créé avec succès avec pour mot de passe:  %s.", adminData.IDUtilisateur, tempPassword)
 	return &pb.CreateAdminResponse{
 		Message: fmt.Sprintf("Administrateur %s créé avec succès.", adminData.IDUtilisateur),
 	}, nil

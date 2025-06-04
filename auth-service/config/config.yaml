@@ -1,4 +1,4 @@
-# configuration du Control Plane (control-plane/config/config.yaml)
+# configuration d'authentification 
 
 server:
   host: "0.0.0.0"           

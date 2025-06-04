@@ -41,6 +41,7 @@ func StoreUserSessionInRedis(ctx context.Context, user *repositories.Utilisateur
 		"prenom":             user.Prenom,
 		"email":              user.Email,
 		"telephone":          user.Telephone,
+		"id_tenant":          user.TenantID,
 		"role":               user.Role,
 		"permissions":        user.Permissions,
 		"mfa_enabled":        user.MFAEnabled,
@@ -66,7 +67,7 @@ func StoreUserSessionInRedis(ctx context.Context, user *repositories.Utilisateur
 func GetUserInfoFromRedis(ctx context.Context, userID string) (*repositories.UtilisateurRedis, error) {
 	redisKey := fmt.Sprintf("user:session:%s", userID)
 
-	// Récupérer toutes les valeurs stockées sous cette clé
+	//  toutes les valeurs stockées sous cette clé
 	data, err := RedisClient.HGetAll(ctx, redisKey).Result()
 	if err != nil {
 		log.Printf("Erreur Redis lors de la récupération des infos utilisateur [ID: %s]: %v", userID, err)
