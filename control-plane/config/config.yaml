@@ -1,10 +1,11 @@
 # configuration du Control Plane (control-plane/config/config.yaml)
 
 server:
-  grpc_port: 50061            # serveur gRPC
-  http_port: 8090             # serveur REST (via grpc-gateway)
-  tls_cert: "certs/server.crt" #  vers le certificat TLS (mTLS)
-  tls_key: "certs/server.key"  #  vers la clé privée TLS
+  host: "0.0.0.0"           
+  grpc_port: 50062
+  http_port: 8091
+  tls_cert: "certs/server.crt"
+  tls_key: "certs/server.key"
 
 
 jwt:
@@ -12,14 +13,14 @@ jwt:
   refresh_secret: ""
   access_token_expiry: 1h
   refresh_token_expiry: 7d
-  issuer: control-plane
+  issuer: auth-service
 
 database:
   host: "localhost"
-  port: 5442
+  port: 5443
   user: "cdnadmin"
   password: "cdnpassword"
-  name: "cdn_control"
+  name: "control_db"
   sslmode: "disable"  # disable | require | verify-ca | verify-full
 
 redis:
@@ -51,6 +52,28 @@ tracking:
   enable_ip_logging: true
   enable_user_agent_logging: true
 
-roles_b: ["admin", "viewer"]
 roles_a: ["superadmin"]
+roles_b: ["admin", "viewer"]
 
+google_cloud:
+  secret_manager:
+    gcloud_key: "gcloud-key-json"
+  pubsub:
+    project_id: "syk-microservices"
+    topic_name: "syk-event"
+    subscription_name: "notes-subscription"
+
+use_cloud_secrets: false
+
+firebase:
+  firebase_api_key: ""
+  firebase_credentials: ""
+
+
+email:
+  smtp_host: ""
+  smtp_port: ""
+  username: ""
+  password: ""
+  from_email: ""
+  from_name: "cdn"

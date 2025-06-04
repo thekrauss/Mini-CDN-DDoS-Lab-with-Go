@@ -1,0 +1,7 @@
+DROP TABLE IF EXISTS control_logs;
+DROP TABLE IF EXISTS alerts;
+DROP TABLE IF EXISTS tenant_configs;
+DROP TABLE IF EXISTS services;
+DROP TABLE IF EXISTS commands;
+DROP TABLE IF EXISTS node_metrics;
+DROP TABLE IF EXISTS nodes;

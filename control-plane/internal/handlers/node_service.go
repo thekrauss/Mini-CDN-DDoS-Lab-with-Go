@@ -1,9 +1,17 @@
 package handlers
 
-import "github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/internal/repository"
+import (
+	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/db"
+	pb "github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/proto"
+
+	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/internal/repository"
+)
 
 type NodeService struct {
-	repo repository.NodeRepository
+	pb.UnimplementedNodeServiceServer
+
+	repo  repository.NodeRepository
+	Store *db.DBStore
 }
 
 func NewNodeService(repo repository.NodeRepository) *NodeService {

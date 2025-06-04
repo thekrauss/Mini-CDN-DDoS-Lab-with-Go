@@ -27,6 +27,10 @@ type RegisterRequest struct {
 	NodeId        string                 `protobuf:"bytes,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
 	Ip            string                 `protobuf:"bytes,2,opt,name=ip,proto3" json:"ip,omitempty"`
 	Hostname      string                 `protobuf:"bytes,3,opt,name=hostname,proto3" json:"hostname,omitempty"`
+	Location      string                 `protobuf:"bytes,4,opt,name=location,proto3" json:"location,omitempty"`
+	Provider      string                 `protobuf:"bytes,5,opt,name=provider,proto3" json:"provider,omitempty"`
+	Version       string                 `protobuf:"bytes,6,opt,name=version,proto3" json:"version,omitempty"`
+	Tags          []string               `protobuf:"bytes,7,rep,name=tags,proto3" json:"tags,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -82,9 +86,38 @@ func (x *RegisterRequest) GetHostname() string {
 	return ""
 }
 
+func (x *RegisterRequest) GetLocation() string {
+	if x != nil {
+		return x.Location
+	}
+	return ""
+}
+
+func (x *RegisterRequest) GetProvider() string {
+	if x != nil {
+		return x.Provider
+	}
+	return ""
+}
+
+func (x *RegisterRequest) GetVersion() string {
+	if x != nil {
+		return x.Version
+	}
+	return ""
+}
+
+func (x *RegisterRequest) GetTags() []string {
+	if x != nil {
+		return x.Tags
+	}
+	return nil
+}
+
 type RegisterResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Message       string                 `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+	NodeId        string                 `protobuf:"bytes,2,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -126,9 +159,21 @@ func (x *RegisterResponse) GetMessage() string {
 	return ""
 }
 
+func (x *RegisterResponse) GetNodeId() string {
+	if x != nil {
+		return x.NodeId
+	}
+	return ""
+}
+
 type PingRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	NodeId        string                 `protobuf:"bytes,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
+	Cpu           float32                `protobuf:"fixed32,2,opt,name=cpu,proto3" json:"cpu,omitempty"`
+	Memory        float32                `protobuf:"fixed32,3,opt,name=memory,proto3" json:"memory,omitempty"`
+	UptimeSeconds int32                  `protobuf:"varint,4,opt,name=uptime_seconds,json=uptimeSeconds,proto3" json:"uptime_seconds,omitempty"`
+	Connections   int32                  `protobuf:"varint,5,opt,name=connections,proto3" json:"connections,omitempty"`
+	Status        string                 `protobuf:"bytes,6,opt,name=status,proto3" json:"status,omitempty"` // healthy, slow, critical
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -170,9 +215,44 @@ func (x *PingRequest) GetNodeId() string {
 	return ""
 }
 
+func (x *PingRequest) GetCpu() float32 {
+	if x != nil {
+		return x.Cpu
+	}
+	return 0
+}
+
+func (x *PingRequest) GetMemory() float32 {
+	if x != nil {
+		return x.Memory
+	}
+	return 0
+}
+
+func (x *PingRequest) GetUptimeSeconds() int32 {
+	if x != nil {
+		return x.UptimeSeconds
+	}
+	return 0
+}
+
+func (x *PingRequest) GetConnections() int32 {
+	if x != nil {
+		return x.Connections
+	}
+	return 0
+}
+
+func (x *PingRequest) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
 type PingResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Status        string                 `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+	Status        string                 `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"` // ok, failed, warning
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -220,6 +300,8 @@ type MetricsRequest struct {
 	Cpu           float32                `protobuf:"fixed32,2,opt,name=cpu,proto3" json:"cpu,omitempty"`
 	Memory        float32                `protobuf:"fixed32,3,opt,name=memory,proto3" json:"memory,omitempty"`
 	Connections   int32                  `protobuf:"varint,4,opt,name=connections,proto3" json:"connections,omitempty"`
+	UptimeSeconds int32                  `protobuf:"varint,5,opt,name=uptime_seconds,json=uptimeSeconds,proto3" json:"uptime_seconds,omitempty"`
+	Status        string                 `protobuf:"bytes,6,opt,name=status,proto3" json:"status,omitempty"` // healthy, slow, critical
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -282,6 +364,20 @@ func (x *MetricsRequest) GetConnections() int32 {
 	return 0
 }
 
+func (x *MetricsRequest) GetUptimeSeconds() int32 {
+	if x != nil {
+		return x.UptimeSeconds
+	}
+	return 0
+}
+
+func (x *MetricsRequest) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
 type MetricsResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Status        string                 `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
@@ -331,22 +427,34 @@ var File_node_proto protoreflect.FileDescriptor
 const file_node_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"node.proto\x12\x06nodepb\x1a\x1cgoogle/api/annotations.proto\"V\n" +
+	"node.proto\x12\x06nodepb\x1a\x1cgoogle/api/annotations.proto\"\xbc\x01\n" +
 	"\x0fRegisterRequest\x12\x17\n" +
 	"\anode_id\x18\x01 \x01(\tR\x06nodeId\x12\x0e\n" +
 	"\x02ip\x18\x02 \x01(\tR\x02ip\x12\x1a\n" +
-	"\bhostname\x18\x03 \x01(\tR\bhostname\",\n" +
+	"\bhostname\x18\x03 \x01(\tR\bhostname\x12\x1a\n" +
+	"\blocation\x18\x04 \x01(\tR\blocation\x12\x1a\n" +
+	"\bprovider\x18\x05 \x01(\tR\bprovider\x12\x18\n" +
+	"\aversion\x18\x06 \x01(\tR\aversion\x12\x12\n" +
+	"\x04tags\x18\a \x03(\tR\x04tags\"E\n" +
 	"\x10RegisterResponse\x12\x18\n" +
-	"\amessage\x18\x01 \x01(\tR\amessage\"&\n" +
+	"\amessage\x18\x01 \x01(\tR\amessage\x12\x17\n" +
+	"\anode_id\x18\x02 \x01(\tR\x06nodeId\"\xb1\x01\n" +
 	"\vPingRequest\x12\x17\n" +
-	"\anode_id\x18\x01 \x01(\tR\x06nodeId\"&\n" +
+	"\anode_id\x18\x01 \x01(\tR\x06nodeId\x12\x10\n" +
+	"\x03cpu\x18\x02 \x01(\x02R\x03cpu\x12\x16\n" +
+	"\x06memory\x18\x03 \x01(\x02R\x06memory\x12%\n" +
+	"\x0euptime_seconds\x18\x04 \x01(\x05R\ruptimeSeconds\x12 \n" +
+	"\vconnections\x18\x05 \x01(\x05R\vconnections\x12\x16\n" +
+	"\x06status\x18\x06 \x01(\tR\x06status\"&\n" +
 	"\fPingResponse\x12\x16\n" +
-	"\x06status\x18\x01 \x01(\tR\x06status\"u\n" +
+	"\x06status\x18\x01 \x01(\tR\x06status\"\xb4\x01\n" +
 	"\x0eMetricsRequest\x12\x17\n" +
 	"\anode_id\x18\x01 \x01(\tR\x06nodeId\x12\x10\n" +
 	"\x03cpu\x18\x02 \x01(\x02R\x03cpu\x12\x16\n" +
 	"\x06memory\x18\x03 \x01(\x02R\x06memory\x12 \n" +
-	"\vconnections\x18\x04 \x01(\x05R\vconnections\")\n" +
+	"\vconnections\x18\x04 \x01(\x05R\vconnections\x12%\n" +
+	"\x0euptime_seconds\x18\x05 \x01(\x05R\ruptimeSeconds\x12\x16\n" +
+	"\x06status\x18\x06 \x01(\tR\x06status\")\n" +
 	"\x0fMetricsResponse\x12\x16\n" +
 	"\x06status\x18\x01 \x01(\tR\x06status2\x8e\x02\n" +
 	"\vNodeService\x12_\n" +

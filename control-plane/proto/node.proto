@@ -33,18 +33,28 @@ message RegisterRequest {
   string node_id = 1;
   string ip = 2;
   string hostname = 3;
+  string location = 4;
+  string provider = 5;
+  string version = 6;
+  repeated string tags = 7;
 }
 
 message RegisterResponse {
   string message = 1;
+  string node_id = 2;
 }
 
 message PingRequest {
   string node_id = 1;
+  float cpu = 2;
+  float memory = 3;
+  int32 uptime_seconds = 4;
+  int32 connections = 5;
+  string status = 6; // healthy, slow, critical
 }
 
 message PingResponse {
-  string status = 1;
+  string status = 1; // ok, failed, warning
 }
 
 message MetricsRequest {
@@ -52,6 +62,8 @@ message MetricsRequest {
   float cpu = 2;
   float memory = 3;
   int32 connections = 4;
+  int32 uptime_seconds = 5;
+  string status = 6; // healthy, slow, critical
 }
 
 message MetricsResponse {

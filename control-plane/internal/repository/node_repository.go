@@ -21,6 +21,20 @@ type Node struct {
 	Tags            []string  `json:"tags"`             // mots-clés libres pour filtrage, UI, regroupement logique
 }
 
+type UtilisateurRedis struct {
+	IDUtilisateur string
+	Nom           string
+	Prenom        string
+	Email         string
+	Telephone     string
+	Role          string
+	Permissions   string
+	TenantID      string
+	MFAEnabled    bool
+	IsActive      bool
+	Status        string
+}
+
 type NodeFilter struct {
 	TenantID string
 	Query    string
