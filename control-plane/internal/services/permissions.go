@@ -55,21 +55,21 @@ func (s *NodeService) HasPermission(ctx context.Context, userID, requiredPermiss
 	}
 
 	//  dans PostgreSQL si la permission n'est pas en cache
-	// var count int
-	// err = s.Store.DB.QueryRowContext(ctx, `SELECT COUNT(*) FROM utilisateurs_permissions WHERE id_utilisateur = $1 AND permission = $2`,
-	// 	userID, requiredPermission).Scan(&count)
-	// if err != nil {
-	// 	return false, status.Errorf(codes.Internal, "Erreur lors de la vérification de la permission")
-	// }
+	var count int
+	err = s.Store.DB.QueryRowContext(ctx, `SELECT COUNT(*) FROM utilisateurs_permissions WHERE id_utilisateur = $1 AND permission = $2`,
+		userID, requiredPermission).Scan(&count)
+	if err != nil {
+		return false, status.Errorf(codes.Internal, "Erreur lors de la vérification de la permission")
+	}
 
-	// Si permission trouvée en db, met en cache pour la prochaine fois
-	// if count > 0 {
-	// 	err = CachCdnPermissionsInRedis(ctx, userID, []string{requiredPermission})
-	// 	if err != nil {
-	// 		log.Printf("Impossible de mettre en cache Redis : %v", err)
-	// 	}
-	// 	return true, nil
-	// }
+	//Si permission trouvée en db, met en cache pour la prochaine fois
+	if count > 0 {
+		err = CachCdnPermissionsInRedis(ctx, userID, []string{requiredPermission})
+		if err != nil {
+			log.Printf("Impossible de mettre en cache Redis : %v", err)
+		}
+		return true, nil
+	}
 
 	log.Printf("Permission '%s' non trouvée pour %s", requiredPermission, userID)
 	return false, nil

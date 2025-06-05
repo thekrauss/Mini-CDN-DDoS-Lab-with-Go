@@ -61,3 +61,5 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250512202823-5a2f75b736a9 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+replace github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/auth-service => ../auth-service

@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/lib/pq"
 	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/internal/repository"
 	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/pkg/logger"
 	pkg "github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/pkg/redis"
@@ -26,13 +27,16 @@ func NewNodeRepository(db *sql.DB) repository.NodeRepository {
 
 func (r *SQLNodeRepository) CreateNode(ctx context.Context, node *repository.Node) error {
 	query := `
-		INSERT INTO nodes (id, name, ip, tenant_id, last_seen, created_at, updated_at)
-		VALUES ($1, $2, $3, $4, $5, $6, $7)
-	`
+  INSERT INTO nodes (id, hostname, ip_address, tenant_id, last_seen, created_at, updated_at, location, os, version, status, provider, is_blacklisted, tags)
+  VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+`
 	_, err := r.DB.ExecContext(ctx, query,
-		node.ID, node.Name, node.IP, node.TenantID,
-		node.LastSeen, node.CreatedAt, node.UpdatedAt,
+		node.ID, node.Name, node.IP, node.TenantID, node.LastSeen,
+		node.CreatedAt, node.UpdatedAt,
+		node.Location, node.OS, node.SoftwareVersion,
+		node.Status, node.Provider, node.IsBlacklisted, pq.Array(node.Tags),
 	)
+
 	if err != nil {
 		return err
 	}
@@ -46,7 +50,6 @@ func (r *SQLNodeRepository) CreateNode(ctx context.Context, node *repository.Nod
 }
 
 func (r *SQLNodeRepository) GetNodeByID(ctx context.Context, id string) (*repository.Node, error) {
-
 	cachedKey := fmt.Sprintf("node:%s", id)
 
 	cached, err := pkg.RedisClient.Get(ctx, cachedKey).Result()
@@ -58,14 +61,15 @@ func (r *SQLNodeRepository) GetNodeByID(ctx context.Context, id string) (*reposi
 		logger.Log.Warn("cache corrupted", zap.String("node_id", id), zap.Error(err))
 	}
 
-	query := `SELECT id, name, ip, tenant_id, last_seen, created_at, updated_at FROM nodes WHERE id = $1`
+	query := `SELECT id, hostname, ip_address, tenant_id, status, last_seen, created_at, updated_at, location, os, version, provider, is_blacklisted, tags FROM nodes WHERE id = $1`
 	row := r.DB.QueryRowContext(ctx, query, id)
 
 	var node repository.Node
-	if err := row.Scan(&node.ID, &node.Name, &node.IP, &node.TenantID,
-		&node.LastSeen, &node.CreatedAt, &node.UpdatedAt); err != nil {
+	var tags []string
+	if err := row.Scan(&node.ID, &node.Name, &node.IP, &node.TenantID, &node.Status, &node.LastSeen, &node.CreatedAt, &node.UpdatedAt, &node.Location, &node.OS, &node.SoftwareVersion, &node.Provider, &node.IsBlacklisted, pq.Array(&tags)); err != nil {
 		return nil, err
 	}
+	node.Tags = tags
 
 	if raw, err := json.Marshal(&node); err == nil {
 		if err := pkg.RedisClient.Set(ctx, cachedKey, raw, 60*time.Minute).Err(); err != nil {
@@ -105,7 +109,7 @@ func (r *SQLNodeRepository) ListNodesByTenant(ctx context.Context, tenantID stri
 		)
 	}
 
-	query := `SELECT id, name, ip, tenant_id, last_seen, created_at, updated_at FROM nodes WHERE tenant_id = $1`
+	query := `SELECT id, hostname, ip_address, tenant_id, status, last_seen, created_at, updated_at, location, os, version, provider, is_blacklisted, tags FROM nodes WHERE tenant_id = $1`
 	rows, err := r.DB.QueryContext(ctx, query, tenantID)
 	if err != nil {
 		return nil, err
@@ -115,9 +119,11 @@ func (r *SQLNodeRepository) ListNodesByTenant(ctx context.Context, tenantID stri
 	var nodes []*repository.Node
 	for rows.Next() {
 		var node repository.Node
-		if err := rows.Scan(&node.ID, &node.Name, &node.IP, &node.TenantID, &node.LastSeen, &node.CreatedAt, &node.UpdatedAt); err != nil {
+		var tags []string
+		if err := rows.Scan(&node.ID, &node.Name, &node.IP, &node.TenantID, &node.Status, &node.LastSeen, &node.CreatedAt, &node.UpdatedAt, &node.Location, &node.OS, &node.SoftwareVersion, &node.Provider, &node.IsBlacklisted, pq.Array(&tags)); err != nil {
 			return nil, err
 		}
+		node.Tags = tags
 		nodes = append(nodes, &node)
 	}
 

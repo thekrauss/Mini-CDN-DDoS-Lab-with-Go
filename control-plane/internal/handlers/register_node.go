@@ -14,9 +14,9 @@ import (
 )
 
 func (s *NodeService) RegisterNode(ctx context.Context, req *pb.RegisterRequest) (*pb.RegisterResponse, error) {
-	log.Printf("→ RegisterNode: ID=%s, IP=%s", req.NodeId, req.Ip)
+	log.Printf("RegisterNode: ID=%s, IP=%s", req.NodeId, req.Ip)
 
-	// Authentification par contexte (claims extraits depuis le JWT middleware)
+	// authentification par contexte
 	claims, err := auth.ExtractJWTFromContext(ctx)
 	if err != nil {
 		return nil, status.Errorf(codes.Unauthenticated, "Token invalide ou expiré")
@@ -27,7 +27,7 @@ func (s *NodeService) RegisterNode(ctx context.Context, req *pb.RegisterRequest)
 		return nil, status.Errorf(codes.PermissionDenied, "no tenant assigned")
 	}
 
-	// Vérifier si l'IP est déjà utilisée
+	//  si l'IP est déjà utilisée
 	exists, err := s.repo.IsIPAlreadyRegistered(ctx, req.Ip)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "database error: %v", err)

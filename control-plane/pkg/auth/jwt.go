@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"time"
 
 	"github.com/gofrs/uuid"
 	"github.com/golang-jwt/jwt/v4"
@@ -18,34 +17,6 @@ type Claims struct {
 	Username string    `json:"username"`
 	Role     string    `json:"role"`
 	jwt.RegisteredClaims
-}
-
-// GenerateJWT generates a new JWT token with user-specific claims
-func GenerateJWT(userID uuid.UUID, username, role string) (string, error) {
-	secretKey, err := config.GetSecret("JWT_REFRESH_SECRET")
-	if err != nil {
-		return "", fmt.Errorf("failed to get JWT_REFRESH_SECRET: %w", err)
-	}
-
-	expirationTime := time.Now().Add(24 * time.Hour)
-	claims := Claims{
-		UserID:   userID,
-		Username: username,
-		Role:     role,
-		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(expirationTime),
-			IssuedAt:  jwt.NewNumericDate(time.Now()),
-			Issuer:    "auth-service",
-		},
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString([]byte(secretKey))
-	if err != nil {
-		return "", fmt.Errorf("failed to sign token: %w", err)
-	}
-
-	return tokenString, nil
 }
 
 func VerifyJWT(tokenString string) (*Claims, error) {

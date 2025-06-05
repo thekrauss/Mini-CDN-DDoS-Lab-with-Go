@@ -19,6 +19,7 @@ type Node struct {
 	SoftwareVersion string    `json:"software_version"` // version de l'agent exécuté sur le nœud
 	IsBlacklisted   bool      `json:"is_blacklisted"`   //  si le nœud est temporairement désactivé (DDoS, infra)
 	Tags            []string  `json:"tags"`             // mots-clés libres pour filtrage, UI, regroupement logique
+	OS              string    `json:"os"`
 }
 
 type UtilisateurRedis struct {
