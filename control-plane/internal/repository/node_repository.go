@@ -3,6 +3,8 @@ package repository
 import (
 	"context"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type Node struct {
@@ -34,6 +36,27 @@ type UtilisateurRedis struct {
 	MFAEnabled    bool
 	IsActive      bool
 	Status        string
+}
+
+type AuditLog struct {
+	ID        uuid.UUID
+	UserID    uuid.UUID
+	Role      string
+	Action    string
+	Target    string
+	Details   string
+	IPAddress string
+	UserAgent string
+	Timestamp time.Time
+	TenantID  uuid.UUID
+}
+
+type AuditLogFilter struct {
+	Limit    int
+	Offset   int
+	Action   *string
+	UserID   *string
+	TenantID *string
 }
 
 type NodeFilter struct {
@@ -75,4 +98,7 @@ type NodeRepository interface {
 	// Sécurité / Enregistrement
 	IsIPAlreadyRegistered(ctx context.Context, ip string) (bool, error)       // limite les enregistrements
 	AssignToTenant(ctx context.Context, nodeID string, tenantID string) error //migration d’un node à un client
+
+	InsertAuditLog(ctx context.Context, log *AuditLog) error
+	GetAuditLogs(ctx context.Context, filter AuditLogFilter) ([]*AuditLog, int, error)
 }

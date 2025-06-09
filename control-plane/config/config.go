@@ -46,6 +46,10 @@ type Config struct {
 		Password string
 		DB       int
 	}
+	AuthService struct {
+		Host string
+		Port int
+	}
 	Metrics struct {
 		PrometheusEnabled bool `mapstructure:"prometheus_enabled"`
 		PrometheusPort    int  `mapstructure:"prometheus_port"`

@@ -303,3 +303,97 @@ func (r *SQLNodeRepository) InvalidateTenantCache(ctx context.Context, tenantID 
 	}
 	return err
 }
+
+func (r *SQLNodeRepository) InsertAuditLog(ctx context.Context, log *repository.AuditLog) error {
+	query := `
+		INSERT INTO infra_audit_logs 
+			(id, user_id, role, action, target, details, ip_address, user_agent, timestamp, tenant_id) 
+		VALUES 
+			($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+	`
+
+	_, err := r.DB.ExecContext(ctx, query,
+		log.ID,
+		log.UserID,
+		log.Role,
+		log.Action,
+		log.Target,
+		log.Details,
+		log.IPAddress,
+		log.UserAgent,
+		log.Timestamp,
+		log.TenantID,
+	)
+
+	return err
+}
+
+func (r *SQLNodeRepository) GetAuditLogs(ctx context.Context, filter repository.AuditLogFilter) ([]*repository.AuditLog, int, error) {
+	query := `SELECT id, user_id, role, action, target, details, ip_address, user_agent, tenant_id, timestamp FROM infra_audit_logs WHERE 1=1`
+	args := []interface{}{}
+	idx := 1
+
+	if filter.Action != nil {
+		query += fmt.Sprintf(" AND action = $%d", idx)
+		args = append(args, *filter.Action)
+		idx++
+	}
+	if filter.UserID != nil {
+		query += fmt.Sprintf(" AND user_id = $%d", idx)
+		args = append(args, *filter.UserID)
+		idx++
+	}
+	if filter.TenantID != nil {
+		query += fmt.Sprintf(" AND tenant_id = $%d", idx)
+		args = append(args, *filter.TenantID)
+		idx++
+	}
+
+	query += fmt.Sprintf(" ORDER BY timestamp DESC LIMIT $%d OFFSET $%d", idx, idx+1)
+	args = append(args, filter.Limit, filter.Offset)
+
+	rows, err := r.DB.QueryContext(ctx, query, args...)
+	if err != nil {
+		return nil, 0, err
+	}
+	defer rows.Close()
+
+	var logs []*repository.AuditLog
+	for rows.Next() {
+		var log repository.AuditLog
+		if err := rows.Scan(
+			&log.ID, &log.UserID, &log.Role, &log.Action, &log.Target, &log.Details,
+			&log.IPAddress, &log.UserAgent, &log.TenantID, &log.Timestamp,
+		); err != nil {
+			return nil, 0, err
+		}
+		logs = append(logs, &log)
+	}
+
+	// total count
+	countQuery := `SELECT COUNT(*) FROM infra_audit_logs WHERE 1=1`
+	argsCount := []interface{}{}
+	idx = 1
+	if filter.Action != nil {
+		countQuery += fmt.Sprintf(" AND action = $%d", idx)
+		argsCount = append(argsCount, *filter.Action)
+		idx++
+	}
+	if filter.UserID != nil {
+		countQuery += fmt.Sprintf(" AND user_id = $%d", idx)
+		argsCount = append(argsCount, *filter.UserID)
+		idx++
+	}
+	if filter.TenantID != nil {
+		countQuery += fmt.Sprintf(" AND tenant_id = $%d", idx)
+		argsCount = append(argsCount, *filter.TenantID)
+		idx++
+	}
+
+	var total int
+	if err := r.DB.QueryRowContext(ctx, countQuery, argsCount...).Scan(&total); err != nil {
+		return nil, 0, err
+	}
+
+	return logs, total, nil
+}

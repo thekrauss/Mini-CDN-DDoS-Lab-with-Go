@@ -6,8 +6,10 @@ import (
 	"log"
 	"time"
 
+	authpb "github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/auth-service/proto"
 	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/config"
 	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/db"
+	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/internal/repository"
 	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/pkg/auth"
 
 	"google.golang.org/grpc/codes"
@@ -15,23 +17,20 @@ import (
 )
 
 type NodeService struct {
-	Store *db.DBStore
+	Repo       repository.NodeRepository
+	Store      *db.DBStore
+	AuthClient authpb.AuthServiceClient
 }
 
-func (s *NodeService) CheckAdminPermissions(ctx context.Context, claims *auth.Claims, permission string) error {
-
-	adminUser, err := GetUserInfoFromRedis(ctx, claims.UserID.String())
-	if err != nil {
-		return status.Errorf(codes.Internal, "Impossible de récupérer les informations de l'administrateur.")
-	}
+func (s *NodeService) CheckAdminPermissions(ctx context.Context, claims *auth.Claims, tenantID, permission string) error {
 
 	// Cas classiques
-	if config.IsRoleA(adminUser.Role) {
+	if config.IsRoleA(claims.Role) {
 		return nil
 	}
 
-	if config.IsRoleB(adminUser.Role) {
-		hasPerm, err := s.HasPermission(ctx, adminUser.IDUtilisateur, permission)
+	if config.IsRoleB(claims.Role) {
+		hasPerm, err := s.Permission(ctx, claims.UserID.String(), permission)
 		if err != nil {
 			return status.Errorf(codes.Internal, "Erreur interne lors de la vérification des permissions")
 		}
@@ -44,34 +43,35 @@ func (s *NodeService) CheckAdminPermissions(ctx context.Context, claims *auth.Cl
 	return status.Errorf(codes.PermissionDenied, "Accès refusé")
 }
 
-func (s *NodeService) HasPermission(ctx context.Context, userID, requiredPermission string) (bool, error) {
+func (s *NodeService) Permission(ctx context.Context, userID, requiredPermission string) (bool, error) {
 	permissionsKey := fmt.Sprintf("cdn-permissions:%s", userID)
 
-	// verifi d'abord dans Redis
+	//  dans Redis
 	exists, err := RedisClient.SIsMember(ctx, permissionsKey, requiredPermission).Result()
 	if err == nil && exists {
-		log.Printf("Permission '%s' trouvée en cache Redis pour %s", requiredPermission, userID)
+		log.Printf("Permission '%s' trouvée dans Redis pour %s", requiredPermission, userID)
 		return true, nil
 	}
 
-	//  dans PostgreSQL si la permission n'est pas en cache
-	var count int
-	err = s.Store.DB.QueryRowContext(ctx, `SELECT COUNT(*) FROM utilisateurs_permissions WHERE id_utilisateur = $1 AND permission = $2`,
-		userID, requiredPermission).Scan(&count)
+	//  gRPC vers auth-service
+	res, err := s.AuthClient.HasPermission(ctx, &authpb.HasPermissionRequest{
+		UserId:     userID,
+		Permission: requiredPermission,
+	})
 	if err != nil {
-		return false, status.Errorf(codes.Internal, "Erreur lors de la vérification de la permission")
+		log.Printf("Erreur gRPC HasPermission: %v", err)
+		return false, err
 	}
 
-	//Si permission trouvée en db, met en cache pour la prochaine fois
-	if count > 0 {
-		err = CachCdnPermissionsInRedis(ctx, userID, []string{requiredPermission})
-		if err != nil {
+	if res.Allowed {
+		// Mise en cache pour la prochaine fois
+		if err := CachCdnPermissionsInRedis(ctx, userID, []string{requiredPermission}); err != nil {
 			log.Printf("Impossible de mettre en cache Redis : %v", err)
 		}
 		return true, nil
 	}
 
-	log.Printf("Permission '%s' non trouvée pour %s", requiredPermission, userID)
+	log.Printf("Permission '%s' refusée pour %s", requiredPermission, userID)
 	return false, nil
 }
 

@@ -10,6 +10,7 @@ import (
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -31,6 +32,7 @@ type RegisterRequest struct {
 	Provider      string                 `protobuf:"bytes,5,opt,name=provider,proto3" json:"provider,omitempty"`
 	Version       string                 `protobuf:"bytes,6,opt,name=version,proto3" json:"version,omitempty"`
 	Tags          []string               `protobuf:"bytes,7,rep,name=tags,proto3" json:"tags,omitempty"`
+	IdTenant      string                 `protobuf:"bytes,8,opt,name=id_tenant,json=idTenant,proto3" json:"id_tenant,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -112,6 +114,13 @@ func (x *RegisterRequest) GetTags() []string {
 		return x.Tags
 	}
 	return nil
+}
+
+func (x *RegisterRequest) GetIdTenant() string {
+	if x != nil {
+		return x.IdTenant
+	}
+	return ""
 }
 
 type RegisterResponse struct {
@@ -422,12 +431,904 @@ func (x *MetricsResponse) GetStatus() string {
 	return ""
 }
 
+type GetAuditLogsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Limit         int32                  `protobuf:"varint,1,opt,name=limit,proto3" json:"limit,omitempty"`
+	Offset        int32                  `protobuf:"varint,2,opt,name=offset,proto3" json:"offset,omitempty"`
+	Action        *string                `protobuf:"bytes,3,opt,name=action,proto3,oneof" json:"action,omitempty"`
+	UserId        *string                `protobuf:"bytes,4,opt,name=user_id,json=userId,proto3,oneof" json:"user_id,omitempty"`
+	TenantId      *string                `protobuf:"bytes,5,opt,name=tenant_id,json=tenantId,proto3,oneof" json:"tenant_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetAuditLogsRequest) Reset() {
+	*x = GetAuditLogsRequest{}
+	mi := &file_node_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetAuditLogsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetAuditLogsRequest) ProtoMessage() {}
+
+func (x *GetAuditLogsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_node_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetAuditLogsRequest.ProtoReflect.Descriptor instead.
+func (*GetAuditLogsRequest) Descriptor() ([]byte, []int) {
+	return file_node_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *GetAuditLogsRequest) GetLimit() int32 {
+	if x != nil {
+		return x.Limit
+	}
+	return 0
+}
+
+func (x *GetAuditLogsRequest) GetOffset() int32 {
+	if x != nil {
+		return x.Offset
+	}
+	return 0
+}
+
+func (x *GetAuditLogsRequest) GetAction() string {
+	if x != nil && x.Action != nil {
+		return *x.Action
+	}
+	return ""
+}
+
+func (x *GetAuditLogsRequest) GetUserId() string {
+	if x != nil && x.UserId != nil {
+		return *x.UserId
+	}
+	return ""
+}
+
+func (x *GetAuditLogsRequest) GetTenantId() string {
+	if x != nil && x.TenantId != nil {
+		return *x.TenantId
+	}
+	return ""
+}
+
+type AuditLogEntry struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	UserId        string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Role          string                 `protobuf:"bytes,3,opt,name=role,proto3" json:"role,omitempty"`
+	Action        string                 `protobuf:"bytes,4,opt,name=action,proto3" json:"action,omitempty"`
+	Target        string                 `protobuf:"bytes,5,opt,name=target,proto3" json:"target,omitempty"`
+	Details       string                 `protobuf:"bytes,6,opt,name=details,proto3" json:"details,omitempty"`
+	IpAddress     string                 `protobuf:"bytes,7,opt,name=ip_address,json=ipAddress,proto3" json:"ip_address,omitempty"`
+	UserAgent     string                 `protobuf:"bytes,8,opt,name=user_agent,json=userAgent,proto3" json:"user_agent,omitempty"`
+	TenantId      string                 `protobuf:"bytes,9,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
+	Timestamp     string                 `protobuf:"bytes,10,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AuditLogEntry) Reset() {
+	*x = AuditLogEntry{}
+	mi := &file_node_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AuditLogEntry) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AuditLogEntry) ProtoMessage() {}
+
+func (x *AuditLogEntry) ProtoReflect() protoreflect.Message {
+	mi := &file_node_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AuditLogEntry.ProtoReflect.Descriptor instead.
+func (*AuditLogEntry) Descriptor() ([]byte, []int) {
+	return file_node_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *AuditLogEntry) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *AuditLogEntry) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *AuditLogEntry) GetRole() string {
+	if x != nil {
+		return x.Role
+	}
+	return ""
+}
+
+func (x *AuditLogEntry) GetAction() string {
+	if x != nil {
+		return x.Action
+	}
+	return ""
+}
+
+func (x *AuditLogEntry) GetTarget() string {
+	if x != nil {
+		return x.Target
+	}
+	return ""
+}
+
+func (x *AuditLogEntry) GetDetails() string {
+	if x != nil {
+		return x.Details
+	}
+	return ""
+}
+
+func (x *AuditLogEntry) GetIpAddress() string {
+	if x != nil {
+		return x.IpAddress
+	}
+	return ""
+}
+
+func (x *AuditLogEntry) GetUserAgent() string {
+	if x != nil {
+		return x.UserAgent
+	}
+	return ""
+}
+
+func (x *AuditLogEntry) GetTenantId() string {
+	if x != nil {
+		return x.TenantId
+	}
+	return ""
+}
+
+func (x *AuditLogEntry) GetTimestamp() string {
+	if x != nil {
+		return x.Timestamp
+	}
+	return ""
+}
+
+type GetAuditLogsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Logs          []*AuditLogEntry       `protobuf:"bytes,1,rep,name=logs,proto3" json:"logs,omitempty"`
+	Total         int32                  `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetAuditLogsResponse) Reset() {
+	*x = GetAuditLogsResponse{}
+	mi := &file_node_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetAuditLogsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetAuditLogsResponse) ProtoMessage() {}
+
+func (x *GetAuditLogsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_node_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetAuditLogsResponse.ProtoReflect.Descriptor instead.
+func (*GetAuditLogsResponse) Descriptor() ([]byte, []int) {
+	return file_node_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *GetAuditLogsResponse) GetLogs() []*AuditLogEntry {
+	if x != nil {
+		return x.Logs
+	}
+	return nil
+}
+
+func (x *GetAuditLogsResponse) GetTotal() int32 {
+	if x != nil {
+		return x.Total
+	}
+	return 0
+}
+
+type TenantRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TenantId      string                 `protobuf:"bytes,1,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TenantRequest) Reset() {
+	*x = TenantRequest{}
+	mi := &file_node_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TenantRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TenantRequest) ProtoMessage() {}
+
+func (x *TenantRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_node_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TenantRequest.ProtoReflect.Descriptor instead.
+func (*TenantRequest) Descriptor() ([]byte, []int) {
+	return file_node_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *TenantRequest) GetTenantId() string {
+	if x != nil {
+		return x.TenantId
+	}
+	return ""
+}
+
+type NodeListResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Nodes         []*Node                `protobuf:"bytes,1,rep,name=nodes,proto3" json:"nodes,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *NodeListResponse) Reset() {
+	*x = NodeListResponse{}
+	mi := &file_node_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *NodeListResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*NodeListResponse) ProtoMessage() {}
+
+func (x *NodeListResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_node_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use NodeListResponse.ProtoReflect.Descriptor instead.
+func (*NodeListResponse) Descriptor() ([]byte, []int) {
+	return file_node_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *NodeListResponse) GetNodes() []*Node {
+	if x != nil {
+		return x.Nodes
+	}
+	return nil
+}
+
+type UpdateNodeRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	NodeId        string                 `protobuf:"bytes,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Ip            string                 `protobuf:"bytes,3,opt,name=ip,proto3" json:"ip,omitempty"`
+	Tags          []string               `protobuf:"bytes,4,rep,name=tags,proto3" json:"tags,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateNodeRequest) Reset() {
+	*x = UpdateNodeRequest{}
+	mi := &file_node_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateNodeRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateNodeRequest) ProtoMessage() {}
+
+func (x *UpdateNodeRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_node_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateNodeRequest.ProtoReflect.Descriptor instead.
+func (*UpdateNodeRequest) Descriptor() ([]byte, []int) {
+	return file_node_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *UpdateNodeRequest) GetNodeId() string {
+	if x != nil {
+		return x.NodeId
+	}
+	return ""
+}
+
+func (x *UpdateNodeRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *UpdateNodeRequest) GetIp() string {
+	if x != nil {
+		return x.Ip
+	}
+	return ""
+}
+
+func (x *UpdateNodeRequest) GetTags() []string {
+	if x != nil {
+		return x.Tags
+	}
+	return nil
+}
+
+type NodeStatusRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	NodeId        string                 `protobuf:"bytes,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
+	Status        string                 `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *NodeStatusRequest) Reset() {
+	*x = NodeStatusRequest{}
+	mi := &file_node_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *NodeStatusRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*NodeStatusRequest) ProtoMessage() {}
+
+func (x *NodeStatusRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_node_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use NodeStatusRequest.ProtoReflect.Descriptor instead.
+func (*NodeStatusRequest) Descriptor() ([]byte, []int) {
+	return file_node_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *NodeStatusRequest) GetNodeId() string {
+	if x != nil {
+		return x.NodeId
+	}
+	return ""
+}
+
+func (x *NodeStatusRequest) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+type GetNodeRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	NodeId        string                 `protobuf:"bytes,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetNodeRequest) Reset() {
+	*x = GetNodeRequest{}
+	mi := &file_node_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetNodeRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetNodeRequest) ProtoMessage() {}
+
+func (x *GetNodeRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_node_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetNodeRequest.ProtoReflect.Descriptor instead.
+func (*GetNodeRequest) Descriptor() ([]byte, []int) {
+	return file_node_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *GetNodeRequest) GetNodeId() string {
+	if x != nil {
+		return x.NodeId
+	}
+	return ""
+}
+
+type NodeID struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	NodeId        string                 `protobuf:"bytes,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *NodeID) Reset() {
+	*x = NodeID{}
+	mi := &file_node_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *NodeID) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*NodeID) ProtoMessage() {}
+
+func (x *NodeID) ProtoReflect() protoreflect.Message {
+	mi := &file_node_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use NodeID.ProtoReflect.Descriptor instead.
+func (*NodeID) Descriptor() ([]byte, []int) {
+	return file_node_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *NodeID) GetNodeId() string {
+	if x != nil {
+		return x.NodeId
+	}
+	return ""
+}
+
+type Node struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	Id              string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name            string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Ip              string                 `protobuf:"bytes,3,opt,name=ip,proto3" json:"ip,omitempty"`
+	TenantId        string                 `protobuf:"bytes,4,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
+	Status          string                 `protobuf:"bytes,5,opt,name=status,proto3" json:"status,omitempty"`
+	Location        string                 `protobuf:"bytes,6,opt,name=location,proto3" json:"location,omitempty"`
+	Provider        string                 `protobuf:"bytes,7,opt,name=provider,proto3" json:"provider,omitempty"`
+	SoftwareVersion string                 `protobuf:"bytes,8,opt,name=software_version,json=softwareVersion,proto3" json:"software_version,omitempty"`
+	Tags            []string               `protobuf:"bytes,9,rep,name=tags,proto3" json:"tags,omitempty"`
+	Os              string                 `protobuf:"bytes,10,opt,name=os,proto3" json:"os,omitempty"`
+	LastSeen        string                 `protobuf:"bytes,11,opt,name=last_seen,json=lastSeen,proto3" json:"last_seen,omitempty"`
+	CreatedAt       string                 `protobuf:"bytes,12,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt       string                 `protobuf:"bytes,13,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	IsBlacklisted   bool                   `protobuf:"varint,14,opt,name=is_blacklisted,json=isBlacklisted,proto3" json:"is_blacklisted,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *Node) Reset() {
+	*x = Node{}
+	mi := &file_node_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Node) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Node) ProtoMessage() {}
+
+func (x *Node) ProtoReflect() protoreflect.Message {
+	mi := &file_node_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Node.ProtoReflect.Descriptor instead.
+func (*Node) Descriptor() ([]byte, []int) {
+	return file_node_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *Node) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *Node) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *Node) GetIp() string {
+	if x != nil {
+		return x.Ip
+	}
+	return ""
+}
+
+func (x *Node) GetTenantId() string {
+	if x != nil {
+		return x.TenantId
+	}
+	return ""
+}
+
+func (x *Node) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *Node) GetLocation() string {
+	if x != nil {
+		return x.Location
+	}
+	return ""
+}
+
+func (x *Node) GetProvider() string {
+	if x != nil {
+		return x.Provider
+	}
+	return ""
+}
+
+func (x *Node) GetSoftwareVersion() string {
+	if x != nil {
+		return x.SoftwareVersion
+	}
+	return ""
+}
+
+func (x *Node) GetTags() []string {
+	if x != nil {
+		return x.Tags
+	}
+	return nil
+}
+
+func (x *Node) GetOs() string {
+	if x != nil {
+		return x.Os
+	}
+	return ""
+}
+
+func (x *Node) GetLastSeen() string {
+	if x != nil {
+		return x.LastSeen
+	}
+	return ""
+}
+
+func (x *Node) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+func (x *Node) GetUpdatedAt() string {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return ""
+}
+
+func (x *Node) GetIsBlacklisted() bool {
+	if x != nil {
+		return x.IsBlacklisted
+	}
+	return false
+}
+
+type CommandRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	NodeId        string                 `protobuf:"bytes,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
+	Type          string                 `protobuf:"bytes,2,opt,name=type,proto3" json:"type,omitempty"` // restart, update, etc.
+	Payload       string                 `protobuf:"bytes,3,opt,name=payload,proto3" json:"payload,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CommandRequest) Reset() {
+	*x = CommandRequest{}
+	mi := &file_node_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CommandRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CommandRequest) ProtoMessage() {}
+
+func (x *CommandRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_node_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CommandRequest.ProtoReflect.Descriptor instead.
+func (*CommandRequest) Descriptor() ([]byte, []int) {
+	return file_node_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *CommandRequest) GetNodeId() string {
+	if x != nil {
+		return x.NodeId
+	}
+	return ""
+}
+
+func (x *CommandRequest) GetType() string {
+	if x != nil {
+		return x.Type
+	}
+	return ""
+}
+
+func (x *CommandRequest) GetPayload() string {
+	if x != nil {
+		return x.Payload
+	}
+	return ""
+}
+
+type Command struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Type          string                 `protobuf:"bytes,2,opt,name=type,proto3" json:"type,omitempty"`
+	Payload       string                 `protobuf:"bytes,3,opt,name=payload,proto3" json:"payload,omitempty"`
+	CreatedAt     string                 `protobuf:"bytes,4,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Command) Reset() {
+	*x = Command{}
+	mi := &file_node_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Command) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Command) ProtoMessage() {}
+
+func (x *Command) ProtoReflect() protoreflect.Message {
+	mi := &file_node_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Command.ProtoReflect.Descriptor instead.
+func (*Command) Descriptor() ([]byte, []int) {
+	return file_node_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *Command) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *Command) GetType() string {
+	if x != nil {
+		return x.Type
+	}
+	return ""
+}
+
+func (x *Command) GetPayload() string {
+	if x != nil {
+		return x.Payload
+	}
+	return ""
+}
+
+func (x *Command) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+type CommandResultRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	CommandId     string                 `protobuf:"bytes,1,opt,name=command_id,json=commandId,proto3" json:"command_id,omitempty"`
+	NodeId        string                 `protobuf:"bytes,2,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
+	Success       bool                   `protobuf:"varint,3,opt,name=success,proto3" json:"success,omitempty"`
+	Output        string                 `protobuf:"bytes,4,opt,name=output,proto3" json:"output,omitempty"`
+	Timestamp     string                 `protobuf:"bytes,5,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CommandResultRequest) Reset() {
+	*x = CommandResultRequest{}
+	mi := &file_node_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CommandResultRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CommandResultRequest) ProtoMessage() {}
+
+func (x *CommandResultRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_node_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CommandResultRequest.ProtoReflect.Descriptor instead.
+func (*CommandResultRequest) Descriptor() ([]byte, []int) {
+	return file_node_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *CommandResultRequest) GetCommandId() string {
+	if x != nil {
+		return x.CommandId
+	}
+	return ""
+}
+
+func (x *CommandResultRequest) GetNodeId() string {
+	if x != nil {
+		return x.NodeId
+	}
+	return ""
+}
+
+func (x *CommandResultRequest) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *CommandResultRequest) GetOutput() string {
+	if x != nil {
+		return x.Output
+	}
+	return ""
+}
+
+func (x *CommandResultRequest) GetTimestamp() string {
+	if x != nil {
+		return x.Timestamp
+	}
+	return ""
+}
+
 var File_node_proto protoreflect.FileDescriptor
 
 const file_node_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"node.proto\x12\x06nodepb\x1a\x1cgoogle/api/annotations.proto\"\xbc\x01\n" +
+	"node.proto\x12\x06nodepb\x1a\x1cgoogle/api/annotations.proto\x1a\x1bgoogle/protobuf/empty.proto\"\xd9\x01\n" +
 	"\x0fRegisterRequest\x12\x17\n" +
 	"\anode_id\x18\x01 \x01(\tR\x06nodeId\x12\x0e\n" +
 	"\x02ip\x18\x02 \x01(\tR\x02ip\x12\x1a\n" +
@@ -435,7 +1336,8 @@ const file_node_proto_rawDesc = "" +
 	"\blocation\x18\x04 \x01(\tR\blocation\x12\x1a\n" +
 	"\bprovider\x18\x05 \x01(\tR\bprovider\x12\x18\n" +
 	"\aversion\x18\x06 \x01(\tR\aversion\x12\x12\n" +
-	"\x04tags\x18\a \x03(\tR\x04tags\"E\n" +
+	"\x04tags\x18\a \x03(\tR\x04tags\x12\x1b\n" +
+	"\tid_tenant\x18\b \x01(\tR\bidTenant\"E\n" +
 	"\x10RegisterResponse\x12\x18\n" +
 	"\amessage\x18\x01 \x01(\tR\amessage\x12\x17\n" +
 	"\anode_id\x18\x02 \x01(\tR\x06nodeId\"\xb1\x01\n" +
@@ -456,11 +1358,98 @@ const file_node_proto_rawDesc = "" +
 	"\x0euptime_seconds\x18\x05 \x01(\x05R\ruptimeSeconds\x12\x16\n" +
 	"\x06status\x18\x06 \x01(\tR\x06status\")\n" +
 	"\x0fMetricsResponse\x12\x16\n" +
-	"\x06status\x18\x01 \x01(\tR\x06status2\x8e\x02\n" +
+	"\x06status\x18\x01 \x01(\tR\x06status\"\xc5\x01\n" +
+	"\x13GetAuditLogsRequest\x12\x14\n" +
+	"\x05limit\x18\x01 \x01(\x05R\x05limit\x12\x16\n" +
+	"\x06offset\x18\x02 \x01(\x05R\x06offset\x12\x1b\n" +
+	"\x06action\x18\x03 \x01(\tH\x00R\x06action\x88\x01\x01\x12\x1c\n" +
+	"\auser_id\x18\x04 \x01(\tH\x01R\x06userId\x88\x01\x01\x12 \n" +
+	"\ttenant_id\x18\x05 \x01(\tH\x02R\btenantId\x88\x01\x01B\t\n" +
+	"\a_actionB\n" +
+	"\n" +
+	"\b_user_idB\f\n" +
+	"\n" +
+	"_tenant_id\"\x8f\x02\n" +
+	"\rAuditLogEntry\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
+	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x12\n" +
+	"\x04role\x18\x03 \x01(\tR\x04role\x12\x16\n" +
+	"\x06action\x18\x04 \x01(\tR\x06action\x12\x16\n" +
+	"\x06target\x18\x05 \x01(\tR\x06target\x12\x18\n" +
+	"\adetails\x18\x06 \x01(\tR\adetails\x12\x1d\n" +
+	"\n" +
+	"ip_address\x18\a \x01(\tR\tipAddress\x12\x1d\n" +
+	"\n" +
+	"user_agent\x18\b \x01(\tR\tuserAgent\x12\x1b\n" +
+	"\ttenant_id\x18\t \x01(\tR\btenantId\x12\x1c\n" +
+	"\ttimestamp\x18\n" +
+	" \x01(\tR\ttimestamp\"W\n" +
+	"\x14GetAuditLogsResponse\x12)\n" +
+	"\x04logs\x18\x01 \x03(\v2\x15.nodepb.AuditLogEntryR\x04logs\x12\x14\n" +
+	"\x05total\x18\x02 \x01(\x05R\x05total\",\n" +
+	"\rTenantRequest\x12\x1b\n" +
+	"\ttenant_id\x18\x01 \x01(\tR\btenantId\"6\n" +
+	"\x10NodeListResponse\x12\"\n" +
+	"\x05nodes\x18\x01 \x03(\v2\f.nodepb.NodeR\x05nodes\"d\n" +
+	"\x11UpdateNodeRequest\x12\x17\n" +
+	"\anode_id\x18\x01 \x01(\tR\x06nodeId\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x0e\n" +
+	"\x02ip\x18\x03 \x01(\tR\x02ip\x12\x12\n" +
+	"\x04tags\x18\x04 \x03(\tR\x04tags\"D\n" +
+	"\x11NodeStatusRequest\x12\x17\n" +
+	"\anode_id\x18\x01 \x01(\tR\x06nodeId\x12\x16\n" +
+	"\x06status\x18\x02 \x01(\tR\x06status\")\n" +
+	"\x0eGetNodeRequest\x12\x17\n" +
+	"\anode_id\x18\x01 \x01(\tR\x06nodeId\"!\n" +
+	"\x06NodeID\x12\x17\n" +
+	"\anode_id\x18\x01 \x01(\tR\x06nodeId\"\xf8\x02\n" +
+	"\x04Node\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x0e\n" +
+	"\x02ip\x18\x03 \x01(\tR\x02ip\x12\x1b\n" +
+	"\ttenant_id\x18\x04 \x01(\tR\btenantId\x12\x16\n" +
+	"\x06status\x18\x05 \x01(\tR\x06status\x12\x1a\n" +
+	"\blocation\x18\x06 \x01(\tR\blocation\x12\x1a\n" +
+	"\bprovider\x18\a \x01(\tR\bprovider\x12)\n" +
+	"\x10software_version\x18\b \x01(\tR\x0fsoftwareVersion\x12\x12\n" +
+	"\x04tags\x18\t \x03(\tR\x04tags\x12\x0e\n" +
+	"\x02os\x18\n" +
+	" \x01(\tR\x02os\x12\x1b\n" +
+	"\tlast_seen\x18\v \x01(\tR\blastSeen\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\f \x01(\tR\tcreatedAt\x12\x1d\n" +
+	"\n" +
+	"updated_at\x18\r \x01(\tR\tupdatedAt\x12%\n" +
+	"\x0eis_blacklisted\x18\x0e \x01(\bR\risBlacklisted\"W\n" +
+	"\x0eCommandRequest\x12\x17\n" +
+	"\anode_id\x18\x01 \x01(\tR\x06nodeId\x12\x12\n" +
+	"\x04type\x18\x02 \x01(\tR\x04type\x12\x18\n" +
+	"\apayload\x18\x03 \x01(\tR\apayload\"f\n" +
+	"\aCommand\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
+	"\x04type\x18\x02 \x01(\tR\x04type\x12\x18\n" +
+	"\apayload\x18\x03 \x01(\tR\apayload\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\x04 \x01(\tR\tcreatedAt\"\x9e\x01\n" +
+	"\x14CommandResultRequest\x12\x1d\n" +
+	"\n" +
+	"command_id\x18\x01 \x01(\tR\tcommandId\x12\x17\n" +
+	"\anode_id\x18\x02 \x01(\tR\x06nodeId\x12\x18\n" +
+	"\asuccess\x18\x03 \x01(\bR\asuccess\x12\x16\n" +
+	"\x06output\x18\x04 \x01(\tR\x06output\x12\x1c\n" +
+	"\ttimestamp\x18\x05 \x01(\tR\ttimestamp2\xe2\a\n" +
 	"\vNodeService\x12_\n" +
 	"\fRegisterNode\x12\x17.nodepb.RegisterRequest\x1a\x18.nodepb.RegisterResponse\"\x1c\x82\xd3\xe4\x93\x02\x16:\x01*\"\x11/v1/register-node\x12F\n" +
 	"\x04Ping\x12\x13.nodepb.PingRequest\x1a\x14.nodepb.PingResponse\"\x13\x82\xd3\xe4\x93\x02\r:\x01*\"\b/v1/ping\x12V\n" +
-	"\vSendMetrics\x12\x16.nodepb.MetricsRequest\x1a\x17.nodepb.MetricsResponse\"\x16\x82\xd3\xe4\x93\x02\x10:\x01*\"\v/v1/metricsBDZBgithub.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/protob\x06proto3"
+	"\vSendMetrics\x12\x16.nodepb.MetricsRequest\x1a\x17.nodepb.MetricsResponse\"\x16\x82\xd3\xe4\x93\x02\x10:\x01*\"\v/v1/metrics\x12g\n" +
+	"\fGetAuditLogs\x12\x1b.nodepb.GetAuditLogsRequest\x1a\x1c.nodepb.GetAuditLogsResponse\"\x1c\x82\xd3\xe4\x93\x02\x16\x12\x14/v1/nodes/audit-logs\x12W\n" +
+	"\x11ListNodesByTenant\x12\x15.nodepb.TenantRequest\x1a\x18.nodepb.NodeListResponse\"\x11\x82\xd3\xe4\x93\x02\v\x12\t/v1/nodes\x12g\n" +
+	"\x12UpdateNodeMetadata\x12\x19.nodepb.UpdateNodeRequest\x1a\x16.google.protobuf.Empty\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\x1a\x13/v1/nodes/{node_id}\x12i\n" +
+	"\rSetNodeStatus\x12\x19.nodepb.NodeStatusRequest\x1a\x16.google.protobuf.Empty\"%\x82\xd3\xe4\x93\x02\x1f:\x01*\"\x1a/v1/nodes/{node_id}/status\x12P\n" +
+	"\vGetNodeByID\x12\x16.nodepb.GetNodeRequest\x1a\f.nodepb.Node\"\x1b\x82\xd3\xe4\x93\x02\x15\x12\x13/v1/nodes/{node_id}\x12^\n" +
+	"\rBlacklistNode\x12\x0e.nodepb.NodeID\x1a\x16.google.protobuf.Empty\"%\x82\xd3\xe4\x93\x02\x1f\"\x1d/v1/nodes/{node_id}/blacklist\x12=\n" +
+	"\x0eStreamCommands\x12\x16.nodepb.CommandRequest\x1a\x0f.nodepb.Command(\x010\x01\x12K\n" +
+	"\x13ReportCommandResult\x12\x1c.nodepb.CommandResultRequest\x1a\x16.google.protobuf.EmptyBDZBgithub.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/protob\x06proto3"
 
 var (
 	file_node_proto_rawDescOnce sync.Once
@@ -474,27 +1463,59 @@ func file_node_proto_rawDescGZIP() []byte {
 	return file_node_proto_rawDescData
 }
 
-var file_node_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_node_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
 var file_node_proto_goTypes = []any{
-	(*RegisterRequest)(nil),  // 0: nodepb.RegisterRequest
-	(*RegisterResponse)(nil), // 1: nodepb.RegisterResponse
-	(*PingRequest)(nil),      // 2: nodepb.PingRequest
-	(*PingResponse)(nil),     // 3: nodepb.PingResponse
-	(*MetricsRequest)(nil),   // 4: nodepb.MetricsRequest
-	(*MetricsResponse)(nil),  // 5: nodepb.MetricsResponse
+	(*RegisterRequest)(nil),      // 0: nodepb.RegisterRequest
+	(*RegisterResponse)(nil),     // 1: nodepb.RegisterResponse
+	(*PingRequest)(nil),          // 2: nodepb.PingRequest
+	(*PingResponse)(nil),         // 3: nodepb.PingResponse
+	(*MetricsRequest)(nil),       // 4: nodepb.MetricsRequest
+	(*MetricsResponse)(nil),      // 5: nodepb.MetricsResponse
+	(*GetAuditLogsRequest)(nil),  // 6: nodepb.GetAuditLogsRequest
+	(*AuditLogEntry)(nil),        // 7: nodepb.AuditLogEntry
+	(*GetAuditLogsResponse)(nil), // 8: nodepb.GetAuditLogsResponse
+	(*TenantRequest)(nil),        // 9: nodepb.TenantRequest
+	(*NodeListResponse)(nil),     // 10: nodepb.NodeListResponse
+	(*UpdateNodeRequest)(nil),    // 11: nodepb.UpdateNodeRequest
+	(*NodeStatusRequest)(nil),    // 12: nodepb.NodeStatusRequest
+	(*GetNodeRequest)(nil),       // 13: nodepb.GetNodeRequest
+	(*NodeID)(nil),               // 14: nodepb.NodeID
+	(*Node)(nil),                 // 15: nodepb.Node
+	(*CommandRequest)(nil),       // 16: nodepb.CommandRequest
+	(*Command)(nil),              // 17: nodepb.Command
+	(*CommandResultRequest)(nil), // 18: nodepb.CommandResultRequest
+	(*emptypb.Empty)(nil),        // 19: google.protobuf.Empty
 }
 var file_node_proto_depIdxs = []int32{
-	0, // 0: nodepb.NodeService.RegisterNode:input_type -> nodepb.RegisterRequest
-	2, // 1: nodepb.NodeService.Ping:input_type -> nodepb.PingRequest
-	4, // 2: nodepb.NodeService.SendMetrics:input_type -> nodepb.MetricsRequest
-	1, // 3: nodepb.NodeService.RegisterNode:output_type -> nodepb.RegisterResponse
-	3, // 4: nodepb.NodeService.Ping:output_type -> nodepb.PingResponse
-	5, // 5: nodepb.NodeService.SendMetrics:output_type -> nodepb.MetricsResponse
-	3, // [3:6] is the sub-list for method output_type
-	0, // [0:3] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	7,  // 0: nodepb.GetAuditLogsResponse.logs:type_name -> nodepb.AuditLogEntry
+	15, // 1: nodepb.NodeListResponse.nodes:type_name -> nodepb.Node
+	0,  // 2: nodepb.NodeService.RegisterNode:input_type -> nodepb.RegisterRequest
+	2,  // 3: nodepb.NodeService.Ping:input_type -> nodepb.PingRequest
+	4,  // 4: nodepb.NodeService.SendMetrics:input_type -> nodepb.MetricsRequest
+	6,  // 5: nodepb.NodeService.GetAuditLogs:input_type -> nodepb.GetAuditLogsRequest
+	9,  // 6: nodepb.NodeService.ListNodesByTenant:input_type -> nodepb.TenantRequest
+	11, // 7: nodepb.NodeService.UpdateNodeMetadata:input_type -> nodepb.UpdateNodeRequest
+	12, // 8: nodepb.NodeService.SetNodeStatus:input_type -> nodepb.NodeStatusRequest
+	13, // 9: nodepb.NodeService.GetNodeByID:input_type -> nodepb.GetNodeRequest
+	14, // 10: nodepb.NodeService.BlacklistNode:input_type -> nodepb.NodeID
+	16, // 11: nodepb.NodeService.StreamCommands:input_type -> nodepb.CommandRequest
+	18, // 12: nodepb.NodeService.ReportCommandResult:input_type -> nodepb.CommandResultRequest
+	1,  // 13: nodepb.NodeService.RegisterNode:output_type -> nodepb.RegisterResponse
+	3,  // 14: nodepb.NodeService.Ping:output_type -> nodepb.PingResponse
+	5,  // 15: nodepb.NodeService.SendMetrics:output_type -> nodepb.MetricsResponse
+	8,  // 16: nodepb.NodeService.GetAuditLogs:output_type -> nodepb.GetAuditLogsResponse
+	10, // 17: nodepb.NodeService.ListNodesByTenant:output_type -> nodepb.NodeListResponse
+	19, // 18: nodepb.NodeService.UpdateNodeMetadata:output_type -> google.protobuf.Empty
+	19, // 19: nodepb.NodeService.SetNodeStatus:output_type -> google.protobuf.Empty
+	15, // 20: nodepb.NodeService.GetNodeByID:output_type -> nodepb.Node
+	19, // 21: nodepb.NodeService.BlacklistNode:output_type -> google.protobuf.Empty
+	17, // 22: nodepb.NodeService.StreamCommands:output_type -> nodepb.Command
+	19, // 23: nodepb.NodeService.ReportCommandResult:output_type -> google.protobuf.Empty
+	13, // [13:24] is the sub-list for method output_type
+	2,  // [2:13] is the sub-list for method input_type
+	2,  // [2:2] is the sub-list for extension type_name
+	2,  // [2:2] is the sub-list for extension extendee
+	0,  // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_node_proto_init() }
@@ -502,13 +1523,14 @@ func file_node_proto_init() {
 	if File_node_proto != nil {
 		return
 	}
+	file_node_proto_msgTypes[6].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_node_proto_rawDesc), len(file_node_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   19,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -2,15 +2,21 @@ package services
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/redis/go-redis/v9"
 	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/config"
 	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/internal/repository"
+	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/pkg/logger"
+	"go.uber.org/zap"
 )
 
 var RedisClient *redis.Client
+
+const nodeCacheTTL = 15 * time.Minute
 
 func InitRedis(cfg *config.Config) {
 
@@ -29,6 +35,25 @@ func InitRedis(cfg *config.Config) {
 	} else {
 		log.Printf(" Connexion Redis réussie: %s", pong)
 	}
+}
+
+func CacheNode(ctx context.Context, node *repository.Node) error {
+	key := fmt.Sprintf("node:%s", node.ID)
+
+	data, err := json.Marshal(node)
+	if err != nil {
+		logger.Log.Error("Erreur JSON lors du cache node", zap.String("node_id", node.ID), zap.Error(err))
+		return err
+	}
+
+	err = RedisClient.Set(ctx, key, data, nodeCacheTTL).Err()
+	if err != nil {
+		logger.Log.Error("Échec cache node Redis", zap.String("key", key), zap.Error(err))
+		return err
+	}
+
+	logger.Log.Debug("Node mis en cache", zap.String("node_id", node.ID))
+	return nil
 }
 
 func GetUserInfoFromRedis(ctx context.Context, userID string) (*repository.UtilisateurRedis, error) {

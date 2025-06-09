@@ -7,6 +7,9 @@ server:
   tls_cert: "certs/server.crt"
   tls_key: "certs/server.key"
 
+auth_service:
+  host: auth-service
+  port: 50051  
 
 jwt:
   secret_key: ""

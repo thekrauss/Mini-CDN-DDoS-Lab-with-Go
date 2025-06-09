@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -19,9 +20,17 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	NodeService_RegisterNode_FullMethodName = "/nodepb.NodeService/RegisterNode"
-	NodeService_Ping_FullMethodName         = "/nodepb.NodeService/Ping"
-	NodeService_SendMetrics_FullMethodName  = "/nodepb.NodeService/SendMetrics"
+	NodeService_RegisterNode_FullMethodName        = "/nodepb.NodeService/RegisterNode"
+	NodeService_Ping_FullMethodName                = "/nodepb.NodeService/Ping"
+	NodeService_SendMetrics_FullMethodName         = "/nodepb.NodeService/SendMetrics"
+	NodeService_GetAuditLogs_FullMethodName        = "/nodepb.NodeService/GetAuditLogs"
+	NodeService_ListNodesByTenant_FullMethodName   = "/nodepb.NodeService/ListNodesByTenant"
+	NodeService_UpdateNodeMetadata_FullMethodName  = "/nodepb.NodeService/UpdateNodeMetadata"
+	NodeService_SetNodeStatus_FullMethodName       = "/nodepb.NodeService/SetNodeStatus"
+	NodeService_GetNodeByID_FullMethodName         = "/nodepb.NodeService/GetNodeByID"
+	NodeService_BlacklistNode_FullMethodName       = "/nodepb.NodeService/BlacklistNode"
+	NodeService_StreamCommands_FullMethodName      = "/nodepb.NodeService/StreamCommands"
+	NodeService_ReportCommandResult_FullMethodName = "/nodepb.NodeService/ReportCommandResult"
 )
 
 // NodeServiceClient is the client API for NodeService service.
@@ -31,6 +40,14 @@ type NodeServiceClient interface {
 	RegisterNode(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 	Ping(ctx context.Context, in *PingRequest, opts ...grpc.CallOption) (*PingResponse, error)
 	SendMetrics(ctx context.Context, in *MetricsRequest, opts ...grpc.CallOption) (*MetricsResponse, error)
+	GetAuditLogs(ctx context.Context, in *GetAuditLogsRequest, opts ...grpc.CallOption) (*GetAuditLogsResponse, error)
+	ListNodesByTenant(ctx context.Context, in *TenantRequest, opts ...grpc.CallOption) (*NodeListResponse, error)
+	UpdateNodeMetadata(ctx context.Context, in *UpdateNodeRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	SetNodeStatus(ctx context.Context, in *NodeStatusRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	GetNodeByID(ctx context.Context, in *GetNodeRequest, opts ...grpc.CallOption) (*Node, error)
+	BlacklistNode(ctx context.Context, in *NodeID, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	StreamCommands(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[CommandRequest, Command], error)
+	ReportCommandResult(ctx context.Context, in *CommandResultRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type nodeServiceClient struct {
@@ -71,6 +88,89 @@ func (c *nodeServiceClient) SendMetrics(ctx context.Context, in *MetricsRequest,
 	return out, nil
 }
 
+func (c *nodeServiceClient) GetAuditLogs(ctx context.Context, in *GetAuditLogsRequest, opts ...grpc.CallOption) (*GetAuditLogsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetAuditLogsResponse)
+	err := c.cc.Invoke(ctx, NodeService_GetAuditLogs_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nodeServiceClient) ListNodesByTenant(ctx context.Context, in *TenantRequest, opts ...grpc.CallOption) (*NodeListResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(NodeListResponse)
+	err := c.cc.Invoke(ctx, NodeService_ListNodesByTenant_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nodeServiceClient) UpdateNodeMetadata(ctx context.Context, in *UpdateNodeRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, NodeService_UpdateNodeMetadata_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nodeServiceClient) SetNodeStatus(ctx context.Context, in *NodeStatusRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, NodeService_SetNodeStatus_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nodeServiceClient) GetNodeByID(ctx context.Context, in *GetNodeRequest, opts ...grpc.CallOption) (*Node, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Node)
+	err := c.cc.Invoke(ctx, NodeService_GetNodeByID_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nodeServiceClient) BlacklistNode(ctx context.Context, in *NodeID, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, NodeService_BlacklistNode_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nodeServiceClient) StreamCommands(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[CommandRequest, Command], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &NodeService_ServiceDesc.Streams[0], NodeService_StreamCommands_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[CommandRequest, Command]{ClientStream: stream}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type NodeService_StreamCommandsClient = grpc.BidiStreamingClient[CommandRequest, Command]
+
+func (c *nodeServiceClient) ReportCommandResult(ctx context.Context, in *CommandResultRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, NodeService_ReportCommandResult_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // NodeServiceServer is the server API for NodeService service.
 // All implementations must embed UnimplementedNodeServiceServer
 // for forward compatibility.
@@ -78,6 +178,14 @@ type NodeServiceServer interface {
 	RegisterNode(context.Context, *RegisterRequest) (*RegisterResponse, error)
 	Ping(context.Context, *PingRequest) (*PingResponse, error)
 	SendMetrics(context.Context, *MetricsRequest) (*MetricsResponse, error)
+	GetAuditLogs(context.Context, *GetAuditLogsRequest) (*GetAuditLogsResponse, error)
+	ListNodesByTenant(context.Context, *TenantRequest) (*NodeListResponse, error)
+	UpdateNodeMetadata(context.Context, *UpdateNodeRequest) (*emptypb.Empty, error)
+	SetNodeStatus(context.Context, *NodeStatusRequest) (*emptypb.Empty, error)
+	GetNodeByID(context.Context, *GetNodeRequest) (*Node, error)
+	BlacklistNode(context.Context, *NodeID) (*emptypb.Empty, error)
+	StreamCommands(grpc.BidiStreamingServer[CommandRequest, Command]) error
+	ReportCommandResult(context.Context, *CommandResultRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedNodeServiceServer()
 }
 
@@ -96,6 +204,30 @@ func (UnimplementedNodeServiceServer) Ping(context.Context, *PingRequest) (*Ping
 }
 func (UnimplementedNodeServiceServer) SendMetrics(context.Context, *MetricsRequest) (*MetricsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendMetrics not implemented")
+}
+func (UnimplementedNodeServiceServer) GetAuditLogs(context.Context, *GetAuditLogsRequest) (*GetAuditLogsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetAuditLogs not implemented")
+}
+func (UnimplementedNodeServiceServer) ListNodesByTenant(context.Context, *TenantRequest) (*NodeListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListNodesByTenant not implemented")
+}
+func (UnimplementedNodeServiceServer) UpdateNodeMetadata(context.Context, *UpdateNodeRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateNodeMetadata not implemented")
+}
+func (UnimplementedNodeServiceServer) SetNodeStatus(context.Context, *NodeStatusRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetNodeStatus not implemented")
+}
+func (UnimplementedNodeServiceServer) GetNodeByID(context.Context, *GetNodeRequest) (*Node, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetNodeByID not implemented")
+}
+func (UnimplementedNodeServiceServer) BlacklistNode(context.Context, *NodeID) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method BlacklistNode not implemented")
+}
+func (UnimplementedNodeServiceServer) StreamCommands(grpc.BidiStreamingServer[CommandRequest, Command]) error {
+	return status.Errorf(codes.Unimplemented, "method StreamCommands not implemented")
+}
+func (UnimplementedNodeServiceServer) ReportCommandResult(context.Context, *CommandResultRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReportCommandResult not implemented")
 }
 func (UnimplementedNodeServiceServer) mustEmbedUnimplementedNodeServiceServer() {}
 func (UnimplementedNodeServiceServer) testEmbeddedByValue()                     {}
@@ -172,6 +304,139 @@ func _NodeService_SendMetrics_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _NodeService_GetAuditLogs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAuditLogsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NodeServiceServer).GetAuditLogs(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NodeService_GetAuditLogs_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NodeServiceServer).GetAuditLogs(ctx, req.(*GetAuditLogsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NodeService_ListNodesByTenant_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TenantRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NodeServiceServer).ListNodesByTenant(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NodeService_ListNodesByTenant_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NodeServiceServer).ListNodesByTenant(ctx, req.(*TenantRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NodeService_UpdateNodeMetadata_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateNodeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NodeServiceServer).UpdateNodeMetadata(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NodeService_UpdateNodeMetadata_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NodeServiceServer).UpdateNodeMetadata(ctx, req.(*UpdateNodeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NodeService_SetNodeStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(NodeStatusRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NodeServiceServer).SetNodeStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NodeService_SetNodeStatus_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NodeServiceServer).SetNodeStatus(ctx, req.(*NodeStatusRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NodeService_GetNodeByID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetNodeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NodeServiceServer).GetNodeByID(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NodeService_GetNodeByID_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NodeServiceServer).GetNodeByID(ctx, req.(*GetNodeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NodeService_BlacklistNode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(NodeID)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NodeServiceServer).BlacklistNode(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NodeService_BlacklistNode_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NodeServiceServer).BlacklistNode(ctx, req.(*NodeID))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NodeService_StreamCommands_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(NodeServiceServer).StreamCommands(&grpc.GenericServerStream[CommandRequest, Command]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type NodeService_StreamCommandsServer = grpc.BidiStreamingServer[CommandRequest, Command]
+
+func _NodeService_ReportCommandResult_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CommandResultRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NodeServiceServer).ReportCommandResult(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NodeService_ReportCommandResult_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NodeServiceServer).ReportCommandResult(ctx, req.(*CommandResultRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // NodeService_ServiceDesc is the grpc.ServiceDesc for NodeService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -191,7 +456,42 @@ var NodeService_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "SendMetrics",
 			Handler:    _NodeService_SendMetrics_Handler,
 		},
+		{
+			MethodName: "GetAuditLogs",
+			Handler:    _NodeService_GetAuditLogs_Handler,
+		},
+		{
+			MethodName: "ListNodesByTenant",
+			Handler:    _NodeService_ListNodesByTenant_Handler,
+		},
+		{
+			MethodName: "UpdateNodeMetadata",
+			Handler:    _NodeService_UpdateNodeMetadata_Handler,
+		},
+		{
+			MethodName: "SetNodeStatus",
+			Handler:    _NodeService_SetNodeStatus_Handler,
+		},
+		{
+			MethodName: "GetNodeByID",
+			Handler:    _NodeService_GetNodeByID_Handler,
+		},
+		{
+			MethodName: "BlacklistNode",
+			Handler:    _NodeService_BlacklistNode_Handler,
+		},
+		{
+			MethodName: "ReportCommandResult",
+			Handler:    _NodeService_ReportCommandResult_Handler,
+		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "StreamCommands",
+			Handler:       _NodeService_StreamCommands_Handler,
+			ServerStreams: true,
+			ClientStreams: true,
+		},
+	},
 	Metadata: "node.proto",
 }

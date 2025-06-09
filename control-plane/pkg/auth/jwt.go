@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/gofrs/uuid"
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/google/uuid"
 	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/config"
 	"google.golang.org/grpc/metadata"
 )

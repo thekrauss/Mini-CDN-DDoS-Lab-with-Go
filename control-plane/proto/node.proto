@@ -5,8 +5,10 @@ package nodepb;
 option go_package = "github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/proto";
 
 import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
 
 service NodeService {
+  
   rpc RegisterNode(RegisterRequest) returns (RegisterResponse) {
     option (google.api.http) = {
       post: "/v1/register-node"
@@ -27,6 +29,48 @@ service NodeService {
       body: "*"
     };
   }
+
+  rpc GetAuditLogs(GetAuditLogsRequest) returns (GetAuditLogsResponse) {
+    option (google.api.http) = {
+      get: "/v1/nodes/audit-logs"
+    };
+  }
+
+  rpc ListNodesByTenant(TenantRequest) returns (NodeListResponse) { //liste de tous les nœuds d’un tenant
+    option (google.api.http) = {
+      get: "/v1/nodes"
+    };
+  }
+
+  rpc UpdateNodeMetadata(UpdateNodeRequest) returns (google.protobuf.Empty) { //renommage ou changement de tags/IP
+    option (google.api.http) = {
+      put: "/v1/nodes/{node_id}"
+      body: "*"
+    };
+  }
+
+  rpc SetNodeStatus(NodeStatusRequest) returns (google.protobuf.Empty) { //met à jour du statut du nœud (offline, degraded…)
+    option (google.api.http) = {
+      post: "/v1/nodes/{node_id}/status"
+      body: "*"
+    };
+  }
+
+  rpc GetNodeByID(GetNodeRequest) returns (Node) { // récupération détaillée d’un nœud
+    option (google.api.http) = {
+      get: "/v1/nodes/{node_id}"
+    };
+  }
+
+  rpc BlacklistNode(NodeID) returns (google.protobuf.Empty) { //blocage temporaire d’un nœud
+    option (google.api.http) = {
+      post: "/v1/nodes/{node_id}/blacklist"
+    };
+  }
+
+  rpc StreamCommands(stream CommandRequest) returns (stream Command); //stream de commandes vers les worker
+
+  rpc ReportCommandResult(CommandResultRequest) returns (google.protobuf.Empty); //envoi des résultats de commandes par le nœud
 }
 
 message RegisterRequest {
@@ -37,6 +81,7 @@ message RegisterRequest {
   string provider = 5;
   string version = 6;
   repeated string tags = 7;
+  string id_tenant = 8;
 }
 
 message RegisterResponse {
@@ -68,4 +113,96 @@ message MetricsRequest {
 
 message MetricsResponse {
   string status = 1;
+}
+
+message GetAuditLogsRequest {
+  int32 limit = 1;
+  int32 offset = 2;
+  optional string action = 3;
+  optional string user_id = 4;
+  optional string tenant_id = 5;
+}
+
+message AuditLogEntry {
+  string id = 1;
+  string user_id = 2;
+  string role = 3;
+  string action = 4;
+  string target = 5;
+  string details = 6;
+  string ip_address = 7;
+  string user_agent = 8;
+  string tenant_id = 9;
+  string timestamp = 10;
+}
+
+message GetAuditLogsResponse {
+  repeated AuditLogEntry logs = 1;
+  int32 total = 2;
+}
+
+message TenantRequest {
+  string tenant_id = 1;
+}
+
+message NodeListResponse {
+  repeated Node nodes = 1;
+}
+
+message UpdateNodeRequest {
+  string node_id = 1;
+  string name = 2;
+  string ip = 3;
+  repeated string tags = 4;
+}
+
+message NodeStatusRequest {
+  string node_id = 1;
+  string status = 2;
+}
+
+message GetNodeRequest {
+  string node_id = 1;
+}
+
+message NodeID {
+  string node_id = 1;
+}
+
+message Node {
+  string id = 1;
+  string name = 2;
+  string ip = 3;
+  string tenant_id = 4;
+  string status = 5;
+  string location = 6;
+  string provider = 7;
+  string software_version = 8;
+  repeated string tags = 9;
+  string os = 10;
+  string last_seen = 11;
+  string created_at = 12;
+  string updated_at = 13;
+  bool is_blacklisted = 14;
+}
+
+message CommandRequest {
+  string node_id = 1;
+  string type = 2; // restart, update, etc.
+  string payload = 3;
+}
+
+message Command {
+  string id = 1;
+  string type = 2;
+  string payload = 3;
+  string created_at = 4;
+}
+
+message CommandResultRequest {
+  string command_id = 1;
+  string node_id = 2;
+  bool success = 3;
+  string output = 4;
+  string timestamp = 5;
 }

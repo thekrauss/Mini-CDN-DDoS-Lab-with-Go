@@ -18,6 +18,7 @@ import (
 	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/internal/handlers"
 	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/internal/middleware"
 
+	authpb "github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/auth-service/proto"
 	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/db"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -66,8 +67,16 @@ func main() {
 		log.Fatalf("Échec écoute gRPC: %v", err)
 	}
 
+	authClient, err := NewAuthServiceClient(cfg.AuthService.Host)
+	if err != nil {
+		log.Fatalf("Erreur connexion auth-service: %v", err)
+	}
+
 	grpcServer := newGRPCServer(cfg)
-	nodeServer := &handlers.NodeService{Store: store}
+	nodeServer := &handlers.NodeService{
+		Store:      store,
+		AuthClient: authClient,
+	}
 	pb.RegisterNodeServiceServer(grpcServer, nodeServer)
 
 	go func() {
@@ -131,4 +140,19 @@ func waitForShutdown(grpcServer *grpc.Server, gwServer *http.Server) {
 	if err := gwServer.Close(); err != nil {
 		log.Printf("Erreur arrêt HTTP: %v", err)
 	}
+}
+
+func NewAuthServiceClient(addr string) (authpb.AuthServiceClient, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	conn, err := grpc.DialContext(ctx, addr,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithBlock(), // attend que la connexion soit prête
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return authpb.NewAuthServiceClient(conn), nil
 }
