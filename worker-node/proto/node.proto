@@ -9,6 +9,15 @@ service WorkerService {
   rpc RestartService(RestartRequest) returns (RestartResponse);
   rpc StopService(StopRequest) returns (StopResponse);
   rpc UpdateConfig(UpdateConfigRequest) returns (UpdateConfigResponse);
+
+  //  le worker envoie ses métriques
+  rpc SendMetrics(MetricsRequest) returns (MetricsResponse);
+
+  //  le worker s'annonce au boot
+  rpc Hello(HelloRequest) returns (HelloResponse);
+
+  //  canal bidirectionnel pour recevoir les commandes du control-plane
+  rpc StreamCommands(stream CommandMessage) returns (stream CommandResult);
 }
 
 message RestartRequest {
@@ -34,4 +43,45 @@ message UpdateConfigRequest {
 
 message UpdateConfigResponse {
   string status = 1;
+}
+
+message MetricsRequest {
+  string node_id = 1;
+  float cpu = 2;
+  float memory = 3;
+  int32 connections = 4;
+  int32 uptime_seconds = 5;
+  string status = 6; // healthy, slow, critical
+}
+
+message MetricsResponse {
+  string status = 1;
+}
+
+message HelloRequest {
+  string node_id = 1;
+  string hostname = 2;
+  string version = 3;
+  string location = 4;
+  repeated string services = 5;
+}
+
+message HelloResponse {
+  string message = 1;
+}
+
+message CommandMessage {
+  string command_id = 1;
+  string command_type = 2; // restart, stop, update_config, deploy, etc.
+  string payload = 3;      // JSON ou contenu de la commande
+  string issued_by = 4;    // ID du control-plane
+  string timestamp = 5;
+}
+
+message CommandResult {
+  string command_id = 1;
+  string status = 2;       // success, failed
+  string message = 3;      // logs ou message d'erreur
+  string node_id = 4;
+  string executed_at = 5;
 }

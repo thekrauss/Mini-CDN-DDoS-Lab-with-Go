@@ -4,10 +4,9 @@
 // 	protoc        v3.21.12
 // source: node.proto
 
-package nodepb
+package workerpb
 
 import (
-	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -22,29 +21,27 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type RegisterRequest struct {
+type RestartRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	NodeId        string                 `protobuf:"bytes,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
-	Ip            string                 `protobuf:"bytes,2,opt,name=ip,proto3" json:"ip,omitempty"`
-	Hostname      string                 `protobuf:"bytes,3,opt,name=hostname,proto3" json:"hostname,omitempty"`
+	ServiceId     string                 `protobuf:"bytes,1,opt,name=service_id,json=serviceId,proto3" json:"service_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *RegisterRequest) Reset() {
-	*x = RegisterRequest{}
+func (x *RestartRequest) Reset() {
+	*x = RestartRequest{}
 	mi := &file_node_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *RegisterRequest) String() string {
+func (x *RestartRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*RegisterRequest) ProtoMessage() {}
+func (*RestartRequest) ProtoMessage() {}
 
-func (x *RegisterRequest) ProtoReflect() protoreflect.Message {
+func (x *RestartRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_node_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -56,53 +53,39 @@ func (x *RegisterRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use RegisterRequest.ProtoReflect.Descriptor instead.
-func (*RegisterRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use RestartRequest.ProtoReflect.Descriptor instead.
+func (*RestartRequest) Descriptor() ([]byte, []int) {
 	return file_node_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *RegisterRequest) GetNodeId() string {
+func (x *RestartRequest) GetServiceId() string {
 	if x != nil {
-		return x.NodeId
+		return x.ServiceId
 	}
 	return ""
 }
 
-func (x *RegisterRequest) GetIp() string {
-	if x != nil {
-		return x.Ip
-	}
-	return ""
-}
-
-func (x *RegisterRequest) GetHostname() string {
-	if x != nil {
-		return x.Hostname
-	}
-	return ""
-}
-
-type RegisterResponse struct {
+type RestartResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Message       string                 `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+	Status        string                 `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"` // "ok", "error"
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *RegisterResponse) Reset() {
-	*x = RegisterResponse{}
+func (x *RestartResponse) Reset() {
+	*x = RestartResponse{}
 	mi := &file_node_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *RegisterResponse) String() string {
+func (x *RestartResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*RegisterResponse) ProtoMessage() {}
+func (*RestartResponse) ProtoMessage() {}
 
-func (x *RegisterResponse) ProtoReflect() protoreflect.Message {
+func (x *RestartResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_node_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -114,39 +97,39 @@ func (x *RegisterResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use RegisterResponse.ProtoReflect.Descriptor instead.
-func (*RegisterResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use RestartResponse.ProtoReflect.Descriptor instead.
+func (*RestartResponse) Descriptor() ([]byte, []int) {
 	return file_node_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *RegisterResponse) GetMessage() string {
+func (x *RestartResponse) GetStatus() string {
 	if x != nil {
-		return x.Message
+		return x.Status
 	}
 	return ""
 }
 
-type PingRequest struct {
+type StopRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	NodeId        string                 `protobuf:"bytes,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
+	ServiceId     string                 `protobuf:"bytes,1,opt,name=service_id,json=serviceId,proto3" json:"service_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *PingRequest) Reset() {
-	*x = PingRequest{}
+func (x *StopRequest) Reset() {
+	*x = StopRequest{}
 	mi := &file_node_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *PingRequest) String() string {
+func (x *StopRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*PingRequest) ProtoMessage() {}
+func (*StopRequest) ProtoMessage() {}
 
-func (x *PingRequest) ProtoReflect() protoreflect.Message {
+func (x *StopRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_node_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -158,39 +141,39 @@ func (x *PingRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use PingRequest.ProtoReflect.Descriptor instead.
-func (*PingRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use StopRequest.ProtoReflect.Descriptor instead.
+func (*StopRequest) Descriptor() ([]byte, []int) {
 	return file_node_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *PingRequest) GetNodeId() string {
+func (x *StopRequest) GetServiceId() string {
 	if x != nil {
-		return x.NodeId
+		return x.ServiceId
 	}
 	return ""
 }
 
-type PingResponse struct {
+type StopResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Status        string                 `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *PingResponse) Reset() {
-	*x = PingResponse{}
+func (x *StopResponse) Reset() {
+	*x = StopResponse{}
 	mi := &file_node_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *PingResponse) String() string {
+func (x *StopResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*PingResponse) ProtoMessage() {}
+func (*StopResponse) ProtoMessage() {}
 
-func (x *PingResponse) ProtoReflect() protoreflect.Message {
+func (x *StopResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_node_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -202,12 +185,108 @@ func (x *PingResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use PingResponse.ProtoReflect.Descriptor instead.
-func (*PingResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use StopResponse.ProtoReflect.Descriptor instead.
+func (*StopResponse) Descriptor() ([]byte, []int) {
 	return file_node_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *PingResponse) GetStatus() string {
+func (x *StopResponse) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+type UpdateConfigRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ServiceId     string                 `protobuf:"bytes,1,opt,name=service_id,json=serviceId,proto3" json:"service_id,omitempty"`
+	ConfigJson    string                 `protobuf:"bytes,2,opt,name=config_json,json=configJson,proto3" json:"config_json,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateConfigRequest) Reset() {
+	*x = UpdateConfigRequest{}
+	mi := &file_node_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateConfigRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateConfigRequest) ProtoMessage() {}
+
+func (x *UpdateConfigRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_node_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateConfigRequest.ProtoReflect.Descriptor instead.
+func (*UpdateConfigRequest) Descriptor() ([]byte, []int) {
+	return file_node_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *UpdateConfigRequest) GetServiceId() string {
+	if x != nil {
+		return x.ServiceId
+	}
+	return ""
+}
+
+func (x *UpdateConfigRequest) GetConfigJson() string {
+	if x != nil {
+		return x.ConfigJson
+	}
+	return ""
+}
+
+type UpdateConfigResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Status        string                 `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateConfigResponse) Reset() {
+	*x = UpdateConfigResponse{}
+	mi := &file_node_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateConfigResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateConfigResponse) ProtoMessage() {}
+
+func (x *UpdateConfigResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_node_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateConfigResponse.ProtoReflect.Descriptor instead.
+func (*UpdateConfigResponse) Descriptor() ([]byte, []int) {
+	return file_node_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *UpdateConfigResponse) GetStatus() string {
 	if x != nil {
 		return x.Status
 	}
@@ -220,13 +299,15 @@ type MetricsRequest struct {
 	Cpu           float32                `protobuf:"fixed32,2,opt,name=cpu,proto3" json:"cpu,omitempty"`
 	Memory        float32                `protobuf:"fixed32,3,opt,name=memory,proto3" json:"memory,omitempty"`
 	Connections   int32                  `protobuf:"varint,4,opt,name=connections,proto3" json:"connections,omitempty"`
+	UptimeSeconds int32                  `protobuf:"varint,5,opt,name=uptime_seconds,json=uptimeSeconds,proto3" json:"uptime_seconds,omitempty"`
+	Status        string                 `protobuf:"bytes,6,opt,name=status,proto3" json:"status,omitempty"` // healthy, slow, critical
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *MetricsRequest) Reset() {
 	*x = MetricsRequest{}
-	mi := &file_node_proto_msgTypes[4]
+	mi := &file_node_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -238,7 +319,7 @@ func (x *MetricsRequest) String() string {
 func (*MetricsRequest) ProtoMessage() {}
 
 func (x *MetricsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_node_proto_msgTypes[4]
+	mi := &file_node_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -251,7 +332,7 @@ func (x *MetricsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MetricsRequest.ProtoReflect.Descriptor instead.
 func (*MetricsRequest) Descriptor() ([]byte, []int) {
-	return file_node_proto_rawDescGZIP(), []int{4}
+	return file_node_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *MetricsRequest) GetNodeId() string {
@@ -282,6 +363,20 @@ func (x *MetricsRequest) GetConnections() int32 {
 	return 0
 }
 
+func (x *MetricsRequest) GetUptimeSeconds() int32 {
+	if x != nil {
+		return x.UptimeSeconds
+	}
+	return 0
+}
+
+func (x *MetricsRequest) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
 type MetricsResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Status        string                 `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
@@ -291,7 +386,7 @@ type MetricsResponse struct {
 
 func (x *MetricsResponse) Reset() {
 	*x = MetricsResponse{}
-	mi := &file_node_proto_msgTypes[5]
+	mi := &file_node_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -303,7 +398,7 @@ func (x *MetricsResponse) String() string {
 func (*MetricsResponse) ProtoMessage() {}
 
 func (x *MetricsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_node_proto_msgTypes[5]
+	mi := &file_node_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -316,7 +411,7 @@ func (x *MetricsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MetricsResponse.ProtoReflect.Descriptor instead.
 func (*MetricsResponse) Descriptor() ([]byte, []int) {
-	return file_node_proto_rawDescGZIP(), []int{5}
+	return file_node_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *MetricsResponse) GetStatus() string {
@@ -326,33 +421,340 @@ func (x *MetricsResponse) GetStatus() string {
 	return ""
 }
 
+type HelloRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	NodeId        string                 `protobuf:"bytes,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
+	Hostname      string                 `protobuf:"bytes,2,opt,name=hostname,proto3" json:"hostname,omitempty"`
+	Version       string                 `protobuf:"bytes,3,opt,name=version,proto3" json:"version,omitempty"`
+	Location      string                 `protobuf:"bytes,4,opt,name=location,proto3" json:"location,omitempty"`
+	Services      []string               `protobuf:"bytes,5,rep,name=services,proto3" json:"services,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *HelloRequest) Reset() {
+	*x = HelloRequest{}
+	mi := &file_node_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *HelloRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*HelloRequest) ProtoMessage() {}
+
+func (x *HelloRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_node_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use HelloRequest.ProtoReflect.Descriptor instead.
+func (*HelloRequest) Descriptor() ([]byte, []int) {
+	return file_node_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *HelloRequest) GetNodeId() string {
+	if x != nil {
+		return x.NodeId
+	}
+	return ""
+}
+
+func (x *HelloRequest) GetHostname() string {
+	if x != nil {
+		return x.Hostname
+	}
+	return ""
+}
+
+func (x *HelloRequest) GetVersion() string {
+	if x != nil {
+		return x.Version
+	}
+	return ""
+}
+
+func (x *HelloRequest) GetLocation() string {
+	if x != nil {
+		return x.Location
+	}
+	return ""
+}
+
+func (x *HelloRequest) GetServices() []string {
+	if x != nil {
+		return x.Services
+	}
+	return nil
+}
+
+type HelloResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Message       string                 `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *HelloResponse) Reset() {
+	*x = HelloResponse{}
+	mi := &file_node_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *HelloResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*HelloResponse) ProtoMessage() {}
+
+func (x *HelloResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_node_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use HelloResponse.ProtoReflect.Descriptor instead.
+func (*HelloResponse) Descriptor() ([]byte, []int) {
+	return file_node_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *HelloResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+type CommandMessage struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	CommandId     string                 `protobuf:"bytes,1,opt,name=command_id,json=commandId,proto3" json:"command_id,omitempty"`
+	CommandType   string                 `protobuf:"bytes,2,opt,name=command_type,json=commandType,proto3" json:"command_type,omitempty"` // restart, stop, update_config, deploy, etc.
+	Payload       string                 `protobuf:"bytes,3,opt,name=payload,proto3" json:"payload,omitempty"`                            // JSON ou contenu de la commande
+	IssuedBy      string                 `protobuf:"bytes,4,opt,name=issued_by,json=issuedBy,proto3" json:"issued_by,omitempty"`          // ID du control-plane
+	Timestamp     string                 `protobuf:"bytes,5,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CommandMessage) Reset() {
+	*x = CommandMessage{}
+	mi := &file_node_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CommandMessage) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CommandMessage) ProtoMessage() {}
+
+func (x *CommandMessage) ProtoReflect() protoreflect.Message {
+	mi := &file_node_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CommandMessage.ProtoReflect.Descriptor instead.
+func (*CommandMessage) Descriptor() ([]byte, []int) {
+	return file_node_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *CommandMessage) GetCommandId() string {
+	if x != nil {
+		return x.CommandId
+	}
+	return ""
+}
+
+func (x *CommandMessage) GetCommandType() string {
+	if x != nil {
+		return x.CommandType
+	}
+	return ""
+}
+
+func (x *CommandMessage) GetPayload() string {
+	if x != nil {
+		return x.Payload
+	}
+	return ""
+}
+
+func (x *CommandMessage) GetIssuedBy() string {
+	if x != nil {
+		return x.IssuedBy
+	}
+	return ""
+}
+
+func (x *CommandMessage) GetTimestamp() string {
+	if x != nil {
+		return x.Timestamp
+	}
+	return ""
+}
+
+type CommandResult struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	CommandId     string                 `protobuf:"bytes,1,opt,name=command_id,json=commandId,proto3" json:"command_id,omitempty"`
+	Status        string                 `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`   // success, failed
+	Message       string                 `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"` // logs ou message d'erreur
+	NodeId        string                 `protobuf:"bytes,4,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
+	ExecutedAt    string                 `protobuf:"bytes,5,opt,name=executed_at,json=executedAt,proto3" json:"executed_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CommandResult) Reset() {
+	*x = CommandResult{}
+	mi := &file_node_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CommandResult) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CommandResult) ProtoMessage() {}
+
+func (x *CommandResult) ProtoReflect() protoreflect.Message {
+	mi := &file_node_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CommandResult.ProtoReflect.Descriptor instead.
+func (*CommandResult) Descriptor() ([]byte, []int) {
+	return file_node_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *CommandResult) GetCommandId() string {
+	if x != nil {
+		return x.CommandId
+	}
+	return ""
+}
+
+func (x *CommandResult) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *CommandResult) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *CommandResult) GetNodeId() string {
+	if x != nil {
+		return x.NodeId
+	}
+	return ""
+}
+
+func (x *CommandResult) GetExecutedAt() string {
+	if x != nil {
+		return x.ExecutedAt
+	}
+	return ""
+}
+
 var File_node_proto protoreflect.FileDescriptor
 
 const file_node_proto_rawDesc = "" +
 	"\n" +
 	"\n" +
-	"node.proto\x12\x04node\x1a\x1cgoogle/api/annotations.proto\"V\n" +
-	"\x0fRegisterRequest\x12\x17\n" +
-	"\anode_id\x18\x01 \x01(\tR\x06nodeId\x12\x0e\n" +
-	"\x02ip\x18\x02 \x01(\tR\x02ip\x12\x1a\n" +
-	"\bhostname\x18\x03 \x01(\tR\bhostname\",\n" +
-	"\x10RegisterResponse\x12\x18\n" +
-	"\amessage\x18\x01 \x01(\tR\amessage\"&\n" +
-	"\vPingRequest\x12\x17\n" +
-	"\anode_id\x18\x01 \x01(\tR\x06nodeId\"&\n" +
-	"\fPingResponse\x12\x16\n" +
-	"\x06status\x18\x01 \x01(\tR\x06status\"u\n" +
+	"node.proto\x12\x06worker\"/\n" +
+	"\x0eRestartRequest\x12\x1d\n" +
+	"\n" +
+	"service_id\x18\x01 \x01(\tR\tserviceId\")\n" +
+	"\x0fRestartResponse\x12\x16\n" +
+	"\x06status\x18\x01 \x01(\tR\x06status\",\n" +
+	"\vStopRequest\x12\x1d\n" +
+	"\n" +
+	"service_id\x18\x01 \x01(\tR\tserviceId\"&\n" +
+	"\fStopResponse\x12\x16\n" +
+	"\x06status\x18\x01 \x01(\tR\x06status\"U\n" +
+	"\x13UpdateConfigRequest\x12\x1d\n" +
+	"\n" +
+	"service_id\x18\x01 \x01(\tR\tserviceId\x12\x1f\n" +
+	"\vconfig_json\x18\x02 \x01(\tR\n" +
+	"configJson\".\n" +
+	"\x14UpdateConfigResponse\x12\x16\n" +
+	"\x06status\x18\x01 \x01(\tR\x06status\"\xb4\x01\n" +
 	"\x0eMetricsRequest\x12\x17\n" +
 	"\anode_id\x18\x01 \x01(\tR\x06nodeId\x12\x10\n" +
 	"\x03cpu\x18\x02 \x01(\x02R\x03cpu\x12\x16\n" +
 	"\x06memory\x18\x03 \x01(\x02R\x06memory\x12 \n" +
-	"\vconnections\x18\x04 \x01(\x05R\vconnections\")\n" +
+	"\vconnections\x18\x04 \x01(\x05R\vconnections\x12%\n" +
+	"\x0euptime_seconds\x18\x05 \x01(\x05R\ruptimeSeconds\x12\x16\n" +
+	"\x06status\x18\x06 \x01(\tR\x06status\")\n" +
 	"\x0fMetricsResponse\x12\x16\n" +
-	"\x06status\x18\x01 \x01(\tR\x06status2\x82\x02\n" +
-	"\vNodeService\x12[\n" +
-	"\fRegisterNode\x12\x15.node.RegisterRequest\x1a\x16.node.RegisterResponse\"\x1c\x82\xd3\xe4\x93\x02\x16:\x01*\"\x11/v1/register-node\x12B\n" +
-	"\x04Ping\x12\x11.node.PingRequest\x1a\x12.node.PingResponse\"\x13\x82\xd3\xe4\x93\x02\r:\x01*\"\b/v1/ping\x12R\n" +
-	"\vSendMetrics\x12\x14.node.MetricsRequest\x1a\x15.node.MetricsResponse\"\x16\x82\xd3\xe4\x93\x02\x10:\x01*\"\v/v1/metricsBDZBgithub.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/shared-proto/nodepbb\x06proto3"
+	"\x06status\x18\x01 \x01(\tR\x06status\"\x95\x01\n" +
+	"\fHelloRequest\x12\x17\n" +
+	"\anode_id\x18\x01 \x01(\tR\x06nodeId\x12\x1a\n" +
+	"\bhostname\x18\x02 \x01(\tR\bhostname\x12\x18\n" +
+	"\aversion\x18\x03 \x01(\tR\aversion\x12\x1a\n" +
+	"\blocation\x18\x04 \x01(\tR\blocation\x12\x1a\n" +
+	"\bservices\x18\x05 \x03(\tR\bservices\")\n" +
+	"\rHelloResponse\x12\x18\n" +
+	"\amessage\x18\x01 \x01(\tR\amessage\"\xa7\x01\n" +
+	"\x0eCommandMessage\x12\x1d\n" +
+	"\n" +
+	"command_id\x18\x01 \x01(\tR\tcommandId\x12!\n" +
+	"\fcommand_type\x18\x02 \x01(\tR\vcommandType\x12\x18\n" +
+	"\apayload\x18\x03 \x01(\tR\apayload\x12\x1b\n" +
+	"\tissued_by\x18\x04 \x01(\tR\bissuedBy\x12\x1c\n" +
+	"\ttimestamp\x18\x05 \x01(\tR\ttimestamp\"\x9a\x01\n" +
+	"\rCommandResult\x12\x1d\n" +
+	"\n" +
+	"command_id\x18\x01 \x01(\tR\tcommandId\x12\x16\n" +
+	"\x06status\x18\x02 \x01(\tR\x06status\x12\x18\n" +
+	"\amessage\x18\x03 \x01(\tR\amessage\x12\x17\n" +
+	"\anode_id\x18\x04 \x01(\tR\x06nodeId\x12\x1f\n" +
+	"\vexecuted_at\x18\x05 \x01(\tR\n" +
+	"executedAt2\x92\x03\n" +
+	"\rWorkerService\x12A\n" +
+	"\x0eRestartService\x12\x16.worker.RestartRequest\x1a\x17.worker.RestartResponse\x128\n" +
+	"\vStopService\x12\x13.worker.StopRequest\x1a\x14.worker.StopResponse\x12I\n" +
+	"\fUpdateConfig\x12\x1b.worker.UpdateConfigRequest\x1a\x1c.worker.UpdateConfigResponse\x12>\n" +
+	"\vSendMetrics\x12\x16.worker.MetricsRequest\x1a\x17.worker.MetricsResponse\x124\n" +
+	"\x05Hello\x12\x14.worker.HelloRequest\x1a\x15.worker.HelloResponse\x12C\n" +
+	"\x0eStreamCommands\x12\x16.worker.CommandMessage\x1a\x15.worker.CommandResult(\x010\x01BFZDgithub.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/shared-proto/workerpbb\x06proto3"
 
 var (
 	file_node_proto_rawDescOnce sync.Once
@@ -366,27 +768,39 @@ func file_node_proto_rawDescGZIP() []byte {
 	return file_node_proto_rawDescData
 }
 
-var file_node_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_node_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
 var file_node_proto_goTypes = []any{
-	(*RegisterRequest)(nil),  // 0: node.RegisterRequest
-	(*RegisterResponse)(nil), // 1: node.RegisterResponse
-	(*PingRequest)(nil),      // 2: node.PingRequest
-	(*PingResponse)(nil),     // 3: node.PingResponse
-	(*MetricsRequest)(nil),   // 4: node.MetricsRequest
-	(*MetricsResponse)(nil),  // 5: node.MetricsResponse
+	(*RestartRequest)(nil),       // 0: worker.RestartRequest
+	(*RestartResponse)(nil),      // 1: worker.RestartResponse
+	(*StopRequest)(nil),          // 2: worker.StopRequest
+	(*StopResponse)(nil),         // 3: worker.StopResponse
+	(*UpdateConfigRequest)(nil),  // 4: worker.UpdateConfigRequest
+	(*UpdateConfigResponse)(nil), // 5: worker.UpdateConfigResponse
+	(*MetricsRequest)(nil),       // 6: worker.MetricsRequest
+	(*MetricsResponse)(nil),      // 7: worker.MetricsResponse
+	(*HelloRequest)(nil),         // 8: worker.HelloRequest
+	(*HelloResponse)(nil),        // 9: worker.HelloResponse
+	(*CommandMessage)(nil),       // 10: worker.CommandMessage
+	(*CommandResult)(nil),        // 11: worker.CommandResult
 }
 var file_node_proto_depIdxs = []int32{
-	0, // 0: node.NodeService.RegisterNode:input_type -> node.RegisterRequest
-	2, // 1: node.NodeService.Ping:input_type -> node.PingRequest
-	4, // 2: node.NodeService.SendMetrics:input_type -> node.MetricsRequest
-	1, // 3: node.NodeService.RegisterNode:output_type -> node.RegisterResponse
-	3, // 4: node.NodeService.Ping:output_type -> node.PingResponse
-	5, // 5: node.NodeService.SendMetrics:output_type -> node.MetricsResponse
-	3, // [3:6] is the sub-list for method output_type
-	0, // [0:3] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	0,  // 0: worker.WorkerService.RestartService:input_type -> worker.RestartRequest
+	2,  // 1: worker.WorkerService.StopService:input_type -> worker.StopRequest
+	4,  // 2: worker.WorkerService.UpdateConfig:input_type -> worker.UpdateConfigRequest
+	6,  // 3: worker.WorkerService.SendMetrics:input_type -> worker.MetricsRequest
+	8,  // 4: worker.WorkerService.Hello:input_type -> worker.HelloRequest
+	10, // 5: worker.WorkerService.StreamCommands:input_type -> worker.CommandMessage
+	1,  // 6: worker.WorkerService.RestartService:output_type -> worker.RestartResponse
+	3,  // 7: worker.WorkerService.StopService:output_type -> worker.StopResponse
+	5,  // 8: worker.WorkerService.UpdateConfig:output_type -> worker.UpdateConfigResponse
+	7,  // 9: worker.WorkerService.SendMetrics:output_type -> worker.MetricsResponse
+	9,  // 10: worker.WorkerService.Hello:output_type -> worker.HelloResponse
+	11, // 11: worker.WorkerService.StreamCommands:output_type -> worker.CommandResult
+	6,  // [6:12] is the sub-list for method output_type
+	0,  // [0:6] is the sub-list for method input_type
+	0,  // [0:0] is the sub-list for extension type_name
+	0,  // [0:0] is the sub-list for extension extendee
+	0,  // [0:0] is the sub-list for field type_name
 }
 
 func init() { file_node_proto_init() }
@@ -400,7 +814,7 @@ func file_node_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_node_proto_rawDesc), len(file_node_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   6,
+			NumMessages:   12,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
