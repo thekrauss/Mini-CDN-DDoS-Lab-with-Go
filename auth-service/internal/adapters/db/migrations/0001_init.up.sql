@@ -72,3 +72,15 @@ CREATE TABLE IF NOT EXISTS refresh_tokens (
     ip_address VARCHAR(50),
     user_agent TEXT,
 );
+
+//audit_logs
+Ajoute target_json JSONB au lieu de details TEXT si tu veux des logs structurés
+Indexe sur action_time, admin_id, tenant_id pour recherches rapides
+
+//refresh_tokens
+Ajoute une colonne ip, user_agent, device_id
+Prends en compte l’expiration à l’invalidation du token global (pas juste l’accès)
+
+//utilisateurs
+Ajouter un champ origin ou auth_provider si tu veux un jour supporter SSO (Keycloak, LDAP…)
+Ajouter un champ language ou locale si tu veux gérer plusieurs langues (ex. en/FR pour dashboard)

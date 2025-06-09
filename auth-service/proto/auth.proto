@@ -193,7 +193,12 @@ service AuthService {
       };
     }
   
-  
+  // ➤ Vérification d'une permission pour un utilisateur
+  rpc HasPermission (HasPermissionRequest) returns (HasPermissionResponse) {
+    option (google.api.http) = {
+      get: "/v1/auth/users/{user_id}/has-permission"
+    };
+  }
 
 }
 
@@ -501,3 +506,11 @@ message ListTenantResponse {
   int32 total = 2;
 }
 
+message HasPermissionRequest {
+  string user_id = 1;
+  string permission = 2;
+}
+
+message HasPermissionResponse {
+  bool allowed = 1;
+}

@@ -80,7 +80,7 @@ func CheckPermissionMiddleware(service *services.AuthService, requiredPermission
 		}
 
 		// vérification des permissions
-		hasPerm, err := service.HasPermission(ctx, claims.UserID.String(), requiredPermission)
+		hasPerm, err := service.Permission(ctx, claims.UserID.String(), requiredPermission)
 		if err != nil {
 			log.Printf("Erreur lors de la vérification des permissions: %v", err)
 			return nil, status.Errorf(codes.Internal, "Erreur interne")

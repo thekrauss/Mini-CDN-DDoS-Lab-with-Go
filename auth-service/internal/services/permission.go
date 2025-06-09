@@ -14,6 +14,45 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+func (s *AuthService) HasPermission(ctx context.Context, req *pb.HasPermissionRequest) (*pb.HasPermissionResponse, error) {
+	allowed, err := s.Permission(ctx, req.UserId, req.Permission)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "Erreur permission: %v", err)
+	}
+	return &pb.HasPermissionResponse{Allowed: allowed}, nil
+}
+
+func (s *AuthService) Permission(ctx context.Context, userID, requiredPermission string) (bool, error) {
+	permissionsKey := fmt.Sprintf("cdn-permissions:%s", userID)
+
+	// verifi d'abord dans Redis
+	exists, err := RedisClient.SIsMember(ctx, permissionsKey, requiredPermission).Result()
+	if err == nil && exists {
+		log.Printf("Permission '%s' trouvée en cache Redis pour %s", requiredPermission, userID)
+		return true, nil
+	}
+
+	//  dans PostgreSQL si la permission n'est pas en cache
+	var count int
+	err = s.Store.DB.QueryRowContext(ctx, `SELECT COUNT(*) FROM utilisateurs_permissions WHERE id_utilisateur = $1 AND permission = $2`,
+		userID, requiredPermission).Scan(&count)
+	if err != nil {
+		return false, status.Errorf(codes.Internal, "Erreur lors de la vérification de la permission")
+	}
+
+	// Si permission trouvée en db, met en cache pour la prochaine fois
+	if count > 0 {
+		err = CachCdnPermissionsInRedis(ctx, userID, []string{requiredPermission})
+		if err != nil {
+			log.Printf("Impossible de mettre en cache Redis : %v", err)
+		}
+		return true, nil
+	}
+
+	log.Printf("Permission '%s' non trouvée pour %s", requiredPermission, userID)
+	return false, nil
+}
+
 func (s *AuthService) SetCdnPermissions(ctx context.Context, req *pb.SetCdnPermissionsRequest) (*pb.SetCdnPermissionsResponse, error) {
 	log.Printf("Mise à jour des permissions Cdn pour l'utilisateur %s", req.UtilisateurId)
 
@@ -83,7 +122,7 @@ func (s *AuthService) CheckAdminPermissions(ctx context.Context, claims *auth.Cl
 	}
 
 	if config.IsRoleB(adminUser.Role) {
-		hasPerm, err := s.HasPermission(ctx, adminUser.IDUtilisateur, permission)
+		hasPerm, err := s.Permission(ctx, adminUser.IDUtilisateur, permission)
 		if err != nil {
 			return status.Errorf(codes.Internal, "Erreur interne lors de la vérification des permissions")
 		}
@@ -94,37 +133,6 @@ func (s *AuthService) CheckAdminPermissions(ctx context.Context, claims *auth.Cl
 	}
 
 	return status.Errorf(codes.PermissionDenied, "Accès refusé")
-}
-
-func (s *AuthService) HasPermission(ctx context.Context, userID, requiredPermission string) (bool, error) {
-	permissionsKey := fmt.Sprintf("cdn-permissions:%s", userID)
-
-	// verifi d'abord dans Redis
-	exists, err := RedisClient.SIsMember(ctx, permissionsKey, requiredPermission).Result()
-	if err == nil && exists {
-		log.Printf("Permission '%s' trouvée en cache Redis pour %s", requiredPermission, userID)
-		return true, nil
-	}
-
-	//  dans PostgreSQL si la permission n'est pas en cache
-	var count int
-	err = s.Store.DB.QueryRowContext(ctx, `SELECT COUNT(*) FROM utilisateurs_permissions WHERE id_utilisateur = $1 AND permission = $2`,
-		userID, requiredPermission).Scan(&count)
-	if err != nil {
-		return false, status.Errorf(codes.Internal, "Erreur lors de la vérification de la permission")
-	}
-
-	// Si permission trouvée en db, met en cache pour la prochaine fois
-	if count > 0 {
-		err = CachCdnPermissionsInRedis(ctx, userID, []string{requiredPermission})
-		if err != nil {
-			log.Printf("Impossible de mettre en cache Redis : %v", err)
-		}
-		return true, nil
-	}
-
-	log.Printf("Permission '%s' non trouvée pour %s", requiredPermission, userID)
-	return false, nil
 }
 
 func CachCdnPermissionsInRedis(ctx context.Context, userID string, permissions []string) error {

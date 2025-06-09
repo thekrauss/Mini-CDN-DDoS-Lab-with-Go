@@ -3021,6 +3021,102 @@ func (x *ListTenantResponse) GetTotal() int32 {
 	return 0
 }
 
+type HasPermissionRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Permission    string                 `protobuf:"bytes,2,opt,name=permission,proto3" json:"permission,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *HasPermissionRequest) Reset() {
+	*x = HasPermissionRequest{}
+	mi := &file_auth_proto_msgTypes[49]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *HasPermissionRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*HasPermissionRequest) ProtoMessage() {}
+
+func (x *HasPermissionRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_auth_proto_msgTypes[49]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use HasPermissionRequest.ProtoReflect.Descriptor instead.
+func (*HasPermissionRequest) Descriptor() ([]byte, []int) {
+	return file_auth_proto_rawDescGZIP(), []int{49}
+}
+
+func (x *HasPermissionRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *HasPermissionRequest) GetPermission() string {
+	if x != nil {
+		return x.Permission
+	}
+	return ""
+}
+
+type HasPermissionResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Allowed       bool                   `protobuf:"varint,1,opt,name=allowed,proto3" json:"allowed,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *HasPermissionResponse) Reset() {
+	*x = HasPermissionResponse{}
+	mi := &file_auth_proto_msgTypes[50]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *HasPermissionResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*HasPermissionResponse) ProtoMessage() {}
+
+func (x *HasPermissionResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_auth_proto_msgTypes[50]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use HasPermissionResponse.ProtoReflect.Descriptor instead.
+func (*HasPermissionResponse) Descriptor() ([]byte, []int) {
+	return file_auth_proto_rawDescGZIP(), []int{50}
+}
+
+func (x *HasPermissionResponse) GetAllowed() bool {
+	if x != nil {
+		return x.Allowed
+	}
+	return false
+}
+
 var File_auth_proto protoreflect.FileDescriptor
 
 const file_auth_proto_rawDesc = "" +
@@ -3237,13 +3333,20 @@ const file_auth_proto_rawDesc = "" +
 	"\x11min_creation_date\x18\b \x01(\tR\x0fminCreationDate\"R\n" +
 	"\x12ListTenantResponse\x12&\n" +
 	"\x06tenant\x18\x01 \x03(\v2\x0e.nodepb.TenantR\x06tenant\x12\x14\n" +
-	"\x05total\x18\x02 \x01(\x05R\x05total*-\n" +
+	"\x05total\x18\x02 \x01(\x05R\x05total\"O\n" +
+	"\x14HasPermissionRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x1e\n" +
+	"\n" +
+	"permission\x18\x02 \x01(\tR\n" +
+	"permission\"1\n" +
+	"\x15HasPermissionResponse\x12\x18\n" +
+	"\aallowed\x18\x01 \x01(\bR\aallowed*-\n" +
 	"\x04Role\x12\t\n" +
 	"\x05admin\x10\x00\x12\n" +
 	"\n" +
 	"\x06viewer\x10\x01\x12\x0e\n" +
 	"\n" +
-	"superadmin\x10\x022\xd8\x14\n" +
+	"superadmin\x10\x022\xd7\x15\n" +
 	"\vAuthService\x12O\n" +
 	"\x05Login\x12\x14.nodepb.LoginRequest\x1a\x15.nodepb.LoginResponse\"\x19\x82\xd3\xe4\x93\x02\x13:\x01*\"\x0e/v1/auth/login\x12S\n" +
 	"\x06Logout\x12\x15.nodepb.LogoutRequest\x1a\x16.nodepb.LogoutResponse\"\x1a\x82\xd3\xe4\x93\x02\x14:\x01*\"\x0f/v1/auth/logout\x12]\n" +
@@ -3273,7 +3376,8 @@ const file_auth_proto_rawDesc = "" +
 	"\rGetTenantByID\x12\x18.nodepb.GetTenantRequest\x1a\x0e.nodepb.Tenant\"%\x82\xd3\xe4\x93\x02\x1f\x12\x1d/v1/admin/tenants/{id_tenant}\x12_\n" +
 	"\vListTenants\x12\x19.nodepb.ListTenantRequest\x1a\x1a.nodepb.ListTenantResponse\"\x19\x82\xd3\xe4\x93\x02\x13\x12\x11/v1/admin/schools\x12s\n" +
 	"\fUpdateSchool\x12\x1b.nodepb.UpdateTenantRequest\x1a\x1c.nodepb.UpdateTenantResponse\"(\x82\xd3\xe4\x93\x02\":\x01*\x1a\x1d/v1/admin/schools/{id_tenant}\x12j\n" +
-	"\fDeleteTenant\x12\x1b.nodepb.DeleteTenantRequest\x1a\x16.google.protobuf.Empty\"%\x82\xd3\xe4\x93\x02\x1f*\x1d/v1/admin/tenants/{id_tenant}BDZBgithub.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/protob\x06proto3"
+	"\fDeleteTenant\x12\x1b.nodepb.DeleteTenantRequest\x1a\x16.google.protobuf.Empty\"%\x82\xd3\xe4\x93\x02\x1f*\x1d/v1/admin/tenants/{id_tenant}\x12}\n" +
+	"\rHasPermission\x12\x1c.nodepb.HasPermissionRequest\x1a\x1d.nodepb.HasPermissionResponse\"/\x82\xd3\xe4\x93\x02)\x12'/v1/auth/users/{user_id}/has-permissionBDZBgithub.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/protob\x06proto3"
 
 var (
 	file_auth_proto_rawDescOnce sync.Once
@@ -3288,7 +3392,7 @@ func file_auth_proto_rawDescGZIP() []byte {
 }
 
 var file_auth_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 49)
+var file_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 51)
 var file_auth_proto_goTypes = []any{
 	(Role)(0),                          // 0: nodepb.Role
 	(*LoginRequest)(nil),               // 1: nodepb.LoginRequest
@@ -3340,14 +3444,16 @@ var file_auth_proto_goTypes = []any{
 	(*GetTenantRequest)(nil),           // 47: nodepb.GetTenantRequest
 	(*ListTenantRequest)(nil),          // 48: nodepb.ListTenantRequest
 	(*ListTenantResponse)(nil),         // 49: nodepb.ListTenantResponse
-	(*timestamppb.Timestamp)(nil),      // 50: google.protobuf.Timestamp
-	(*emptypb.Empty)(nil),              // 51: google.protobuf.Empty
+	(*HasPermissionRequest)(nil),       // 50: nodepb.HasPermissionRequest
+	(*HasPermissionResponse)(nil),      // 51: nodepb.HasPermissionResponse
+	(*timestamppb.Timestamp)(nil),      // 52: google.protobuf.Timestamp
+	(*emptypb.Empty)(nil),              // 53: google.protobuf.Empty
 }
 var file_auth_proto_depIdxs = []int32{
 	0,  // 0: nodepb.LoginResponse.role:type_name -> nodepb.Role
 	0,  // 1: nodepb.UpdateUserRequest.role:type_name -> nodepb.Role
 	37, // 2: nodepb.ListAllAdminsResponse.admins:type_name -> nodepb.GetAdminInfoResponse
-	50, // 3: nodepb.Tenant.date_creation:type_name -> google.protobuf.Timestamp
+	52, // 3: nodepb.Tenant.date_creation:type_name -> google.protobuf.Timestamp
 	41, // 4: nodepb.ListTenantResponse.tenant:type_name -> nodepb.Tenant
 	1,  // 5: nodepb.AuthService.Login:input_type -> nodepb.LoginRequest
 	3,  // 6: nodepb.AuthService.Logout:input_type -> nodepb.LogoutRequest
@@ -3373,32 +3479,34 @@ var file_auth_proto_depIdxs = []int32{
 	48, // 26: nodepb.AuthService.ListTenants:input_type -> nodepb.ListTenantRequest
 	45, // 27: nodepb.AuthService.UpdateSchool:input_type -> nodepb.UpdateTenantRequest
 	44, // 28: nodepb.AuthService.DeleteTenant:input_type -> nodepb.DeleteTenantRequest
-	2,  // 29: nodepb.AuthService.Login:output_type -> nodepb.LoginResponse
-	4,  // 30: nodepb.AuthService.Logout:output_type -> nodepb.LogoutResponse
-	36, // 31: nodepb.AuthService.CreateAdmin:output_type -> nodepb.CreateAdminResponse
-	10, // 32: nodepb.AuthService.UpdateUser:output_type -> nodepb.UpdateUserResponse
-	9,  // 33: nodepb.AuthService.CheckUserExists:output_type -> nodepb.CheckUserExistsResponse
-	12, // 34: nodepb.AuthService.DeleteUser:output_type -> nodepb.DeleteUserResponse
-	14, // 35: nodepb.AuthService.ValidateToken:output_type -> nodepb.TokenResponse
-	16, // 36: nodepb.AuthService.RefreshToken:output_type -> nodepb.RefreshTokenResponse
-	18, // 37: nodepb.AuthService.VerifyOTP:output_type -> nodepb.VerifyOTPResponse
-	20, // 38: nodepb.AuthService.NotifyNewDevice:output_type -> nodepb.NotifyNewDeviceResponse
-	22, // 39: nodepb.AuthService.RequestPasswordReset:output_type -> nodepb.PasswordResetResponse
-	24, // 40: nodepb.AuthService.EnableMFA:output_type -> nodepb.EnableMFAResponse
-	26, // 41: nodepb.AuthService.DisableMFA:output_type -> nodepb.DisableMFAResponse
-	28, // 42: nodepb.AuthService.UpdateUserPassword:output_type -> nodepb.UpdateUserPasswordResponse
-	32, // 43: nodepb.AuthService.GetUserProfile:output_type -> nodepb.GetUserProfileResponse
-	30, // 44: nodepb.AuthService.ForgotPassword:output_type -> nodepb.ForgotPasswordResponse
-	34, // 45: nodepb.AuthService.SetCdnPermissions:output_type -> nodepb.SetCdnPermissionsResponse
-	39, // 46: nodepb.AuthService.ListAllAdmins:output_type -> nodepb.ListAllAdminsResponse
-	37, // 47: nodepb.AuthService.GetAdminByID:output_type -> nodepb.GetAdminInfoResponse
-	43, // 48: nodepb.AuthService.CreateTenant:output_type -> nodepb.CreateTenantResponse
-	41, // 49: nodepb.AuthService.GetTenantByID:output_type -> nodepb.Tenant
-	49, // 50: nodepb.AuthService.ListTenants:output_type -> nodepb.ListTenantResponse
-	46, // 51: nodepb.AuthService.UpdateSchool:output_type -> nodepb.UpdateTenantResponse
-	51, // 52: nodepb.AuthService.DeleteTenant:output_type -> google.protobuf.Empty
-	29, // [29:53] is the sub-list for method output_type
-	5,  // [5:29] is the sub-list for method input_type
+	50, // 29: nodepb.AuthService.HasPermission:input_type -> nodepb.HasPermissionRequest
+	2,  // 30: nodepb.AuthService.Login:output_type -> nodepb.LoginResponse
+	4,  // 31: nodepb.AuthService.Logout:output_type -> nodepb.LogoutResponse
+	36, // 32: nodepb.AuthService.CreateAdmin:output_type -> nodepb.CreateAdminResponse
+	10, // 33: nodepb.AuthService.UpdateUser:output_type -> nodepb.UpdateUserResponse
+	9,  // 34: nodepb.AuthService.CheckUserExists:output_type -> nodepb.CheckUserExistsResponse
+	12, // 35: nodepb.AuthService.DeleteUser:output_type -> nodepb.DeleteUserResponse
+	14, // 36: nodepb.AuthService.ValidateToken:output_type -> nodepb.TokenResponse
+	16, // 37: nodepb.AuthService.RefreshToken:output_type -> nodepb.RefreshTokenResponse
+	18, // 38: nodepb.AuthService.VerifyOTP:output_type -> nodepb.VerifyOTPResponse
+	20, // 39: nodepb.AuthService.NotifyNewDevice:output_type -> nodepb.NotifyNewDeviceResponse
+	22, // 40: nodepb.AuthService.RequestPasswordReset:output_type -> nodepb.PasswordResetResponse
+	24, // 41: nodepb.AuthService.EnableMFA:output_type -> nodepb.EnableMFAResponse
+	26, // 42: nodepb.AuthService.DisableMFA:output_type -> nodepb.DisableMFAResponse
+	28, // 43: nodepb.AuthService.UpdateUserPassword:output_type -> nodepb.UpdateUserPasswordResponse
+	32, // 44: nodepb.AuthService.GetUserProfile:output_type -> nodepb.GetUserProfileResponse
+	30, // 45: nodepb.AuthService.ForgotPassword:output_type -> nodepb.ForgotPasswordResponse
+	34, // 46: nodepb.AuthService.SetCdnPermissions:output_type -> nodepb.SetCdnPermissionsResponse
+	39, // 47: nodepb.AuthService.ListAllAdmins:output_type -> nodepb.ListAllAdminsResponse
+	37, // 48: nodepb.AuthService.GetAdminByID:output_type -> nodepb.GetAdminInfoResponse
+	43, // 49: nodepb.AuthService.CreateTenant:output_type -> nodepb.CreateTenantResponse
+	41, // 50: nodepb.AuthService.GetTenantByID:output_type -> nodepb.Tenant
+	49, // 51: nodepb.AuthService.ListTenants:output_type -> nodepb.ListTenantResponse
+	46, // 52: nodepb.AuthService.UpdateSchool:output_type -> nodepb.UpdateTenantResponse
+	53, // 53: nodepb.AuthService.DeleteTenant:output_type -> google.protobuf.Empty
+	51, // 54: nodepb.AuthService.HasPermission:output_type -> nodepb.HasPermissionResponse
+	30, // [30:55] is the sub-list for method output_type
+	5,  // [5:30] is the sub-list for method input_type
 	5,  // [5:5] is the sub-list for extension type_name
 	5,  // [5:5] is the sub-list for extension extendee
 	0,  // [0:5] is the sub-list for field type_name
@@ -3415,7 +3523,7 @@ func file_auth_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_auth_proto_rawDesc), len(file_auth_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   49,
+			NumMessages:   51,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

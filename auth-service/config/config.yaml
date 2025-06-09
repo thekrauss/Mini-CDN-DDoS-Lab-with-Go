@@ -7,7 +7,6 @@ server:
   tls_cert: "certs/server.crt"
   tls_key: "certs/server.key"
 
-
 jwt:
   secret_key: ""
   refresh_secret: ""
