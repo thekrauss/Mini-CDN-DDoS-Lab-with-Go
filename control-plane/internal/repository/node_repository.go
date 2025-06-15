@@ -59,6 +59,16 @@ type AuditLogFilter struct {
 	TenantID *string
 }
 
+type NodeMetrics struct {
+	NodeID    string    `json:"node_id"`
+	TenantID  string    `json:"tenant_id"`
+	Timestamp time.Time `json:"timestamp"`
+	CPU       float64   `json:"cpu"`
+	Memory    float64   `json:"memory"`
+	Uptime    int64     `json:"uptime"`
+	Status    string    `json:"status"`
+}
+
 type NodeFilter struct {
 	TenantID string
 	Query    string
@@ -101,4 +111,5 @@ type NodeRepository interface {
 
 	InsertAuditLog(ctx context.Context, log *AuditLog) error
 	GetAuditLogs(ctx context.Context, filter AuditLogFilter) ([]*AuditLog, int, error)
+	StoreNodeMetrics(ctx context.Context, metrics *NodeMetrics) error
 }

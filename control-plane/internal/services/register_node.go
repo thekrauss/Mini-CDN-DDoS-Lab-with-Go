@@ -17,6 +17,23 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+// RegisterNode permet d'enregistrer un nouveau worker-node dans l'infrastructure.
+//
+// Cette méthode est appelée depuis l’interface d’administration ou via une API lors de l’installation initiale de l’agent.
+//
+// Étapes effectuées :
+//  Validation des champs obligatoires (IP, hostname, tenant).
+//  Vérification du format de l’adresse IP.
+//  Authentification de l’administrateur via JWT extrait du contexte.
+//  Validation des permissions .
+//  Vérification de l’unicité de l’IP pour éviter les doublons.
+//  Enregistrement du nœud dans PostgreSQL avec un ID UUID.
+//  Mise en cache facultative du nœud (Redis).
+//  Insertion d’un log d’audit pour traçabilité (action, user, IP, timestamp).
+//  Contrôle du quota : max 20 nœuds actifs par tenant.
+//
+// Si l’enregistrement réussit, retourne le NodeID attribué.
+
 func (s *NodeService) RegisterNode(ctx context.Context, req *pb.RegisterRequest) (*pb.RegisterResponse, error) {
 	log.Printf("RegisterNode: ID=%s, IP=%s", req.NodeId, req.Ip)
 
@@ -41,7 +58,7 @@ func (s *NodeService) RegisterNode(ctx context.Context, req *pb.RegisterRequest)
 		return nil, status.Errorf(codes.Internal, "Impossible de récupérer les informations administrateur")
 	}
 
-	if err := s.CheckAdminPermissions(ctx, claims, adminUser.TenantID, "MANAGE_NODE"); err != nil {
+	if err := s.CheckAdminPermissions(ctx, claims, adminUser.TenantID, PermManageNode); err != nil {
 		return nil, err
 	}
 
@@ -71,10 +88,13 @@ func (s *NodeService) RegisterNode(ctx context.Context, req *pb.RegisterRequest)
 		Tags:            req.Tags,
 	}
 
+	maxNodes := s.Config.MonitoringEtat.MaxNodesPerTenant
 	count, _ := s.Repo.CountActiveNodes(ctx, node.TenantID, 24*time.Hour)
-	if count >= 20 {
+	if count >= maxNodes {
 		return nil, status.Errorf(codes.ResourceExhausted, "Quota de nodes atteint pour ce tenant")
 	}
+
+	log.Printf("[DEBUG] Max nodes per tenant: %d", maxNodes)
 
 	go func() {
 		if err := CacheNode(ctx, node); err != nil {

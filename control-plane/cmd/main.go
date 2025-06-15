@@ -11,12 +11,15 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/pkg/monitoring"
 	pb "github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/proto"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/config"
-	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/internal/handlers"
+	workers "github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/internal/flush"
 	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/internal/middleware"
+	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/internal/services"
+	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/internal/ws"
 
 	authpb "github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/auth-service/proto"
 	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/db"
@@ -32,12 +35,12 @@ func main() {
 	}
 	config.AppConfig = *cfg
 
-	if cfg.GCloudKeyPath != "" {
-		_ = os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", cfg.GCloudKeyPath)
-		log.Println("GOOGLE_APPLICATION_CREDENTIALS défini sur :", cfg.GCloudKeyPath)
-	}
+	// if cfg.GCloudKeyPath != "" {
+	// 	_ = os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", cfg.GCloudKeyPath)
+	// 	log.Println("GOOGLE_APPLICATION_CREDENTIALS défini sur :", cfg.GCloudKeyPath)
+	// }
 
-	// Init DB
+	// init DB
 	store := &db.DBStore{}
 	if _, err := store.OpenDatabase(cfg); err != nil {
 		log.Fatalf("Échec connexion DB : %v", err)
@@ -48,17 +51,26 @@ func main() {
 		log.Fatalf("Erreur migration DB: %v", err)
 	}
 
-	// Init Redis
-	//	services.InitRedis(cfg)
+	//init Redis & Prometheus
+	services.InitRedis(cfg)
+	monitoring.Init()
+
+	// flush périodique des heartbeat en DB
+	repo := db.NewNodeRepository(store.DB)
+	workers.StartPingFlushWorker(repo)
+	workers.StartMetricsFlushWorker(repo)
 
 	// Prometheus
-	// if cfg.Metrics.PrometheusEnabled {
-	// 	go func() {
-	// 		log.Printf("Serveur Prometheus sur :%d", cfg.Metrics.PrometheusPort)
-	// 		http.Handle("/metrics", services.NewPrometheusHandler())
-	// 		log.Fatal(http.ListenAndServe(":"+strconv.Itoa(cfg.Metrics.PrometheusPort), nil))
-	// 	}()
-	// }
+	if cfg.Metrics.PrometheusEnabled {
+		go func() {
+			addr := ":" + strconv.Itoa(cfg.Metrics.PrometheusPort)
+			log.Printf("Serveur Prometheus /metrics sur %s", addr)
+			http.Handle("/metrics", monitoring.Handler())
+			if err := http.ListenAndServe(addr, nil); err != nil {
+				log.Fatalf("Erreur serveur Prometheus: %v", err)
+			}
+		}()
+	}
 
 	// gRPC
 	grpcAddr := cfg.Server.Host + ":" + strconv.Itoa(cfg.Server.GRPCPort)
@@ -72,10 +84,13 @@ func main() {
 		log.Fatalf("Erreur connexion auth-service: %v", err)
 	}
 
+	hub := ws.NewHub()
+
 	grpcServer := newGRPCServer(cfg)
-	nodeServer := &handlers.NodeService{
+	nodeServer := &services.NodeService{
 		Store:      store,
 		AuthClient: authClient,
+		Hub:        hub,
 	}
 	pb.RegisterNodeServiceServer(grpcServer, nodeServer)
 
@@ -84,6 +99,12 @@ func main() {
 		if err := grpcServer.Serve(lis); err != nil {
 			log.Fatalf("Erreur lancement gRPC: %v", err)
 		}
+	}()
+
+	go func() {
+		log.Println("Serveur WebSocket sur :8088/ws/nodes")
+		http.Handle("/ws/nodes", ws.NewWSServer(hub))
+		log.Fatal(http.ListenAndServe(":8088", nil))
 	}()
 
 	// gRPC Gateway
@@ -121,6 +142,7 @@ func newGRPCServer(cfg *config.Config) *grpc.Server {
 			middleware.AuthMiddleware(cfg),
 			middleware.RateLimitingMiddleware(),
 			middleware.TimeoutMiddleware(),
+			middleware.PrometheusMiddleware(),
 		),
 		grpc.KeepaliveParams(keepalive.ServerParameters{
 			MaxConnectionIdle:     15 * time.Minute,
@@ -137,7 +159,10 @@ func waitForShutdown(grpcServer *grpc.Server, gwServer *http.Server) {
 	log.Println("Arrêt du control-plane...")
 
 	grpcServer.GracefulStop()
-	if err := gwServer.Close(); err != nil {
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := gwServer.Shutdown(ctx); err != nil {
 		log.Printf("Erreur arrêt HTTP: %v", err)
 	}
 }

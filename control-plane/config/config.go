@@ -12,6 +12,7 @@ import (
 
 	secretmanager "cloud.google.com/go/secretmanager/apiv1"
 	"cloud.google.com/go/secretmanager/apiv1/secretmanagerpb"
+	"github.com/joho/godotenv"
 	"github.com/spf13/viper"
 	"google.golang.org/api/option"
 )
@@ -94,6 +95,14 @@ type Config struct {
 		FirebaseAPIKey      string `mapstructure:"firebase_api_key"`
 		FirebaseCredentials string `mapstructure:"firebase_credentials"`
 	} `mapstructure:"firebase"`
+
+	MonitoringEtat struct {
+		DegradedCPUThreshold float64 `mapstructure:"degraded_cpu_threshold"`
+		DegradedMemThreshold float64 `mapstructure:"degraded_mem_threshold"`
+		CriticalCPUThreshold float64 `mapstructure:"critical_cpu_threshold"`
+		CriticalMemThreshold float64 `mapstructure:"critical_mem_threshold"`
+		MaxNodesPerTenant    int     `mapstructure:"max_nodes_per_tenant"`
+	}
 }
 
 var AppConfig Config
@@ -123,6 +132,13 @@ func LoadConfig() (*Config, error) {
 		}
 		loadSecrets(&config)
 		loadRoles(&config)
+	} else {
+
+		if err := godotenv.Load("secret.env"); err != nil {
+			log.Printf("Erreur de chargement du fichier .env: %v", err)
+		}
+		loadFromEnv(&config)
+
 	}
 
 	return &config, nil
@@ -246,4 +262,45 @@ func IsRoleA(role string) bool {
 
 func IsRoleB(role string) bool {
 	return slices.Contains(AppConfig.RolesB, role)
+}
+
+func loadFromEnv(config *Config) {
+	// Server
+	config.Server.Host = os.Getenv("SERVER_HOST")
+	config.Server.GRPCPort, _ = strconv.Atoi(os.Getenv("GRPC_PORT"))
+	config.Server.HTTPPort, _ = strconv.Atoi(os.Getenv("HTTP_PORT"))
+	config.Server.TLSCert = os.Getenv("TLS_CERT")
+	config.Server.TLSKey = os.Getenv("TLS_KEY")
+
+	// JWT
+	config.JWT.SecretKey = os.Getenv("JWT_SECRET_KEY")
+	config.JWT.RefreshSecret = os.Getenv("JWT_REFRESH_SECRET")
+	config.JWT.Issuer = os.Getenv("JWT_ISSUER")
+	config.JWT.AccessTokenExpiry, _ = time.ParseDuration(os.Getenv("JWT_ACCESS_EXPIRY"))
+	config.JWT.RefreshTokenExpiry, _ = time.ParseDuration(os.Getenv("JWT_REFRESH_EXPIRY"))
+
+	// DB
+	config.Database.Host = os.Getenv("DB_HOST")
+	config.Database.Port, _ = strconv.Atoi(os.Getenv("DB_PORT"))
+	config.Database.User = os.Getenv("DB_USER")
+	config.Database.Password = os.Getenv("DB_PASSWORD")
+	config.Database.Name = os.Getenv("DB_NAME")
+	config.Database.SSLMode = os.Getenv("DB_SSLMODE")
+
+	// Redis
+	config.Redis.Host = os.Getenv("REDIS_HOST")
+	config.Redis.Port, _ = strconv.Atoi(os.Getenv("REDIS_PORT"))
+	config.Redis.Password = os.Getenv("REDIS_PASSWORD")
+	config.Redis.DB, _ = strconv.Atoi(os.Getenv("REDIS_DB"))
+
+	// Logging
+	config.Logging.Level = os.Getenv("LOG_LEVEL")
+	config.Logging.Format = os.Getenv("LOG_FORMAT")
+	config.Logging.File = os.Getenv("LOG_FILE")
+
+	// Email
+	config.Email.SMTPHost = os.Getenv("SMTP_HOST")
+	config.Email.SMTPPort, _ = strconv.Atoi(os.Getenv("SMTP_PORT"))
+	config.Email.SMTPUser = os.Getenv("SMTP_USERNAME")
+	config.Email.SMTPPassword = os.Getenv("SMTP_PASSWORD")
 }

@@ -397,3 +397,17 @@ func (r *SQLNodeRepository) GetAuditLogs(ctx context.Context, filter repository.
 
 	return logs, total, nil
 }
+
+func (r *SQLNodeRepository) StoreNodeMetrics(ctx context.Context, metrics *repository.NodeMetrics) error {
+	query := `
+		INSERT INTO node_metrics (node_id, timestamp, cpu_usage, mem_usage)
+		VALUES ($1, $2, $3, $4)
+	`
+	_, err := r.DB.ExecContext(ctx, query,
+		metrics.NodeID,
+		metrics.Timestamp,
+		metrics.CPU,
+		metrics.Memory,
+	)
+	return err
+}
