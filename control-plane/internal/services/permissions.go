@@ -7,10 +7,11 @@ import (
 	"time"
 
 	authpb "github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/auth-service/proto"
+	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/db"
+	pkg "github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/pkg/redis"
 	pb "github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/proto"
 
 	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/config"
-	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/db"
 	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/internal/repository"
 	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/internal/ws"
 	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/pkg/auth"
@@ -70,7 +71,7 @@ func (s *NodeService) Permission(ctx context.Context, userID, requiredPermission
 	permissionsKey := fmt.Sprintf("cdn-permissions:%s", userID)
 
 	//  dans Redis
-	exists, err := RedisClient.SIsMember(ctx, permissionsKey, requiredPermission).Result()
+	exists, err := pkg.RedisClient.SIsMember(ctx, permissionsKey, requiredPermission).Result()
 	if err == nil && exists {
 		log.Printf("Permission '%s' trouvée dans Redis pour %s", requiredPermission, userID)
 		return true, nil
@@ -100,17 +101,17 @@ func (s *NodeService) Permission(ctx context.Context, userID, requiredPermission
 
 func CachCdnPermissionsInRedis(ctx context.Context, userID string, permissions []string) error {
 	permissionsKey := fmt.Sprintf("cdn-permissions:%s", userID)
-	err := RedisClient.SAdd(ctx, permissionsKey, permissions).Err()
+	err := pkg.RedisClient.SAdd(ctx, permissionsKey, permissions).Err()
 	if err != nil {
 		return err
 	}
-	RedisClient.Expire(ctx, permissionsKey, 24*time.Hour)
+	pkg.RedisClient.Expire(ctx, permissionsKey, 24*time.Hour)
 	return nil
 }
 
 func RemoveCachedCdnPermissions(ctx context.Context, userID string) error {
 	permissionsKey := fmt.Sprintf("cdn-permissions:%s", userID)
-	err := RedisClient.Del(ctx, permissionsKey).Err()
+	err := pkg.RedisClient.Del(ctx, permissionsKey).Err()
 	if err != nil {
 		return err
 	}

@@ -22,7 +22,6 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	NodeService_RegisterNode_FullMethodName        = "/nodepb.NodeService/RegisterNode"
 	NodeService_Ping_FullMethodName                = "/nodepb.NodeService/Ping"
-	NodeService_SendMetrics_FullMethodName         = "/nodepb.NodeService/SendMetrics"
 	NodeService_GetAuditLogs_FullMethodName        = "/nodepb.NodeService/GetAuditLogs"
 	NodeService_ListNodesByTenant_FullMethodName   = "/nodepb.NodeService/ListNodesByTenant"
 	NodeService_UpdateNodeMetadata_FullMethodName  = "/nodepb.NodeService/UpdateNodeMetadata"
@@ -39,7 +38,6 @@ const (
 type NodeServiceClient interface {
 	RegisterNode(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 	Ping(ctx context.Context, in *PingRequest, opts ...grpc.CallOption) (*PingResponse, error)
-	SendMetrics(ctx context.Context, in *MetricsRequest, opts ...grpc.CallOption) (*MetricsResponse, error)
 	GetAuditLogs(ctx context.Context, in *GetAuditLogsRequest, opts ...grpc.CallOption) (*GetAuditLogsResponse, error)
 	ListNodesByTenant(ctx context.Context, in *TenantRequest, opts ...grpc.CallOption) (*NodeListResponse, error)
 	UpdateNodeMetadata(ctx context.Context, in *UpdateNodeRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
@@ -72,16 +70,6 @@ func (c *nodeServiceClient) Ping(ctx context.Context, in *PingRequest, opts ...g
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(PingResponse)
 	err := c.cc.Invoke(ctx, NodeService_Ping_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *nodeServiceClient) SendMetrics(ctx context.Context, in *MetricsRequest, opts ...grpc.CallOption) (*MetricsResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(MetricsResponse)
-	err := c.cc.Invoke(ctx, NodeService_SendMetrics_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -177,7 +165,6 @@ func (c *nodeServiceClient) ReportCommandResult(ctx context.Context, in *Command
 type NodeServiceServer interface {
 	RegisterNode(context.Context, *RegisterRequest) (*RegisterResponse, error)
 	Ping(context.Context, *PingRequest) (*PingResponse, error)
-	SendMetrics(context.Context, *MetricsRequest) (*MetricsResponse, error)
 	GetAuditLogs(context.Context, *GetAuditLogsRequest) (*GetAuditLogsResponse, error)
 	ListNodesByTenant(context.Context, *TenantRequest) (*NodeListResponse, error)
 	UpdateNodeMetadata(context.Context, *UpdateNodeRequest) (*emptypb.Empty, error)
@@ -201,9 +188,6 @@ func (UnimplementedNodeServiceServer) RegisterNode(context.Context, *RegisterReq
 }
 func (UnimplementedNodeServiceServer) Ping(context.Context, *PingRequest) (*PingResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Ping not implemented")
-}
-func (UnimplementedNodeServiceServer) SendMetrics(context.Context, *MetricsRequest) (*MetricsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SendMetrics not implemented")
 }
 func (UnimplementedNodeServiceServer) GetAuditLogs(context.Context, *GetAuditLogsRequest) (*GetAuditLogsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAuditLogs not implemented")
@@ -282,24 +266,6 @@ func _NodeService_Ping_Handler(srv interface{}, ctx context.Context, dec func(in
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(NodeServiceServer).Ping(ctx, req.(*PingRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _NodeService_SendMetrics_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(MetricsRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(NodeServiceServer).SendMetrics(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: NodeService_SendMetrics_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(NodeServiceServer).SendMetrics(ctx, req.(*MetricsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -451,10 +417,6 @@ var NodeService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Ping",
 			Handler:    _NodeService_Ping_Handler,
-		},
-		{
-			MethodName: "SendMetrics",
-			Handler:    _NodeService_SendMetrics_Handler,
 		},
 		{
 			MethodName: "GetAuditLogs",

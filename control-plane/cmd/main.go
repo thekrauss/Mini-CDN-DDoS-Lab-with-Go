@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/pkg/monitoring"
+	pkg "github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/pkg/redis"
 	pb "github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/proto"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
@@ -52,7 +53,7 @@ func main() {
 	}
 
 	//init Redis & Prometheus
-	services.InitRedis(cfg)
+	pkg.InitRedis(cfg)
 	monitoring.Init()
 
 	// flush périodique des heartbeat en DB

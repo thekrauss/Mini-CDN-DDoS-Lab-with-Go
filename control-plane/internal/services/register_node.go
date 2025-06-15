@@ -11,6 +11,7 @@ import (
 	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/internal/repository"
 	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/pkg/auth"
 	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/pkg/logger"
+	pkg "github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/pkg/redis"
 	pb "github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/proto"
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
@@ -52,7 +53,7 @@ func (s *NodeService) RegisterNode(ctx context.Context, req *pb.RegisterRequest)
 		return nil, status.Errorf(codes.Unauthenticated, "Token invalide ou expiré")
 	}
 
-	adminUser, err := GetUserInfoFromRedis(ctx, claims.UserID.String())
+	adminUser, err := pkg.GetUserInfoFromRedis(ctx, claims.UserID.String())
 	if err != nil {
 		log.Printf("Impossible de récupérer les infos admin depuis Redis: %v", err)
 		return nil, status.Errorf(codes.Internal, "Impossible de récupérer les informations administrateur")
@@ -97,7 +98,7 @@ func (s *NodeService) RegisterNode(ctx context.Context, req *pb.RegisterRequest)
 	log.Printf("[DEBUG] Max nodes per tenant: %d", maxNodes)
 
 	go func() {
-		if err := CacheNode(ctx, node); err != nil {
+		if err := pkg.CacheNode(ctx, node); err != nil {
 			logger.Log.Warn("Échec mise en cache node", zap.Error(err))
 		}
 	}()

@@ -17,7 +17,7 @@ import (
 
 	"github.com/robfig/cron/v3"
 	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/internal/repository"
-	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/internal/services"
+	pkg "github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/pkg/redis"
 )
 
 const (
@@ -47,7 +47,7 @@ func StartPingFlushWorker(repo repository.NodeRepository) {
 //	node:status:{nodeID}    => string ("online", "offline", "degraded")
 func FlushHeartbeatToPostgres(repo repository.NodeRepository) {
 	ctx := context.Background()
-	keys, err := services.RedisClient.Keys(ctx, lastSeenPrefix+"*").Result()
+	keys, err := pkg.RedisClient.Keys(ctx, lastSeenPrefix+"*").Result()
 	if err != nil {
 		log.Printf("[PING FLUSH] Erreur récupération des clés Redis: %v\n", err)
 		return
@@ -55,7 +55,7 @@ func FlushHeartbeatToPostgres(repo repository.NodeRepository) {
 
 	for _, key := range keys {
 		nodeID := strings.TrimPrefix(key, lastSeenPrefix)
-		lastSeenStr, err := services.RedisClient.Get(ctx, key).Result()
+		lastSeenStr, err := pkg.RedisClient.Get(ctx, key).Result()
 		if err != nil {
 			log.Printf("[PING FLUSH] Erreur récupération valeur pour %s: %v\n", key, err)
 			continue
@@ -77,7 +77,7 @@ func FlushHeartbeatToPostgres(repo repository.NodeRepository) {
 
 		// Récupération du statut si disponible
 		statusKey := statusPrefix + nodeID
-		if status, err := services.RedisClient.Get(ctx, statusKey).Result(); err == nil {
+		if status, err := pkg.RedisClient.Get(ctx, statusKey).Result(); err == nil {
 			err := repo.SetNodeStatus(ctx, nodeID, status)
 			if err != nil {
 				log.Printf("[PING FLUSH] Erreur mise à jour status %s: %v\n", nodeID, err)

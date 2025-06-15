@@ -33,6 +33,6 @@ func InitLogger(level string, format string) {
 	var err error
 	Log, err = zapCfg.Build()
 	if err != nil {
-		panic("⚠️ Logger init failed: " + err.Error())
+		panic("Logger init failed: " + err.Error())
 	}
 }
