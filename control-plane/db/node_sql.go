@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/lib/pq"
@@ -211,17 +212,19 @@ func (r *SQLNodeRepository) SearchNodes(ctx context.Context, filter repository.N
 func (r *SQLNodeRepository) CountActiveNodes(ctx context.Context, tenantID string, since time.Duration) (int, error) {
 	cachedKey := fmt.Sprintf("count:active:tenant:%s:since:%s", tenantID, since.String())
 
-	cached, err := pkg.RedisClient.Get(ctx, cachedKey).Result()
-	if err == nil {
+	if cached, err := pkg.RedisClient.Get(ctx, cachedKey).Result(); err == nil {
 		var count int
 		if err := json.Unmarshal([]byte(cached), &count); err == nil {
 			return count, nil
 		}
 	}
 
-	query := `SELECT COUNT(*) FROM nodes WHERE tenant_id = $1 AND last_seen > NOW() - $2::interval`
+	query := `
+		SELECT COUNT(*) FROM nodes
+		WHERE tenant_id = $1 AND last_seen > NOW() - $2::interval
+	`
 	var count int
-	err = r.DB.QueryRowContext(ctx, query, tenantID, since.String()).Scan(&count)
+	err := r.DB.QueryRowContext(ctx, query, tenantID, since.String()).Scan(&count)
 	if err != nil {
 		return 0, err
 	}
@@ -290,18 +293,6 @@ func (r *SQLNodeRepository) IsIPAlreadyRegistered(ctx context.Context, ip string
 	var exists bool
 	err := r.DB.QueryRowContext(ctx, query, ip).Scan(&exists)
 	return exists, err
-}
-
-func (r *SQLNodeRepository) InvalidateTenantCache(ctx context.Context, tenantID string) error {
-	cacheKey := fmt.Sprintf("nodes:tenant:%s", tenantID)
-	err := pkg.RedisClient.Del(ctx, cacheKey).Err()
-	if err != nil {
-		logger.Log.Warn("invalidate cache tenant",
-			zap.String("tenant_id", tenantID),
-			zap.Error(err),
-		)
-	}
-	return err
 }
 
 func (r *SQLNodeRepository) InsertAuditLog(ctx context.Context, log *repository.AuditLog) error {
@@ -400,14 +391,102 @@ func (r *SQLNodeRepository) GetAuditLogs(ctx context.Context, filter repository.
 
 func (r *SQLNodeRepository) StoreNodeMetrics(ctx context.Context, metrics *repository.NodeMetrics) error {
 	query := `
-		INSERT INTO node_metrics (node_id, timestamp, cpu_usage, mem_usage)
-		VALUES ($1, $2, $3, $4)
+		INSERT INTO node_metrics (
+			node_id, timestamp, cpu_usage, mem_usage,
+			bandwidth_rx, bandwidth_tx, connections, disk_io,
+			uptime, status, tenant_id
+		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
 	`
 	_, err := r.DB.ExecContext(ctx, query,
 		metrics.NodeID,
 		metrics.Timestamp,
 		metrics.CPU,
 		metrics.Memory,
+		metrics.BandwidthRx,
+		metrics.BandwidthTx,
+		metrics.Connections,
+		metrics.DiskIO,
+		metrics.Uptime,
+		metrics.Status,
+		metrics.TenantID,
 	)
 	return err
+}
+
+func (r *SQLNodeRepository) SetNodeBlacklist(ctx context.Context, id string, isBlacklisted bool) error {
+	_, err := r.DB.ExecContext(ctx, `
+		UPDATE nodes
+		SET is_blacklisted = $1, updated_at = NOW()
+		WHERE id = $2
+	`, isBlacklisted, id)
+	return err
+}
+
+func (r *SQLNodeRepository) SetNodeBlacklistStatus(ctx context.Context, nodeID string, isBlacklisted bool) error {
+	//  en base
+	_, err := r.DB.ExecContext(ctx, `
+		UPDATE nodes SET is_blacklisted = $1, updated_at = NOW()
+		WHERE id = $2
+	`, isBlacklisted, nodeID)
+	if err != nil {
+		return err
+	}
+
+	//  cache Redis
+	redisKey := fmt.Sprintf("node:blacklist:%s", nodeID)
+	if isBlacklisted {
+		err := pkg.RedisClient.Set(ctx, redisKey, "1", 10*time.Minute).Err()
+		if err != nil {
+			log.Printf("[Redis] Erreur set blacklist: %v", err)
+		}
+	} else {
+		_ = pkg.RedisClient.Del(ctx, redisKey).Err()
+	}
+
+	return nil
+}
+
+func (r *SQLNodeRepository) ListBlacklistedNodes(ctx context.Context, tenantID string) ([]*repository.Node, error) {
+	cacheKey := fmt.Sprintf("tenant:blacklisted:%s", tenantID)
+
+	// cache Redis
+	if cached, err := pkg.RedisClient.Get(ctx, cacheKey).Result(); err == nil {
+		var nodes []*repository.Node
+		if err := json.Unmarshal([]byte(cached), &nodes); err == nil {
+			return nodes, nil
+		}
+		log.Printf("[Redis] Cache corrompu pour %s: %v", cacheKey, err)
+	}
+
+	// Fallback PostgreSQL
+	query := `
+		SELECT id, name, ip, tenant_id, status, last_seen, created_at, updated_at,
+		       location, provider, software_version, is_blacklisted, tags, os
+		FROM nodes
+		WHERE tenant_id = $1 AND is_blacklisted = true
+	`
+	rows, err := r.DB.QueryContext(ctx, query, tenantID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var nodes []*repository.Node
+	for rows.Next() {
+		var node repository.Node
+		err := rows.Scan(&node.ID, &node.Name, &node.IP, &node.TenantID, &node.Status, &node.LastSeen,
+			&node.CreatedAt, &node.UpdatedAt, &node.Location, &node.Provider, &node.SoftwareVersion,
+			&node.IsBlacklisted, &node.Tags, &node.OS)
+		if err != nil {
+			return nil, err
+		}
+		nodes = append(nodes, &node)
+	}
+
+	// save en Redis
+	if raw, err := json.Marshal(nodes); err == nil {
+		_ = pkg.RedisClient.Set(ctx, cacheKey, raw, 2*time.Minute).Err()
+	}
+
+	return nodes, nil
 }

@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS nodes (
     tenant_id UUID NOT NULL,
     last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     tags TEXT[],
+    is_blacklisted BOOLEAN DEFAULT FALSE,
     UNIQUE (hostname, tenant_id)
 );
 

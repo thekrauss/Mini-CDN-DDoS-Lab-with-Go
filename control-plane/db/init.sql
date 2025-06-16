@@ -12,21 +12,27 @@ CREATE TABLE IF NOT EXISTS nodes (
     tenant_id UUID NOT NULL,
     last_seen TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     tags TEXT[],
+    is_blacklisted BOOLEAN DEFAULT FALSE,
     UNIQUE (hostname, tenant_id)
 );
+
 
 -- Métriques collectées par agent
 CREATE TABLE IF NOT EXISTS node_metrics (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     node_id UUID REFERENCES nodes(id) ON DELETE CASCADE,
+    tenant_id UUID,
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     cpu_usage FLOAT,
     mem_usage FLOAT,
     bandwidth_rx BIGINT,
     bandwidth_tx BIGINT,
     connections INT,
-    disk_io BIGINT
+    disk_io BIGINT,
+    uptime BIGINT,
+    status TEXT
 );
+
 
 -- Suivi des pings/états (heartbeat)
 CREATE TABLE IF NOT EXISTS node_status_logs (

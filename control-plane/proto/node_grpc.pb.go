@@ -20,16 +20,20 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	NodeService_RegisterNode_FullMethodName        = "/nodepb.NodeService/RegisterNode"
-	NodeService_Ping_FullMethodName                = "/nodepb.NodeService/Ping"
-	NodeService_GetAuditLogs_FullMethodName        = "/nodepb.NodeService/GetAuditLogs"
-	NodeService_ListNodesByTenant_FullMethodName   = "/nodepb.NodeService/ListNodesByTenant"
-	NodeService_UpdateNodeMetadata_FullMethodName  = "/nodepb.NodeService/UpdateNodeMetadata"
-	NodeService_SetNodeStatus_FullMethodName       = "/nodepb.NodeService/SetNodeStatus"
-	NodeService_GetNodeByID_FullMethodName         = "/nodepb.NodeService/GetNodeByID"
-	NodeService_BlacklistNode_FullMethodName       = "/nodepb.NodeService/BlacklistNode"
-	NodeService_StreamCommands_FullMethodName      = "/nodepb.NodeService/StreamCommands"
-	NodeService_ReportCommandResult_FullMethodName = "/nodepb.NodeService/ReportCommandResult"
+	NodeService_RegisterNode_FullMethodName         = "/nodepb.NodeService/RegisterNode"
+	NodeService_Ping_FullMethodName                 = "/nodepb.NodeService/Ping"
+	NodeService_GetAuditLogs_FullMethodName         = "/nodepb.NodeService/GetAuditLogs"
+	NodeService_ListNodesByTenant_FullMethodName    = "/nodepb.NodeService/ListNodesByTenant"
+	NodeService_UpdateNodeMetadata_FullMethodName   = "/nodepb.NodeService/UpdateNodeMetadata"
+	NodeService_SetNodeStatus_FullMethodName        = "/nodepb.NodeService/SetNodeStatus"
+	NodeService_GetNodeByID_FullMethodName          = "/nodepb.NodeService/GetNodeByID"
+	NodeService_CountActiveNodes_FullMethodName     = "/nodepb.NodeService/CountActiveNodes"
+	NodeService_ListBlacklistedNodes_FullMethodName = "/nodepb.NodeService/ListBlacklistedNodes"
+	NodeService_BlacklistNode_FullMethodName        = "/nodepb.NodeService/BlacklistNode"
+	NodeService_UnblacklistNode_FullMethodName      = "/nodepb.NodeService/UnblacklistNode"
+	NodeService_SearchNodes_FullMethodName          = "/nodepb.NodeService/SearchNodes"
+	NodeService_StreamCommands_FullMethodName       = "/nodepb.NodeService/StreamCommands"
+	NodeService_ReportCommandResult_FullMethodName  = "/nodepb.NodeService/ReportCommandResult"
 )
 
 // NodeServiceClient is the client API for NodeService service.
@@ -43,7 +47,11 @@ type NodeServiceClient interface {
 	UpdateNodeMetadata(ctx context.Context, in *UpdateNodeRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	SetNodeStatus(ctx context.Context, in *NodeStatusRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetNodeByID(ctx context.Context, in *GetNodeRequest, opts ...grpc.CallOption) (*Node, error)
+	CountActiveNodes(ctx context.Context, in *CountActiveNodesRequest, opts ...grpc.CallOption) (*CountActiveNodesResponse, error)
+	ListBlacklistedNodes(ctx context.Context, in *ListNodesRequest, opts ...grpc.CallOption) (*ListNodesResponse, error)
 	BlacklistNode(ctx context.Context, in *NodeID, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	UnblacklistNode(ctx context.Context, in *NodeID, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	SearchNodes(ctx context.Context, in *SearchRequest, opts ...grpc.CallOption) (*SearchResponse, error)
 	StreamCommands(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[CommandRequest, Command], error)
 	ReportCommandResult(ctx context.Context, in *CommandResultRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
@@ -126,10 +134,50 @@ func (c *nodeServiceClient) GetNodeByID(ctx context.Context, in *GetNodeRequest,
 	return out, nil
 }
 
+func (c *nodeServiceClient) CountActiveNodes(ctx context.Context, in *CountActiveNodesRequest, opts ...grpc.CallOption) (*CountActiveNodesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CountActiveNodesResponse)
+	err := c.cc.Invoke(ctx, NodeService_CountActiveNodes_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nodeServiceClient) ListBlacklistedNodes(ctx context.Context, in *ListNodesRequest, opts ...grpc.CallOption) (*ListNodesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListNodesResponse)
+	err := c.cc.Invoke(ctx, NodeService_ListBlacklistedNodes_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *nodeServiceClient) BlacklistNode(ctx context.Context, in *NodeID, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, NodeService_BlacklistNode_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nodeServiceClient) UnblacklistNode(ctx context.Context, in *NodeID, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, NodeService_UnblacklistNode_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nodeServiceClient) SearchNodes(ctx context.Context, in *SearchRequest, opts ...grpc.CallOption) (*SearchResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SearchResponse)
+	err := c.cc.Invoke(ctx, NodeService_SearchNodes_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -170,7 +218,11 @@ type NodeServiceServer interface {
 	UpdateNodeMetadata(context.Context, *UpdateNodeRequest) (*emptypb.Empty, error)
 	SetNodeStatus(context.Context, *NodeStatusRequest) (*emptypb.Empty, error)
 	GetNodeByID(context.Context, *GetNodeRequest) (*Node, error)
+	CountActiveNodes(context.Context, *CountActiveNodesRequest) (*CountActiveNodesResponse, error)
+	ListBlacklistedNodes(context.Context, *ListNodesRequest) (*ListNodesResponse, error)
 	BlacklistNode(context.Context, *NodeID) (*emptypb.Empty, error)
+	UnblacklistNode(context.Context, *NodeID) (*emptypb.Empty, error)
+	SearchNodes(context.Context, *SearchRequest) (*SearchResponse, error)
 	StreamCommands(grpc.BidiStreamingServer[CommandRequest, Command]) error
 	ReportCommandResult(context.Context, *CommandResultRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedNodeServiceServer()
@@ -204,8 +256,20 @@ func (UnimplementedNodeServiceServer) SetNodeStatus(context.Context, *NodeStatus
 func (UnimplementedNodeServiceServer) GetNodeByID(context.Context, *GetNodeRequest) (*Node, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetNodeByID not implemented")
 }
+func (UnimplementedNodeServiceServer) CountActiveNodes(context.Context, *CountActiveNodesRequest) (*CountActiveNodesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CountActiveNodes not implemented")
+}
+func (UnimplementedNodeServiceServer) ListBlacklistedNodes(context.Context, *ListNodesRequest) (*ListNodesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListBlacklistedNodes not implemented")
+}
 func (UnimplementedNodeServiceServer) BlacklistNode(context.Context, *NodeID) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method BlacklistNode not implemented")
+}
+func (UnimplementedNodeServiceServer) UnblacklistNode(context.Context, *NodeID) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UnblacklistNode not implemented")
+}
+func (UnimplementedNodeServiceServer) SearchNodes(context.Context, *SearchRequest) (*SearchResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SearchNodes not implemented")
 }
 func (UnimplementedNodeServiceServer) StreamCommands(grpc.BidiStreamingServer[CommandRequest, Command]) error {
 	return status.Errorf(codes.Unimplemented, "method StreamCommands not implemented")
@@ -360,6 +424,42 @@ func _NodeService_GetNodeByID_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _NodeService_CountActiveNodes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CountActiveNodesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NodeServiceServer).CountActiveNodes(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NodeService_CountActiveNodes_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NodeServiceServer).CountActiveNodes(ctx, req.(*CountActiveNodesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NodeService_ListBlacklistedNodes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListNodesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NodeServiceServer).ListBlacklistedNodes(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NodeService_ListBlacklistedNodes_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NodeServiceServer).ListBlacklistedNodes(ctx, req.(*ListNodesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _NodeService_BlacklistNode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(NodeID)
 	if err := dec(in); err != nil {
@@ -374,6 +474,42 @@ func _NodeService_BlacklistNode_Handler(srv interface{}, ctx context.Context, de
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(NodeServiceServer).BlacklistNode(ctx, req.(*NodeID))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NodeService_UnblacklistNode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(NodeID)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NodeServiceServer).UnblacklistNode(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NodeService_UnblacklistNode_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NodeServiceServer).UnblacklistNode(ctx, req.(*NodeID))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NodeService_SearchNodes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SearchRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NodeServiceServer).SearchNodes(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NodeService_SearchNodes_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NodeServiceServer).SearchNodes(ctx, req.(*SearchRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -439,8 +575,24 @@ var NodeService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _NodeService_GetNodeByID_Handler,
 		},
 		{
+			MethodName: "CountActiveNodes",
+			Handler:    _NodeService_CountActiveNodes_Handler,
+		},
+		{
+			MethodName: "ListBlacklistedNodes",
+			Handler:    _NodeService_ListBlacklistedNodes_Handler,
+		},
+		{
 			MethodName: "BlacklistNode",
 			Handler:    _NodeService_BlacklistNode_Handler,
+		},
+		{
+			MethodName: "UnblacklistNode",
+			Handler:    _NodeService_UnblacklistNode_Handler,
+		},
+		{
+			MethodName: "SearchNodes",
+			Handler:    _NodeService_SearchNodes_Handler,
 		},
 		{
 			MethodName: "ReportCommandResult",

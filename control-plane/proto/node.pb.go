@@ -1247,6 +1247,286 @@ func (x *CommandResultRequest) GetTimestamp() string {
 	return ""
 }
 
+type SearchRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TenantId      string                 `protobuf:"bytes,1,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
+	Query         string                 `protobuf:"bytes,2,opt,name=query,proto3" json:"query,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SearchRequest) Reset() {
+	*x = SearchRequest{}
+	mi := &file_node_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SearchRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SearchRequest) ProtoMessage() {}
+
+func (x *SearchRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_node_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SearchRequest.ProtoReflect.Descriptor instead.
+func (*SearchRequest) Descriptor() ([]byte, []int) {
+	return file_node_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *SearchRequest) GetTenantId() string {
+	if x != nil {
+		return x.TenantId
+	}
+	return ""
+}
+
+func (x *SearchRequest) GetQuery() string {
+	if x != nil {
+		return x.Query
+	}
+	return ""
+}
+
+type SearchResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Nodes         []*Node                `protobuf:"bytes,1,rep,name=nodes,proto3" json:"nodes,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SearchResponse) Reset() {
+	*x = SearchResponse{}
+	mi := &file_node_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SearchResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SearchResponse) ProtoMessage() {}
+
+func (x *SearchResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_node_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SearchResponse.ProtoReflect.Descriptor instead.
+func (*SearchResponse) Descriptor() ([]byte, []int) {
+	return file_node_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *SearchResponse) GetNodes() []*Node {
+	if x != nil {
+		return x.Nodes
+	}
+	return nil
+}
+
+type ListNodesRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TenantId      string                 `protobuf:"bytes,1,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListNodesRequest) Reset() {
+	*x = ListNodesRequest{}
+	mi := &file_node_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListNodesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListNodesRequest) ProtoMessage() {}
+
+func (x *ListNodesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_node_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListNodesRequest.ProtoReflect.Descriptor instead.
+func (*ListNodesRequest) Descriptor() ([]byte, []int) {
+	return file_node_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *ListNodesRequest) GetTenantId() string {
+	if x != nil {
+		return x.TenantId
+	}
+	return ""
+}
+
+type ListNodesResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Nodes         []*Node                `protobuf:"bytes,1,rep,name=nodes,proto3" json:"nodes,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListNodesResponse) Reset() {
+	*x = ListNodesResponse{}
+	mi := &file_node_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListNodesResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListNodesResponse) ProtoMessage() {}
+
+func (x *ListNodesResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_node_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListNodesResponse.ProtoReflect.Descriptor instead.
+func (*ListNodesResponse) Descriptor() ([]byte, []int) {
+	return file_node_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *ListNodesResponse) GetNodes() []*Node {
+	if x != nil {
+		return x.Nodes
+	}
+	return nil
+}
+
+type CountActiveNodesRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TenantId      string                 `protobuf:"bytes,1,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
+	SinceSeconds  int32                  `protobuf:"varint,2,opt,name=since_seconds,json=sinceSeconds,proto3" json:"since_seconds,omitempty"` // 3600 pour 1h
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CountActiveNodesRequest) Reset() {
+	*x = CountActiveNodesRequest{}
+	mi := &file_node_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CountActiveNodesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CountActiveNodesRequest) ProtoMessage() {}
+
+func (x *CountActiveNodesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_node_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CountActiveNodesRequest.ProtoReflect.Descriptor instead.
+func (*CountActiveNodesRequest) Descriptor() ([]byte, []int) {
+	return file_node_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *CountActiveNodesRequest) GetTenantId() string {
+	if x != nil {
+		return x.TenantId
+	}
+	return ""
+}
+
+func (x *CountActiveNodesRequest) GetSinceSeconds() int32 {
+	if x != nil {
+		return x.SinceSeconds
+	}
+	return 0
+}
+
+type CountActiveNodesResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Count         int32                  `protobuf:"varint,1,opt,name=count,proto3" json:"count,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CountActiveNodesResponse) Reset() {
+	*x = CountActiveNodesResponse{}
+	mi := &file_node_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CountActiveNodesResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CountActiveNodesResponse) ProtoMessage() {}
+
+func (x *CountActiveNodesResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_node_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CountActiveNodesResponse.ProtoReflect.Descriptor instead.
+func (*CountActiveNodesResponse) Descriptor() ([]byte, []int) {
+	return file_node_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *CountActiveNodesResponse) GetCount() int32 {
+	if x != nil {
+		return x.Count
+	}
+	return 0
+}
+
 var File_node_proto protoreflect.FileDescriptor
 
 const file_node_proto_rawDesc = "" +
@@ -1355,13 +1635,28 @@ const file_node_proto_rawDesc = "" +
 	"\anode_id\x18\x02 \x01(\tR\x06nodeId\x12\x18\n" +
 	"\asuccess\x18\x03 \x01(\bR\asuccess\x12\x16\n" +
 	"\x06output\x18\x04 \x01(\tR\x06output\x12\x1c\n" +
-	"\ttimestamp\x18\x05 \x01(\tR\ttimestamp*_\n" +
+	"\ttimestamp\x18\x05 \x01(\tR\ttimestamp\"B\n" +
+	"\rSearchRequest\x12\x1b\n" +
+	"\ttenant_id\x18\x01 \x01(\tR\btenantId\x12\x14\n" +
+	"\x05query\x18\x02 \x01(\tR\x05query\"4\n" +
+	"\x0eSearchResponse\x12\"\n" +
+	"\x05nodes\x18\x01 \x03(\v2\f.nodepb.NodeR\x05nodes\"/\n" +
+	"\x10ListNodesRequest\x12\x1b\n" +
+	"\ttenant_id\x18\x01 \x01(\tR\btenantId\"7\n" +
+	"\x11ListNodesResponse\x12\"\n" +
+	"\x05nodes\x18\x01 \x03(\v2\f.nodepb.NodeR\x05nodes\"[\n" +
+	"\x17CountActiveNodesRequest\x12\x1b\n" +
+	"\ttenant_id\x18\x01 \x01(\tR\btenantId\x12#\n" +
+	"\rsince_seconds\x18\x02 \x01(\x05R\fsinceSeconds\"0\n" +
+	"\x18CountActiveNodesResponse\x12\x14\n" +
+	"\x05count\x18\x01 \x01(\x05R\x05count*_\n" +
 	"\n" +
 	"NodeStatus\x12\x1b\n" +
 	"\x17NODE_STATUS_UNSPECIFIED\x10\x00\x12\x0f\n" +
 	"\vNODE_ONLINE\x10\x01\x12\x10\n" +
 	"\fNODE_OFFLINE\x10\x02\x12\x11\n" +
-	"\rNODE_DEGRADED\x10\x032\x8a\a\n" +
+	"\rNODE_DEGRADED\x10\x032\xa9\n" +
+	"\n" +
 	"\vNodeService\x12_\n" +
 	"\fRegisterNode\x12\x17.nodepb.RegisterRequest\x1a\x18.nodepb.RegisterResponse\"\x1c\x82\xd3\xe4\x93\x02\x16:\x01*\"\x11/v1/register-node\x12F\n" +
 	"\x04Ping\x12\x13.nodepb.PingRequest\x1a\x14.nodepb.PingResponse\"\x13\x82\xd3\xe4\x93\x02\r:\x01*\"\b/v1/ping\x12g\n" +
@@ -1369,8 +1664,12 @@ const file_node_proto_rawDesc = "" +
 	"\x11ListNodesByTenant\x12\x15.nodepb.TenantRequest\x1a\x18.nodepb.NodeListResponse\"\x11\x82\xd3\xe4\x93\x02\v\x12\t/v1/nodes\x12g\n" +
 	"\x12UpdateNodeMetadata\x12\x19.nodepb.UpdateNodeRequest\x1a\x16.google.protobuf.Empty\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\x1a\x13/v1/nodes/{node_id}\x12i\n" +
 	"\rSetNodeStatus\x12\x19.nodepb.NodeStatusRequest\x1a\x16.google.protobuf.Empty\"%\x82\xd3\xe4\x93\x02\x1f:\x01*\"\x1a/v1/nodes/{node_id}/status\x12P\n" +
-	"\vGetNodeByID\x12\x16.nodepb.GetNodeRequest\x1a\f.nodepb.Node\"\x1b\x82\xd3\xe4\x93\x02\x15\x12\x13/v1/nodes/{node_id}\x12^\n" +
-	"\rBlacklistNode\x12\x0e.nodepb.NodeID\x1a\x16.google.protobuf.Empty\"%\x82\xd3\xe4\x93\x02\x1f\"\x1d/v1/nodes/{node_id}/blacklist\x12=\n" +
+	"\vGetNodeByID\x12\x16.nodepb.GetNodeRequest\x1a\f.nodepb.Node\"\x1b\x82\xd3\xe4\x93\x02\x15\x12\x13/v1/nodes/{node_id}\x12u\n" +
+	"\x10CountActiveNodes\x12\x1f.nodepb.CountActiveNodesRequest\x1a .nodepb.CountActiveNodesResponse\"\x1e\x82\xd3\xe4\x93\x02\x18\x12\x16/v1/nodes/active_count\x12j\n" +
+	"\x14ListBlacklistedNodes\x12\x18.nodepb.ListNodesRequest\x1a\x19.nodepb.ListNodesResponse\"\x1d\x82\xd3\xe4\x93\x02\x17\x12\x15/v1/nodes/blacklisted\x12^\n" +
+	"\rBlacklistNode\x12\x0e.nodepb.NodeID\x1a\x16.google.protobuf.Empty\"%\x82\xd3\xe4\x93\x02\x1f\"\x1d/v1/nodes/{node_id}/blacklist\x12b\n" +
+	"\x0fUnblacklistNode\x12\x0e.nodepb.NodeID\x1a\x16.google.protobuf.Empty\"'\x82\xd3\xe4\x93\x02!\"\x1f/v1/nodes/{node_id}/unblacklist\x12V\n" +
+	"\vSearchNodes\x12\x15.nodepb.SearchRequest\x1a\x16.nodepb.SearchResponse\"\x18\x82\xd3\xe4\x93\x02\x12\x12\x10/v1/nodes/search\x12=\n" +
 	"\x0eStreamCommands\x12\x16.nodepb.CommandRequest\x1a\x0f.nodepb.Command(\x010\x01\x12K\n" +
 	"\x13ReportCommandResult\x12\x1c.nodepb.CommandResultRequest\x1a\x16.google.protobuf.EmptyBDZBgithub.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/protob\x06proto3"
 
@@ -1387,59 +1686,75 @@ func file_node_proto_rawDescGZIP() []byte {
 }
 
 var file_node_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_node_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
+var file_node_proto_msgTypes = make([]protoimpl.MessageInfo, 24)
 var file_node_proto_goTypes = []any{
-	(NodeStatus)(0),              // 0: nodepb.NodeStatus
-	(*RegisterRequest)(nil),      // 1: nodepb.RegisterRequest
-	(*RegisterResponse)(nil),     // 2: nodepb.RegisterResponse
-	(*PingRequest)(nil),          // 3: nodepb.PingRequest
-	(*PingResponse)(nil),         // 4: nodepb.PingResponse
-	(*GetAuditLogsRequest)(nil),  // 5: nodepb.GetAuditLogsRequest
-	(*AuditLogEntry)(nil),        // 6: nodepb.AuditLogEntry
-	(*GetAuditLogsResponse)(nil), // 7: nodepb.GetAuditLogsResponse
-	(*TenantRequest)(nil),        // 8: nodepb.TenantRequest
-	(*NodeListResponse)(nil),     // 9: nodepb.NodeListResponse
-	(*UpdateNodeRequest)(nil),    // 10: nodepb.UpdateNodeRequest
-	(*NodeStatusRequest)(nil),    // 11: nodepb.NodeStatusRequest
-	(*GetNodeRequest)(nil),       // 12: nodepb.GetNodeRequest
-	(*NodeID)(nil),               // 13: nodepb.NodeID
-	(*Node)(nil),                 // 14: nodepb.Node
-	(*CommandRequest)(nil),       // 15: nodepb.CommandRequest
-	(*Command)(nil),              // 16: nodepb.Command
-	(*CommandResultRequest)(nil), // 17: nodepb.CommandResultRequest
-	nil,                          // 18: nodepb.UpdateNodeRequest.TagsEntry
-	(*emptypb.Empty)(nil),        // 19: google.protobuf.Empty
+	(NodeStatus)(0),                  // 0: nodepb.NodeStatus
+	(*RegisterRequest)(nil),          // 1: nodepb.RegisterRequest
+	(*RegisterResponse)(nil),         // 2: nodepb.RegisterResponse
+	(*PingRequest)(nil),              // 3: nodepb.PingRequest
+	(*PingResponse)(nil),             // 4: nodepb.PingResponse
+	(*GetAuditLogsRequest)(nil),      // 5: nodepb.GetAuditLogsRequest
+	(*AuditLogEntry)(nil),            // 6: nodepb.AuditLogEntry
+	(*GetAuditLogsResponse)(nil),     // 7: nodepb.GetAuditLogsResponse
+	(*TenantRequest)(nil),            // 8: nodepb.TenantRequest
+	(*NodeListResponse)(nil),         // 9: nodepb.NodeListResponse
+	(*UpdateNodeRequest)(nil),        // 10: nodepb.UpdateNodeRequest
+	(*NodeStatusRequest)(nil),        // 11: nodepb.NodeStatusRequest
+	(*GetNodeRequest)(nil),           // 12: nodepb.GetNodeRequest
+	(*NodeID)(nil),                   // 13: nodepb.NodeID
+	(*Node)(nil),                     // 14: nodepb.Node
+	(*CommandRequest)(nil),           // 15: nodepb.CommandRequest
+	(*Command)(nil),                  // 16: nodepb.Command
+	(*CommandResultRequest)(nil),     // 17: nodepb.CommandResultRequest
+	(*SearchRequest)(nil),            // 18: nodepb.SearchRequest
+	(*SearchResponse)(nil),           // 19: nodepb.SearchResponse
+	(*ListNodesRequest)(nil),         // 20: nodepb.ListNodesRequest
+	(*ListNodesResponse)(nil),        // 21: nodepb.ListNodesResponse
+	(*CountActiveNodesRequest)(nil),  // 22: nodepb.CountActiveNodesRequest
+	(*CountActiveNodesResponse)(nil), // 23: nodepb.CountActiveNodesResponse
+	nil,                              // 24: nodepb.UpdateNodeRequest.TagsEntry
+	(*emptypb.Empty)(nil),            // 25: google.protobuf.Empty
 }
 var file_node_proto_depIdxs = []int32{
 	6,  // 0: nodepb.GetAuditLogsResponse.logs:type_name -> nodepb.AuditLogEntry
 	14, // 1: nodepb.NodeListResponse.nodes:type_name -> nodepb.Node
-	18, // 2: nodepb.UpdateNodeRequest.tags:type_name -> nodepb.UpdateNodeRequest.TagsEntry
+	24, // 2: nodepb.UpdateNodeRequest.tags:type_name -> nodepb.UpdateNodeRequest.TagsEntry
 	0,  // 3: nodepb.NodeStatusRequest.status:type_name -> nodepb.NodeStatus
-	1,  // 4: nodepb.NodeService.RegisterNode:input_type -> nodepb.RegisterRequest
-	3,  // 5: nodepb.NodeService.Ping:input_type -> nodepb.PingRequest
-	5,  // 6: nodepb.NodeService.GetAuditLogs:input_type -> nodepb.GetAuditLogsRequest
-	8,  // 7: nodepb.NodeService.ListNodesByTenant:input_type -> nodepb.TenantRequest
-	10, // 8: nodepb.NodeService.UpdateNodeMetadata:input_type -> nodepb.UpdateNodeRequest
-	11, // 9: nodepb.NodeService.SetNodeStatus:input_type -> nodepb.NodeStatusRequest
-	12, // 10: nodepb.NodeService.GetNodeByID:input_type -> nodepb.GetNodeRequest
-	13, // 11: nodepb.NodeService.BlacklistNode:input_type -> nodepb.NodeID
-	15, // 12: nodepb.NodeService.StreamCommands:input_type -> nodepb.CommandRequest
-	17, // 13: nodepb.NodeService.ReportCommandResult:input_type -> nodepb.CommandResultRequest
-	2,  // 14: nodepb.NodeService.RegisterNode:output_type -> nodepb.RegisterResponse
-	4,  // 15: nodepb.NodeService.Ping:output_type -> nodepb.PingResponse
-	7,  // 16: nodepb.NodeService.GetAuditLogs:output_type -> nodepb.GetAuditLogsResponse
-	9,  // 17: nodepb.NodeService.ListNodesByTenant:output_type -> nodepb.NodeListResponse
-	19, // 18: nodepb.NodeService.UpdateNodeMetadata:output_type -> google.protobuf.Empty
-	19, // 19: nodepb.NodeService.SetNodeStatus:output_type -> google.protobuf.Empty
-	14, // 20: nodepb.NodeService.GetNodeByID:output_type -> nodepb.Node
-	19, // 21: nodepb.NodeService.BlacklistNode:output_type -> google.protobuf.Empty
-	16, // 22: nodepb.NodeService.StreamCommands:output_type -> nodepb.Command
-	19, // 23: nodepb.NodeService.ReportCommandResult:output_type -> google.protobuf.Empty
-	14, // [14:24] is the sub-list for method output_type
-	4,  // [4:14] is the sub-list for method input_type
-	4,  // [4:4] is the sub-list for extension type_name
-	4,  // [4:4] is the sub-list for extension extendee
-	0,  // [0:4] is the sub-list for field type_name
+	14, // 4: nodepb.SearchResponse.nodes:type_name -> nodepb.Node
+	14, // 5: nodepb.ListNodesResponse.nodes:type_name -> nodepb.Node
+	1,  // 6: nodepb.NodeService.RegisterNode:input_type -> nodepb.RegisterRequest
+	3,  // 7: nodepb.NodeService.Ping:input_type -> nodepb.PingRequest
+	5,  // 8: nodepb.NodeService.GetAuditLogs:input_type -> nodepb.GetAuditLogsRequest
+	8,  // 9: nodepb.NodeService.ListNodesByTenant:input_type -> nodepb.TenantRequest
+	10, // 10: nodepb.NodeService.UpdateNodeMetadata:input_type -> nodepb.UpdateNodeRequest
+	11, // 11: nodepb.NodeService.SetNodeStatus:input_type -> nodepb.NodeStatusRequest
+	12, // 12: nodepb.NodeService.GetNodeByID:input_type -> nodepb.GetNodeRequest
+	22, // 13: nodepb.NodeService.CountActiveNodes:input_type -> nodepb.CountActiveNodesRequest
+	20, // 14: nodepb.NodeService.ListBlacklistedNodes:input_type -> nodepb.ListNodesRequest
+	13, // 15: nodepb.NodeService.BlacklistNode:input_type -> nodepb.NodeID
+	13, // 16: nodepb.NodeService.UnblacklistNode:input_type -> nodepb.NodeID
+	18, // 17: nodepb.NodeService.SearchNodes:input_type -> nodepb.SearchRequest
+	15, // 18: nodepb.NodeService.StreamCommands:input_type -> nodepb.CommandRequest
+	17, // 19: nodepb.NodeService.ReportCommandResult:input_type -> nodepb.CommandResultRequest
+	2,  // 20: nodepb.NodeService.RegisterNode:output_type -> nodepb.RegisterResponse
+	4,  // 21: nodepb.NodeService.Ping:output_type -> nodepb.PingResponse
+	7,  // 22: nodepb.NodeService.GetAuditLogs:output_type -> nodepb.GetAuditLogsResponse
+	9,  // 23: nodepb.NodeService.ListNodesByTenant:output_type -> nodepb.NodeListResponse
+	25, // 24: nodepb.NodeService.UpdateNodeMetadata:output_type -> google.protobuf.Empty
+	25, // 25: nodepb.NodeService.SetNodeStatus:output_type -> google.protobuf.Empty
+	14, // 26: nodepb.NodeService.GetNodeByID:output_type -> nodepb.Node
+	23, // 27: nodepb.NodeService.CountActiveNodes:output_type -> nodepb.CountActiveNodesResponse
+	21, // 28: nodepb.NodeService.ListBlacklistedNodes:output_type -> nodepb.ListNodesResponse
+	25, // 29: nodepb.NodeService.BlacklistNode:output_type -> google.protobuf.Empty
+	25, // 30: nodepb.NodeService.UnblacklistNode:output_type -> google.protobuf.Empty
+	19, // 31: nodepb.NodeService.SearchNodes:output_type -> nodepb.SearchResponse
+	16, // 32: nodepb.NodeService.StreamCommands:output_type -> nodepb.Command
+	25, // 33: nodepb.NodeService.ReportCommandResult:output_type -> google.protobuf.Empty
+	20, // [20:34] is the sub-list for method output_type
+	6,  // [6:20] is the sub-list for method input_type
+	6,  // [6:6] is the sub-list for extension type_name
+	6,  // [6:6] is the sub-list for extension extendee
+	0,  // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_node_proto_init() }
@@ -1454,7 +1769,7 @@ func file_node_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_node_proto_rawDesc), len(file_node_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   18,
+			NumMessages:   24,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

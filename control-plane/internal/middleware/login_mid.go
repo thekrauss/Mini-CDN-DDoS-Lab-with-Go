@@ -8,10 +8,7 @@ import (
 	"time"
 
 	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/internal/services"
-	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/pkg/auth"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 var rateLimit = make(map[string]int)
@@ -68,32 +65,6 @@ func RateLimitingMiddleware() grpc.UnaryServerInterceptor {
 
 		return handler(ctx, req)
 	}
-}
-
-func CheckPermissionMiddleware(service *services.NodeService, requiredPermission string) grpc.UnaryServerInterceptor {
-
-	return func(ctx context.Context, req any, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (any, error) {
-		claims, err := auth.ExtractJWTFromContext(ctx)
-		if err != nil {
-			log.Printf("Erreur JWT: %v", err)
-			return nil, status.Errorf(codes.Unauthenticated, "Token invalide ou expiré")
-		}
-
-		// vérification des permissions
-		hasPerm, err := service.Permission(ctx, claims.UserID.String(), requiredPermission)
-		if err != nil {
-			log.Printf("Erreur lors de la vérification des permissions: %v", err)
-			return nil, status.Errorf(codes.Internal, "Erreur interne")
-		}
-		if !hasPerm {
-			log.Printf("Permission refusée: %s", requiredPermission)
-			return nil, status.Errorf(codes.PermissionDenied, "Vous n'avez pas la permission d'effectuer cette action")
-		}
-
-		// l'utilisateur a la permission, on continue l'exécution de la requête
-		return handler(ctx, req)
-	}
-
 }
 
 // Réinitialise le compteur après une durée donnée

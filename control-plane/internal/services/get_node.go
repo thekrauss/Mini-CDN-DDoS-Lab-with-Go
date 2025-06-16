@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"log"
 	"time"
@@ -82,17 +83,13 @@ func (s *NodeService) SetNodeStatus(ctx context.Context, req *pb.NodeStatusReque
 		return nil, status.Errorf(codes.Unauthenticated, "Token invalide")
 	}
 
+	if err := s.CheckAdminPermissions(ctx, claims, PermManageNode); err != nil {
+		return nil, err
+	}
+
 	node, err := s.Repo.GetNodeByID(ctx, req.NodeId)
 	if err != nil {
 		return nil, status.Errorf(codes.NotFound, "Nœud introuvable: %v", err)
-	}
-
-	adminUser, err := pkg.GetUserInfoFromRedis(ctx, claims.UserID.String())
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Erreur autorisation")
-	}
-	if adminUser.TenantID != node.TenantID && adminUser.Role != "GLOBAL_ADMIN" {
-		return nil, status.Errorf(codes.PermissionDenied, "Accès interdit à ce nœud")
 	}
 
 	//enum → string
@@ -132,6 +129,92 @@ func (s *NodeService) SetNodeStatus(ctx context.Context, req *pb.NodeStatusReque
 	_ = s.Repo.InsertAuditLog(ctx, logEntry)
 
 	return &emptypb.Empty{}, nil
+}
+
+func (s *NodeService) GetNodeByID(ctx context.Context, req *pb.GetNodeRequest) (*pb.Node, error) {
+	if req.NodeId == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "node_id requis")
+	}
+
+	node, err := s.Repo.GetNodeByID(ctx, req.NodeId)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, status.Errorf(codes.NotFound, "Node introuvable")
+		}
+		return nil, status.Errorf(codes.Internal, "Erreur récupération node: %v", err)
+	}
+
+	// Conversion Node (repository) → Node (proto)
+	return &pb.Node{
+		Id:              node.ID,
+		Name:            node.Name,
+		Ip:              node.IP,
+		TenantId:        node.TenantID,
+		Status:          node.Status,
+		Location:        node.Location,
+		Provider:        node.Provider,
+		SoftwareVersion: node.SoftwareVersion,
+		Tags:            node.Tags,
+		Os:              node.OS,
+		LastSeen:        node.LastSeen.Format(time.RFC3339),
+		CreatedAt:       node.CreatedAt.Format(time.RFC3339),
+		UpdatedAt:       node.UpdatedAt.Format(time.RFC3339),
+		IsBlacklisted:   node.IsBlacklisted,
+	}, nil
+}
+
+func (s *NodeService) SearchNodes(ctx context.Context, req *pb.SearchRequest) (*pb.SearchResponse, error) {
+	if req.TenantId == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "tenant_id requis")
+	}
+
+	filter := repository.NodeFilter{
+		TenantID: req.TenantId,
+		Query:    req.Query,
+	}
+
+	nodes, err := s.Repo.SearchNodes(ctx, filter)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "Erreur recherche node: %v", err)
+	}
+
+	var pbNodes []*pb.Node
+	for _, n := range nodes {
+		pbNodes = append(pbNodes, &pb.Node{
+			Id:              n.ID,
+			Name:            n.Name,
+			Ip:              n.IP,
+			TenantId:        n.TenantID,
+			Status:          n.Status,
+			LastSeen:        n.LastSeen.Format(time.RFC3339),
+			CreatedAt:       n.CreatedAt.Format(time.RFC3339),
+			UpdatedAt:       n.UpdatedAt.Format(time.RFC3339),
+			Location:        n.Location,
+			Provider:        n.Provider,
+			SoftwareVersion: n.SoftwareVersion,
+			IsBlacklisted:   n.IsBlacklisted,
+			Tags:            n.Tags,
+			Os:              n.OS,
+		})
+	}
+
+	return &pb.SearchResponse{
+		Nodes: pbNodes,
+	}, nil
+}
+
+func (s *NodeService) CountActiveNodes(ctx context.Context, req *pb.CountActiveNodesRequest) (*pb.CountActiveNodesResponse, error) {
+	if req.TenantId == "" || req.SinceSeconds <= 0 {
+		return nil, status.Errorf(codes.InvalidArgument, "tenant_id et since_seconds requis")
+	}
+
+	since := time.Duration(req.SinceSeconds) * time.Second
+	count, err := s.Repo.CountActiveNodes(ctx, req.TenantId, since)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "Erreur comptage nœuds actifs: %v", err)
+	}
+
+	return &pb.CountActiveNodesResponse{Count: int32(count)}, nil
 }
 
 func NodeStatusToString(status pb.NodeStatus) (string, error) {

@@ -60,13 +60,17 @@ type AuditLogFilter struct {
 }
 
 type NodeMetrics struct {
-	NodeID    string    `json:"node_id"`
-	TenantID  string    `json:"tenant_id"`
-	Timestamp time.Time `json:"timestamp"`
-	CPU       float64   `json:"cpu"`
-	Memory    float64   `json:"memory"`
-	Uptime    int64     `json:"uptime"`
-	Status    string    `json:"status"`
+	NodeID      string    `json:"node_id"`
+	TenantID    string    `json:"tenant_id"`
+	Timestamp   time.Time `json:"timestamp"`
+	CPU         float64   `json:"cpu"`
+	Memory      float64   `json:"memory"`
+	BandwidthRx int64     `json:"bandwidth_rx"`
+	BandwidthTx int64     `json:"bandwidth_tx"`
+	Connections int       `json:"connections"`
+	DiskIO      int64     `json:"disk_io"`
+	Uptime      int64     `json:"uptime"`
+	Status      string    `json:"status"`
 }
 
 type NodeFilter struct {
@@ -101,6 +105,8 @@ type NodeRepository interface {
 
 	// Statut / Orchestration
 	SetNodeStatus(ctx context.Context, id string, status string) error //ajoute de statut online, degraded, offline
+	SetNodeBlacklistStatus(ctx context.Context, nodeID string, isBlacklisted bool) error
+	ListBlacklistedNodes(ctx context.Context, tenantID string) ([]*Node, error)
 
 	GetInactiveNodes(ctx context.Context, olderThan time.Duration) ([]*Node, error) //détection automatique des nœuds morts
 	MarkAllNodesOffline(ctx context.Context) error                                  //Réinitialisation périodique

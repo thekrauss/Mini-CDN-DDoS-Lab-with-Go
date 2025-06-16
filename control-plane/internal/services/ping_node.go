@@ -61,6 +61,11 @@ func (s *NodeService) Ping(ctx context.Context, req *pb.PingRequest) (*pb.PingRe
 		return nil, status.Errorf(codes.NotFound, "Node non trouvé: %v", err)
 	}
 
+	if node.IsBlacklisted {
+		log.Printf("[PING BLOCKED] Ping rejeté pour node blacklisté: %s", node.ID)
+		return nil, status.Errorf(codes.PermissionDenied, "Le nœud %s est blacklisté et ne peut pas envoyer de ping", node.ID)
+	}
+
 	now := time.Now()
 	cfg := s.Config.MonitoringEtat
 

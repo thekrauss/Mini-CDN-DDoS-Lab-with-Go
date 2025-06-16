@@ -55,9 +55,34 @@ service NodeService {
     };
   }
 
+  rpc CountActiveNodes(CountActiveNodesRequest) returns (CountActiveNodesResponse) {
+    option (google.api.http) = {
+      get: "/v1/nodes/active_count"
+    };
+  }
+
+  rpc ListBlacklistedNodes(ListNodesRequest) returns (ListNodesResponse) {
+    option (google.api.http) = {
+      get: "/v1/nodes/blacklisted"
+    };
+  }
+
+
   rpc BlacklistNode(NodeID) returns (google.protobuf.Empty) { //blocage temporaire d’un nœud
     option (google.api.http) = {
       post: "/v1/nodes/{node_id}/blacklist"
+    };
+  }
+
+  rpc UnblacklistNode(NodeID) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/v1/nodes/{node_id}/unblacklist"
+    };
+  }
+
+  rpc SearchNodes(SearchRequest) returns (SearchResponse) {
+    option (google.api.http) = {
+      get: "/v1/nodes/search"
     };
   }
 
@@ -192,4 +217,30 @@ message CommandResultRequest {
   bool success = 3;
   string output = 4;
   string timestamp = 5;
+}
+
+message SearchRequest {
+  string tenant_id = 1;
+  string query = 2;
+}
+
+message SearchResponse {
+  repeated Node nodes = 1;
+}
+
+message ListNodesRequest {
+  string tenant_id = 1;
+}
+
+message ListNodesResponse {
+  repeated Node nodes = 1;
+}
+
+message CountActiveNodesRequest {
+  string tenant_id = 1;
+  int32 since_seconds = 2; // 3600 pour 1h
+}
+
+message CountActiveNodesResponse {
+  int32 count = 1;
 }
