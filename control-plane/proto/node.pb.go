@@ -23,6 +23,58 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type NodeStatus int32
+
+const (
+	NodeStatus_NODE_STATUS_UNSPECIFIED NodeStatus = 0
+	NodeStatus_NODE_ONLINE             NodeStatus = 1
+	NodeStatus_NODE_OFFLINE            NodeStatus = 2
+	NodeStatus_NODE_DEGRADED           NodeStatus = 3
+)
+
+// Enum value maps for NodeStatus.
+var (
+	NodeStatus_name = map[int32]string{
+		0: "NODE_STATUS_UNSPECIFIED",
+		1: "NODE_ONLINE",
+		2: "NODE_OFFLINE",
+		3: "NODE_DEGRADED",
+	}
+	NodeStatus_value = map[string]int32{
+		"NODE_STATUS_UNSPECIFIED": 0,
+		"NODE_ONLINE":             1,
+		"NODE_OFFLINE":            2,
+		"NODE_DEGRADED":           3,
+	}
+)
+
+func (x NodeStatus) Enum() *NodeStatus {
+	p := new(NodeStatus)
+	*p = x
+	return p
+}
+
+func (x NodeStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (NodeStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_node_proto_enumTypes[0].Descriptor()
+}
+
+func (NodeStatus) Type() protoreflect.EnumType {
+	return &file_node_proto_enumTypes[0]
+}
+
+func (x NodeStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use NodeStatus.Descriptor instead.
+func (NodeStatus) EnumDescriptor() ([]byte, []int) {
+	return file_node_proto_rawDescGZIP(), []int{0}
+}
+
 type RegisterRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	NodeId        string                 `protobuf:"bytes,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
@@ -640,7 +692,7 @@ type UpdateNodeRequest struct {
 	NodeId        string                 `protobuf:"bytes,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	Ip            string                 `protobuf:"bytes,3,opt,name=ip,proto3" json:"ip,omitempty"`
-	Tags          []string               `protobuf:"bytes,4,rep,name=tags,proto3" json:"tags,omitempty"`
+	Tags          map[string]string      `protobuf:"bytes,4,rep,name=tags,proto3" json:"tags,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -696,7 +748,7 @@ func (x *UpdateNodeRequest) GetIp() string {
 	return ""
 }
 
-func (x *UpdateNodeRequest) GetTags() []string {
+func (x *UpdateNodeRequest) GetTags() map[string]string {
 	if x != nil {
 		return x.Tags
 	}
@@ -706,7 +758,7 @@ func (x *UpdateNodeRequest) GetTags() []string {
 type NodeStatusRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	NodeId        string                 `protobuf:"bytes,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
-	Status        string                 `protobuf:"bytes,2,opt,name=status,proto3" json:"status,omitempty"`
+	Status        NodeStatus             `protobuf:"varint,2,opt,name=status,proto3,enum=nodepb.NodeStatus" json:"status,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -748,11 +800,11 @@ func (x *NodeStatusRequest) GetNodeId() string {
 	return ""
 }
 
-func (x *NodeStatusRequest) GetStatus() string {
+func (x *NodeStatusRequest) GetStatus() NodeStatus {
 	if x != nil {
 		return x.Status
 	}
-	return ""
+	return NodeStatus_NODE_STATUS_UNSPECIFIED
 }
 
 type GetNodeRequest struct {
@@ -1253,15 +1305,18 @@ const file_node_proto_rawDesc = "" +
 	"\rTenantRequest\x12\x1b\n" +
 	"\ttenant_id\x18\x01 \x01(\tR\btenantId\"6\n" +
 	"\x10NodeListResponse\x12\"\n" +
-	"\x05nodes\x18\x01 \x03(\v2\f.nodepb.NodeR\x05nodes\"d\n" +
+	"\x05nodes\x18\x01 \x03(\v2\f.nodepb.NodeR\x05nodes\"\xc2\x01\n" +
 	"\x11UpdateNodeRequest\x12\x17\n" +
 	"\anode_id\x18\x01 \x01(\tR\x06nodeId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x0e\n" +
-	"\x02ip\x18\x03 \x01(\tR\x02ip\x12\x12\n" +
-	"\x04tags\x18\x04 \x03(\tR\x04tags\"D\n" +
+	"\x02ip\x18\x03 \x01(\tR\x02ip\x127\n" +
+	"\x04tags\x18\x04 \x03(\v2#.nodepb.UpdateNodeRequest.TagsEntryR\x04tags\x1a7\n" +
+	"\tTagsEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"X\n" +
 	"\x11NodeStatusRequest\x12\x17\n" +
-	"\anode_id\x18\x01 \x01(\tR\x06nodeId\x12\x16\n" +
-	"\x06status\x18\x02 \x01(\tR\x06status\")\n" +
+	"\anode_id\x18\x01 \x01(\tR\x06nodeId\x12*\n" +
+	"\x06status\x18\x02 \x01(\x0e2\x12.nodepb.NodeStatusR\x06status\")\n" +
 	"\x0eGetNodeRequest\x12\x17\n" +
 	"\anode_id\x18\x01 \x01(\tR\x06nodeId\"!\n" +
 	"\x06NodeID\x12\x17\n" +
@@ -1300,7 +1355,13 @@ const file_node_proto_rawDesc = "" +
 	"\anode_id\x18\x02 \x01(\tR\x06nodeId\x12\x18\n" +
 	"\asuccess\x18\x03 \x01(\bR\asuccess\x12\x16\n" +
 	"\x06output\x18\x04 \x01(\tR\x06output\x12\x1c\n" +
-	"\ttimestamp\x18\x05 \x01(\tR\ttimestamp2\x8a\a\n" +
+	"\ttimestamp\x18\x05 \x01(\tR\ttimestamp*_\n" +
+	"\n" +
+	"NodeStatus\x12\x1b\n" +
+	"\x17NODE_STATUS_UNSPECIFIED\x10\x00\x12\x0f\n" +
+	"\vNODE_ONLINE\x10\x01\x12\x10\n" +
+	"\fNODE_OFFLINE\x10\x02\x12\x11\n" +
+	"\rNODE_DEGRADED\x10\x032\x8a\a\n" +
 	"\vNodeService\x12_\n" +
 	"\fRegisterNode\x12\x17.nodepb.RegisterRequest\x1a\x18.nodepb.RegisterResponse\"\x1c\x82\xd3\xe4\x93\x02\x16:\x01*\"\x11/v1/register-node\x12F\n" +
 	"\x04Ping\x12\x13.nodepb.PingRequest\x1a\x14.nodepb.PingResponse\"\x13\x82\xd3\xe4\x93\x02\r:\x01*\"\b/v1/ping\x12g\n" +
@@ -1325,55 +1386,60 @@ func file_node_proto_rawDescGZIP() []byte {
 	return file_node_proto_rawDescData
 }
 
-var file_node_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
+var file_node_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_node_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
 var file_node_proto_goTypes = []any{
-	(*RegisterRequest)(nil),      // 0: nodepb.RegisterRequest
-	(*RegisterResponse)(nil),     // 1: nodepb.RegisterResponse
-	(*PingRequest)(nil),          // 2: nodepb.PingRequest
-	(*PingResponse)(nil),         // 3: nodepb.PingResponse
-	(*GetAuditLogsRequest)(nil),  // 4: nodepb.GetAuditLogsRequest
-	(*AuditLogEntry)(nil),        // 5: nodepb.AuditLogEntry
-	(*GetAuditLogsResponse)(nil), // 6: nodepb.GetAuditLogsResponse
-	(*TenantRequest)(nil),        // 7: nodepb.TenantRequest
-	(*NodeListResponse)(nil),     // 8: nodepb.NodeListResponse
-	(*UpdateNodeRequest)(nil),    // 9: nodepb.UpdateNodeRequest
-	(*NodeStatusRequest)(nil),    // 10: nodepb.NodeStatusRequest
-	(*GetNodeRequest)(nil),       // 11: nodepb.GetNodeRequest
-	(*NodeID)(nil),               // 12: nodepb.NodeID
-	(*Node)(nil),                 // 13: nodepb.Node
-	(*CommandRequest)(nil),       // 14: nodepb.CommandRequest
-	(*Command)(nil),              // 15: nodepb.Command
-	(*CommandResultRequest)(nil), // 16: nodepb.CommandResultRequest
-	(*emptypb.Empty)(nil),        // 17: google.protobuf.Empty
+	(NodeStatus)(0),              // 0: nodepb.NodeStatus
+	(*RegisterRequest)(nil),      // 1: nodepb.RegisterRequest
+	(*RegisterResponse)(nil),     // 2: nodepb.RegisterResponse
+	(*PingRequest)(nil),          // 3: nodepb.PingRequest
+	(*PingResponse)(nil),         // 4: nodepb.PingResponse
+	(*GetAuditLogsRequest)(nil),  // 5: nodepb.GetAuditLogsRequest
+	(*AuditLogEntry)(nil),        // 6: nodepb.AuditLogEntry
+	(*GetAuditLogsResponse)(nil), // 7: nodepb.GetAuditLogsResponse
+	(*TenantRequest)(nil),        // 8: nodepb.TenantRequest
+	(*NodeListResponse)(nil),     // 9: nodepb.NodeListResponse
+	(*UpdateNodeRequest)(nil),    // 10: nodepb.UpdateNodeRequest
+	(*NodeStatusRequest)(nil),    // 11: nodepb.NodeStatusRequest
+	(*GetNodeRequest)(nil),       // 12: nodepb.GetNodeRequest
+	(*NodeID)(nil),               // 13: nodepb.NodeID
+	(*Node)(nil),                 // 14: nodepb.Node
+	(*CommandRequest)(nil),       // 15: nodepb.CommandRequest
+	(*Command)(nil),              // 16: nodepb.Command
+	(*CommandResultRequest)(nil), // 17: nodepb.CommandResultRequest
+	nil,                          // 18: nodepb.UpdateNodeRequest.TagsEntry
+	(*emptypb.Empty)(nil),        // 19: google.protobuf.Empty
 }
 var file_node_proto_depIdxs = []int32{
-	5,  // 0: nodepb.GetAuditLogsResponse.logs:type_name -> nodepb.AuditLogEntry
-	13, // 1: nodepb.NodeListResponse.nodes:type_name -> nodepb.Node
-	0,  // 2: nodepb.NodeService.RegisterNode:input_type -> nodepb.RegisterRequest
-	2,  // 3: nodepb.NodeService.Ping:input_type -> nodepb.PingRequest
-	4,  // 4: nodepb.NodeService.GetAuditLogs:input_type -> nodepb.GetAuditLogsRequest
-	7,  // 5: nodepb.NodeService.ListNodesByTenant:input_type -> nodepb.TenantRequest
-	9,  // 6: nodepb.NodeService.UpdateNodeMetadata:input_type -> nodepb.UpdateNodeRequest
-	10, // 7: nodepb.NodeService.SetNodeStatus:input_type -> nodepb.NodeStatusRequest
-	11, // 8: nodepb.NodeService.GetNodeByID:input_type -> nodepb.GetNodeRequest
-	12, // 9: nodepb.NodeService.BlacklistNode:input_type -> nodepb.NodeID
-	14, // 10: nodepb.NodeService.StreamCommands:input_type -> nodepb.CommandRequest
-	16, // 11: nodepb.NodeService.ReportCommandResult:input_type -> nodepb.CommandResultRequest
-	1,  // 12: nodepb.NodeService.RegisterNode:output_type -> nodepb.RegisterResponse
-	3,  // 13: nodepb.NodeService.Ping:output_type -> nodepb.PingResponse
-	6,  // 14: nodepb.NodeService.GetAuditLogs:output_type -> nodepb.GetAuditLogsResponse
-	8,  // 15: nodepb.NodeService.ListNodesByTenant:output_type -> nodepb.NodeListResponse
-	17, // 16: nodepb.NodeService.UpdateNodeMetadata:output_type -> google.protobuf.Empty
-	17, // 17: nodepb.NodeService.SetNodeStatus:output_type -> google.protobuf.Empty
-	13, // 18: nodepb.NodeService.GetNodeByID:output_type -> nodepb.Node
-	17, // 19: nodepb.NodeService.BlacklistNode:output_type -> google.protobuf.Empty
-	15, // 20: nodepb.NodeService.StreamCommands:output_type -> nodepb.Command
-	17, // 21: nodepb.NodeService.ReportCommandResult:output_type -> google.protobuf.Empty
-	12, // [12:22] is the sub-list for method output_type
-	2,  // [2:12] is the sub-list for method input_type
-	2,  // [2:2] is the sub-list for extension type_name
-	2,  // [2:2] is the sub-list for extension extendee
-	0,  // [0:2] is the sub-list for field type_name
+	6,  // 0: nodepb.GetAuditLogsResponse.logs:type_name -> nodepb.AuditLogEntry
+	14, // 1: nodepb.NodeListResponse.nodes:type_name -> nodepb.Node
+	18, // 2: nodepb.UpdateNodeRequest.tags:type_name -> nodepb.UpdateNodeRequest.TagsEntry
+	0,  // 3: nodepb.NodeStatusRequest.status:type_name -> nodepb.NodeStatus
+	1,  // 4: nodepb.NodeService.RegisterNode:input_type -> nodepb.RegisterRequest
+	3,  // 5: nodepb.NodeService.Ping:input_type -> nodepb.PingRequest
+	5,  // 6: nodepb.NodeService.GetAuditLogs:input_type -> nodepb.GetAuditLogsRequest
+	8,  // 7: nodepb.NodeService.ListNodesByTenant:input_type -> nodepb.TenantRequest
+	10, // 8: nodepb.NodeService.UpdateNodeMetadata:input_type -> nodepb.UpdateNodeRequest
+	11, // 9: nodepb.NodeService.SetNodeStatus:input_type -> nodepb.NodeStatusRequest
+	12, // 10: nodepb.NodeService.GetNodeByID:input_type -> nodepb.GetNodeRequest
+	13, // 11: nodepb.NodeService.BlacklistNode:input_type -> nodepb.NodeID
+	15, // 12: nodepb.NodeService.StreamCommands:input_type -> nodepb.CommandRequest
+	17, // 13: nodepb.NodeService.ReportCommandResult:input_type -> nodepb.CommandResultRequest
+	2,  // 14: nodepb.NodeService.RegisterNode:output_type -> nodepb.RegisterResponse
+	4,  // 15: nodepb.NodeService.Ping:output_type -> nodepb.PingResponse
+	7,  // 16: nodepb.NodeService.GetAuditLogs:output_type -> nodepb.GetAuditLogsResponse
+	9,  // 17: nodepb.NodeService.ListNodesByTenant:output_type -> nodepb.NodeListResponse
+	19, // 18: nodepb.NodeService.UpdateNodeMetadata:output_type -> google.protobuf.Empty
+	19, // 19: nodepb.NodeService.SetNodeStatus:output_type -> google.protobuf.Empty
+	14, // 20: nodepb.NodeService.GetNodeByID:output_type -> nodepb.Node
+	19, // 21: nodepb.NodeService.BlacklistNode:output_type -> google.protobuf.Empty
+	16, // 22: nodepb.NodeService.StreamCommands:output_type -> nodepb.Command
+	19, // 23: nodepb.NodeService.ReportCommandResult:output_type -> google.protobuf.Empty
+	14, // [14:24] is the sub-list for method output_type
+	4,  // [4:14] is the sub-list for method input_type
+	4,  // [4:4] is the sub-list for extension type_name
+	4,  // [4:4] is the sub-list for extension extendee
+	0,  // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_node_proto_init() }
@@ -1387,13 +1453,14 @@ func file_node_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_node_proto_rawDesc), len(file_node_proto_rawDesc)),
-			NumEnums:      0,
-			NumMessages:   17,
+			NumEnums:      1,
+			NumMessages:   18,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_node_proto_goTypes,
 		DependencyIndexes: file_node_proto_depIdxs,
+		EnumInfos:         file_node_proto_enumTypes,
 		MessageInfos:      file_node_proto_msgTypes,
 	}.Build()
 	File_node_proto = out.File

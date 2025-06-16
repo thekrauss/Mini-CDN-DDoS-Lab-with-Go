@@ -11,7 +11,7 @@ import (
 )
 
 func StartMetricsFlushWorker(repo repository.NodeRepository) {
-	ticker := time.NewTicker(5 * time.Minute) // flush toutes les 2 min
+	ticker := time.NewTicker(2 * time.Minute) // flush toutes les 2 min
 
 	go func() {
 		for range ticker.C {

@@ -256,11 +256,11 @@ func GetRoles(secretName string) ([]string, error) {
 	}
 	return roles, nil
 }
-func IsRoleA(role string) bool {
+func IsSuperAdmin(role string) bool {
 	return slices.Contains(AppConfig.RolesA, role)
 }
 
-func IsRoleB(role string) bool {
+func IsTenantAdmin(role string) bool {
 	return slices.Contains(AppConfig.RolesB, role)
 }
 

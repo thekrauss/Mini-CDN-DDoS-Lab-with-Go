@@ -46,14 +46,14 @@ const (
 	PermUpdateConfig      = "UPDATE_NODE_CONFIG"
 )
 
-func (s *NodeService) CheckAdminPermissions(ctx context.Context, claims *auth.Claims, tenantID, permission string) error {
+func (s *NodeService) CheckAdminPermissions(ctx context.Context, claims *auth.Claims, permission string) error {
 
 	// cas classiques
-	if config.IsRoleA(claims.Role) {
+	if config.IsSuperAdmin(claims.Role) {
 		return nil
 	}
 
-	if config.IsRoleB(claims.Role) {
+	if config.IsTenantAdmin(claims.Role) {
 		hasPerm, err := s.Permission(ctx, claims.UserID.String(), permission)
 		if err != nil {
 			return status.Errorf(codes.Internal, "Erreur interne lors de la vérification des permissions")

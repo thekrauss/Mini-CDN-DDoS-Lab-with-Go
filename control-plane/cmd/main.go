@@ -34,12 +34,13 @@ func main() {
 	if err != nil {
 		log.Fatalf("Erreur chargement config: %v", err)
 	}
+
 	config.AppConfig = *cfg
 
-	// if cfg.GCloudKeyPath != "" {
-	// 	_ = os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", cfg.GCloudKeyPath)
-	// 	log.Println("GOOGLE_APPLICATION_CREDENTIALS défini sur :", cfg.GCloudKeyPath)
-	// }
+	if cfg.GCloudKeyPath != "" {
+		_ = os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", cfg.GCloudKeyPath)
+		log.Println("GOOGLE_APPLICATION_CREDENTIALS défini sur :", cfg.GCloudKeyPath)
+	}
 
 	// init DB
 	store := &db.DBStore{}

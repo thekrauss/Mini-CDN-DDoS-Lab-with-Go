@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -16,6 +17,7 @@ import (
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // RegisterNode permet d'enregistrer un nouveau worker-node dans l'infrastructure.
@@ -59,7 +61,7 @@ func (s *NodeService) RegisterNode(ctx context.Context, req *pb.RegisterRequest)
 		return nil, status.Errorf(codes.Internal, "Impossible de récupérer les informations administrateur")
 	}
 
-	if err := s.CheckAdminPermissions(ctx, claims, adminUser.TenantID, PermManageNode); err != nil {
+	if err := s.CheckAdminPermissions(ctx, claims, PermManageNode); err != nil {
 		return nil, err
 	}
 
@@ -131,4 +133,65 @@ func (s *NodeService) RegisterNode(ctx context.Context, req *pb.RegisterRequest)
 		Message: "Nœud enregistré avec succès",
 		NodeId:  node.ID,
 	}, nil
+}
+
+func (s *NodeService) UpdateNodeMetadata(ctx context.Context, req *pb.UpdateNodeRequest) (*emptypb.Empty, error) {
+	if req.NodeId == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "node_id requis")
+	}
+
+	claims, err := auth.ExtractJWTFromContext(ctx)
+	if err != nil {
+		return nil, status.Errorf(codes.Unauthenticated, "token invalide")
+	}
+
+	node, err := s.Repo.GetNodeByID(ctx, req.NodeId)
+	if err != nil {
+		return nil, status.Errorf(codes.NotFound, "nœud non trouvé: %v", err)
+	}
+
+	adminUser, err := pkg.GetUserInfoFromRedis(ctx, claims.UserID.String())
+	if err != nil {
+		log.Printf("Erreur récupération utilisateur Redis: %v", err)
+		return nil, status.Errorf(codes.Internal, "Erreur accès utilisateur")
+	}
+
+	if err := s.CheckAdminPermissions(ctx, claims, PermManageNode); err != nil {
+		return nil, err
+	}
+
+	if adminUser.TenantID != node.TenantID && adminUser.Role != "GLOBAL_ADMIN" {
+		return nil, status.Errorf(codes.PermissionDenied, "modification interdite sur ce nœud")
+	}
+
+	err = s.Repo.UpdateNodeMetadata(ctx, req.NodeId, req.Name, req.Ip, req.Tags)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "Erreur mise à jour node: %v", err)
+	}
+
+	// audit Log
+	tagList := make([]string, 0, len(req.Tags))
+	for k, v := range req.Tags {
+		tagList = append(tagList, fmt.Sprintf("%s=%s", k, v))
+	}
+
+	ip, userAgent := GetRequestMetadata(ctx)
+	details := fmt.Sprintf("Mise à jour nœud : nom=%s, ip=%s, tags=[%s]", req.Name, req.Ip, strings.Join(tagList, ", "))
+
+	logEntry := &repository.AuditLog{
+		ID:        uuid.New(),
+		UserID:    claims.UserID,
+		Role:      claims.Role,
+		Action:    "UpdateNodeMetadata",
+		Target:    req.NodeId,
+		Details:   details,
+		Timestamp: time.Now(),
+		TenantID:  uuid.MustParse(node.TenantID),
+		IPAddress: ip,
+		UserAgent: userAgent,
+	}
+
+	_ = s.Repo.InsertAuditLog(ctx, logEntry)
+
+	return &emptypb.Empty{}, nil
 }

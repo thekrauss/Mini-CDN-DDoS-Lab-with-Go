@@ -66,6 +66,13 @@ service NodeService {
   rpc ReportCommandResult(CommandResultRequest) returns (google.protobuf.Empty); //envoi des résultats de commandes par le nœud
 }
 
+enum NodeStatus {
+  NODE_STATUS_UNSPECIFIED = 0;
+  NODE_ONLINE = 1;
+  NODE_OFFLINE = 2;
+  NODE_DEGRADED = 3;
+}
+
 message RegisterRequest {
   string node_id = 1;
   string ip = 2;
@@ -133,12 +140,12 @@ message UpdateNodeRequest {
   string node_id = 1;
   string name = 2;
   string ip = 3;
-  repeated string tags = 4;
+  map<string, string> tags = 4;
 }
 
 message NodeStatusRequest {
   string node_id = 1;
-  string status = 2;
+  NodeStatus status = 2;
 }
 
 message GetNodeRequest {

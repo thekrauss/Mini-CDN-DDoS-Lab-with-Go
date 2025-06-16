@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -59,6 +60,12 @@ func CacheNode(ctx context.Context, node *repository.Node) error {
 func GetUserInfoFromRedis(ctx context.Context, userID string) (*repository.UtilisateurRedis, error) {
 	redisKey := fmt.Sprintf("user:session:%s", userID)
 
+	ttl, err := RedisClient.TTL(ctx, redisKey).Result()
+	if err == nil && ttl < 0 {
+		log.Printf("Session expirée pour l'utilisateur %s", userID)
+		return nil, fmt.Errorf("session expirée")
+	}
+
 	//  toutes les valeurs stockées sous cette clé
 	data, err := RedisClient.HGetAll(ctx, redisKey).Result()
 	if err != nil {
@@ -81,7 +88,7 @@ func GetUserInfoFromRedis(ctx context.Context, userID string) (*repository.Utili
 		Role:          data["role"],
 		Permissions:   data["permissions"],
 		TenantID:      data["id_tenant"],
-		MFAEnabled:    data["mfa_enabled"] == "true",
+		MFAEnabled:    strings.ToLower(data["mfa_enabled"]) == "true" || data["mfa_enabled"] == "1",
 	}
 
 	log.Printf("Infos utilisateur récupérées depuis Redis [ID: %s]", userID)

@@ -13,9 +13,8 @@ import (
 
 // Custom claims can include user-specific data such as ID, role, and expiration time.
 type Claims struct {
-	UserID   uuid.UUID `json:"user_id"`
-	Username string    `json:"username"`
-	Role     string    `json:"role"`
+	UserID uuid.UUID `json:"user_id"`
+	Role   string    `json:"role"`
 	jwt.RegisteredClaims
 }
 
