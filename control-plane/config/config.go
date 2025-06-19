@@ -103,6 +103,14 @@ type Config struct {
 		CriticalMemThreshold float64 `mapstructure:"critical_mem_threshold"`
 		MaxNodesPerTenant    int     `mapstructure:"max_nodes_per_tenant"`
 	}
+
+	Agent AgentConfig `mapstructure:"agent"`
+}
+
+type AgentConfig struct {
+	DefaultPingInterval    int  `mapstructure:"default_ping_interval"`
+	DefaultMetricsInterval int  `mapstructure:"default_metrics_interval"`
+	EnableDynamicConfig    bool `mapstructure:"enable_dynamic_config"`
 }
 
 var AppConfig Config

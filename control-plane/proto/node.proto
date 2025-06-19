@@ -7,8 +7,10 @@ option go_package = "github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plan
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 
+// Service principal pour le contrôle des nœuds de l’infrastructure
 service NodeService {
-  
+
+  // Enregistrement initial d’un nœud dans le système
   rpc RegisterNode(RegisterRequest) returns (RegisterResponse) {
     option (google.api.http) = {
       post: "/v1/register-node"
@@ -16,6 +18,7 @@ service NodeService {
     };
   }
 
+  // Ping périodique des nœuds (heartbeat + metrics)
   rpc Ping(PingRequest) returns (PingResponse) {
     option (google.api.http) = {
       post: "/v1/ping"
@@ -23,73 +26,129 @@ service NodeService {
     };
   }
 
+  // Vérifie que le control-plane est en ligne
+  rpc HealthCheck(google.protobuf.Empty) returns (PingResponse) {
+    option (google.api.http) = {
+      get: "/v1/health"
+    };
+  }
+
+  // Récupération des journaux d’audit (actions admin)
   rpc GetAuditLogs(GetAuditLogsRequest) returns (GetAuditLogsResponse) {
     option (google.api.http) = {
       get: "/v1/nodes/audit-logs"
     };
   }
 
-  rpc ListNodesByTenant(TenantRequest) returns (NodeListResponse) { //liste de tous les nœuds d’un tenant
+  // Liste des nœuds d’un tenant
+  rpc ListNodesByTenant(TenantRequest) returns (NodeListResponse) {
     option (google.api.http) = {
       get: "/v1/nodes"
     };
   }
 
-  rpc UpdateNodeMetadata(UpdateNodeRequest) returns (google.protobuf.Empty) { //renommage ou changement de tags/IP
+  // Mise à jour des métadonnées du nœud (IP, nom, tags…)
+  rpc UpdateNodeMetadata(UpdateNodeRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       put: "/v1/nodes/{node_id}"
       body: "*"
     };
   }
 
-  rpc SetNodeStatus(NodeStatusRequest) returns (google.protobuf.Empty) { //met à jour du statut du nœud (offline, degraded…)
+  // Mise à jour manuelle du statut du nœud (offline, degraded…)
+  rpc SetNodeStatus(NodeStatusRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/v1/nodes/{node_id}/status"
       body: "*"
     };
   }
 
-  rpc GetNodeByID(GetNodeRequest) returns (Node) { // récupération détaillée d’un nœud
+  // Récupération détaillée d’un nœud
+  rpc GetNodeByID(GetNodeRequest) returns (Node) {
     option (google.api.http) = {
       get: "/v1/nodes/{node_id}"
     };
   }
 
+  // Nombre de nœuds actifs sur une période
   rpc CountActiveNodes(CountActiveNodesRequest) returns (CountActiveNodesResponse) {
     option (google.api.http) = {
       get: "/v1/nodes/active_count"
     };
   }
 
+  // Liste des nœuds blacklistés
   rpc ListBlacklistedNodes(ListNodesRequest) returns (ListNodesResponse) {
     option (google.api.http) = {
       get: "/v1/nodes/blacklisted"
     };
   }
 
-
-  rpc BlacklistNode(NodeID) returns (google.protobuf.Empty) { //blocage temporaire d’un nœud
+  // Blacklister un nœud (temporairement désactivé)
+  rpc BlacklistNode(NodeID) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/v1/nodes/{node_id}/blacklist"
     };
   }
 
+  // Enlever un nœud de la blacklist
   rpc UnblacklistNode(NodeID) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/v1/nodes/{node_id}/unblacklist"
     };
   }
 
+  // Rechercher des nœuds par tag, IP, nom…
   rpc SearchNodes(SearchRequest) returns (SearchResponse) {
     option (google.api.http) = {
       get: "/v1/nodes/search"
     };
   }
 
-  rpc StreamCommands(stream CommandRequest) returns (stream Command); //stream de commandes vers les worker
+  rpc GetNodeConfig(GetNodeConfigRequest) returns (GetNodeConfigResponse) {
+    option (google.api.http) = {
+      get: "/v1/nodes/{node_id}/config"
+    };
+  }
 
-  rpc ReportCommandResult(CommandResultRequest) returns (google.protobuf.Empty); //envoi des résultats de commandes par le nœud
+  // Stream de commandes vers les nœuds
+  rpc StreamCommands(stream CommandRequest) returns (stream Command);
+
+  // Réception des résultats de commandes exécutées
+  rpc ReportCommandResult(CommandResultRequest) returns (google.protobuf.Empty);
+
+  // Un nœud signale une erreur système
+  rpc ReportNodeError(NodeErrorRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/v1/nodes/{node_id}/errors"
+      body: "*"
+    };
+  }
+
+  // Historique des statuts d’un nœud
+  rpc GetNodeStatusHistory(GetNodeRequest) returns (StatusHistoryResponse) {
+    option (google.api.http) = {
+      get: "/v1/nodes/{node_id}/status-history"
+    };
+  }
+
+  // Ajoute ou met à jour des annotations (métadonnées libres)
+  rpc AnnotateNode(AnnotateNodeRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/v1/nodes/{node_id}/annotations"
+      body: "*"
+    };
+  }
+
+  // Déclenche une action sur le nœud (ex: restart, update)
+  rpc TriggerNodeAction(NodeActionRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/v1/nodes/{node_id}/action"
+      body: "*"
+    };
+  }
 }
+
 
 enum NodeStatus {
   NODE_STATUS_UNSPECIFIED = 0;
@@ -243,4 +302,56 @@ message CountActiveNodesRequest {
 
 message CountActiveNodesResponse {
   int32 count = 1;
+}
+
+// Requête pour reporter une erreur système côté nœud
+message NodeErrorRequest {
+  string node_id = 1;           // ID du nœud qui a rencontré l’erreur
+  string error_message = 2;     // Description de l’erreur
+  string error_type = 3;        // Type (network, cpu, disk, etc.)
+  string occurred_at = 4;       // Timestamp au format RFC3339
+}
+
+// Requête pour déclencher une action sur un nœud
+message NodeActionRequest {
+  string node_id = 1;           // Nœud cible
+  string action_type = 2;       // Ex: restart, update, reload
+  map<string, string> params = 3; // Paramètres de l’action
+}
+
+// Réponse contenant l’historique des statuts d’un nœud
+message StatusHistoryResponse {
+  repeated NodeStatusEntry entries = 1;
+}
+
+message NodeStatusEntry {
+  string status = 1;            // online, degraded, offline
+  string timestamp = 2;         // RFC3339
+}
+
+// Réponse contenant la configuration du nœud (par ex. limites, intervalle de ping, etc.)
+message NodeConfigResponse {
+  string node_id = 1;
+  int32 ping_interval_seconds = 2;
+  float max_cpu = 3;
+  float max_memory = 4;
+  map<string, string> custom = 5; // configuration personnalisée
+}
+
+// Requête pour annoter un nœud avec des métadonnées libres
+message AnnotateNodeRequest {
+  string node_id = 1;
+  map<string, string> annotations = 2; // Ex: {"datacenter": "eu-west-1", "rack": "R12"}
+}
+
+message GetNodeConfigRequest {
+  string node_id = 1;
+}
+
+message GetNodeConfigResponse {
+  string node_id = 1;
+  int32 ping_interval = 2;
+  int32 metrics_interval = 3;
+  bool dynamic_config_enabled = 4;
+  map<string, string> custom_labels = 5;
 }

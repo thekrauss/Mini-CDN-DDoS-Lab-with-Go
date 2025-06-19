@@ -27,7 +27,7 @@ import (
 //  Optimisation :
 // Pour éviter une charge excessive sur PostgreSQL, les informations sont d’abord stockées dans Redis.
 // Une écriture en base de données n’est déclenchée que si :
-//  Le statut du nœud a changé (ex. : passage de "degraded" à "online").
+//  Le statut du nœud a changé (passage de "degraded" à "online").
 //  Le dernier ping reçu remonte à plus de 30 secondes (rafraîchissement nécessaire).
 //
 //  Expiration automatique :

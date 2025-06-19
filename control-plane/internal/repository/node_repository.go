@@ -82,6 +82,14 @@ type NodeFilter struct {
 	IP       string
 }
 
+type NodeConfig struct {
+	NodeID          string
+	PingInterval    int  // secondes
+	MetricsInterval int  // secondes
+	DynamicConfig   bool // true si le mode dynamique est activé
+	CustomLabels    map[string]string
+}
+
 type NodeStatus string
 
 const (
@@ -118,4 +126,10 @@ type NodeRepository interface {
 	InsertAuditLog(ctx context.Context, log *AuditLog) error
 	GetAuditLogs(ctx context.Context, filter AuditLogFilter) ([]*AuditLog, int, error)
 	StoreNodeMetrics(ctx context.Context, metrics *NodeMetrics) error
+
+	GetNodeConfig(ctx context.Context, nodeID string) (*NodeConfig, error)
+
+	CreateNodeConfig(ctx context.Context, config *NodeConfig) error
+	UpdateNodeConfig(ctx context.Context, config *NodeConfig) error
+	DeleteNodeConfig(ctx context.Context, nodeID string) error
 }

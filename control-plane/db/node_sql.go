@@ -490,3 +490,96 @@ func (r *SQLNodeRepository) ListBlacklistedNodes(ctx context.Context, tenantID s
 
 	return nodes, nil
 }
+
+func (r *SQLNodeRepository) GetNodeConfig(ctx context.Context, nodeID string) (*repository.NodeConfig, error) {
+	cacheKey := fmt.Sprintf("node:config:%s", nodeID)
+
+	// tente le cache Redis d'abord
+	if cached, err := pkg.RedisClient.Get(ctx, cacheKey).Result(); err == nil {
+		var cfg repository.NodeConfig
+		if err := json.Unmarshal([]byte(cached), &cfg); err == nil {
+			return &cfg, nil
+		}
+		log.Printf("[Redis] Cache node_config corrompu pour %s: %v", nodeID, err)
+	}
+
+	// Sinon, fallback sur PostgreSQL
+	query := `
+		SELECT ping_interval, metrics_interval, dynamic_config, custom_labels
+		FROM node_configs
+		WHERE node_id = $1
+	`
+
+	var cfg repository.NodeConfig
+	var labelsJSON []byte
+
+	err := r.DB.QueryRowContext(ctx, query, nodeID).Scan(
+		&cfg.PingInterval,
+		&cfg.MetricsInterval,
+		&cfg.DynamicConfig,
+		&labelsJSON,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	cfg.NodeID = nodeID
+	if err := json.Unmarshal(labelsJSON, &cfg.CustomLabels); err != nil {
+		cfg.CustomLabels = map[string]string{}
+	}
+
+	// met en cache Redis pour 2 minutes
+	if raw, err := json.Marshal(cfg); err == nil {
+		_ = pkg.RedisClient.Set(ctx, cacheKey, raw, 2*time.Minute).Err()
+	}
+
+	return &cfg, nil
+}
+
+func (r *SQLNodeRepository) UpdateNodeConfig(ctx context.Context, cfg *repository.NodeConfig) error {
+	labels, _ := json.Marshal(cfg.CustomLabels)
+
+	query := `
+		UPDATE node_configs
+		SET ping_interval = $2, metrics_interval = $3, dynamic_config = $4, custom_labels = $5
+		WHERE node_id = $1
+	`
+
+	_, err := r.DB.ExecContext(ctx, query,
+		cfg.NodeID,
+		cfg.PingInterval,
+		cfg.MetricsInterval,
+		cfg.DynamicConfig,
+		labels,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	// invalidation du cache Redis
+	if err := InvalidateNodeConfigCache(ctx, cfg.NodeID); err != nil {
+		log.Printf("[Redis] Erreur invalidation cache config node %s: %v", cfg.NodeID, err)
+	}
+
+	return nil
+}
+
+func (r *SQLNodeRepository) DeleteNodeConfig(ctx context.Context, nodeID string) error {
+	query := `DELETE FROM node_configs WHERE node_id = $1`
+
+	_, err := r.DB.ExecContext(ctx, query, nodeID)
+	if err != nil {
+		return err
+	}
+
+	if err := InvalidateNodeConfigCache(ctx, nodeID); err != nil {
+		log.Printf("[Redis] Erreur invalidation cache config node %s: %v", nodeID, err)
+	}
+
+	return nil
+}
+func InvalidateNodeConfigCache(ctx context.Context, nodeID string) error {
+	cacheKey := fmt.Sprintf("node:config:%s", nodeID)
+	return pkg.RedisClient.Del(ctx, cacheKey).Err()
+}

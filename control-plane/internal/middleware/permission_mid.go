@@ -12,16 +12,6 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// grpc.NewServer(
-//     grpc.ChainUnaryInterceptor(
-//         CheckPermissionInterceptor(authClient), // Pour les appels normaux
-//         ...
-//     ),
-//     grpc.ChainStreamInterceptor(
-//         CheckPermissionStreamInterceptor(authClient), // Pour les streams
-//     ),
-// )
-
 // map des permissions requises par RPC
 var rpcPermissions = map[string]string{
 	"/nodepb.NodeService.RegisterNode":         "MANAGE_NODE",
@@ -36,13 +26,20 @@ var rpcPermissions = map[string]string{
 	"/nodepb.NodeService.BlacklistNode":        "MANAGE_NODE",
 	"/nodepb.NodeService.UnblacklistNode":      "MANAGE_NODE",
 	"/nodepb.NodeService.SearchNodes":          "READ_NODE",
-	"/nodepb.NodeService.StreamCommands":       "MANAGE_NODE",
-	"/nodepb.NodeService.ReportCommandResult":  "MANAGE_NODE",
+
+	/*------------------------------------------------------*/
+	"/nodepb.NodeService.HealthCheck":          "READ_NODE",
+	"/nodepb.NodeService.ReportNodeError":      "SEND_METRICS",
+	"/nodepb.NodeService.GetNodeStatusHistory": "READ_NODE",
+	"/nodepb.NodeService.GetNodeConfig":        "READ_NODE",
+	"/nodepb.NodeService.AnnotateNode":         "MANAGE_NODE",
+	"/nodepb.NodeService.TriggerNodeAction":    "MANAGE_NODE",
 }
 
 // map des permissions requises par methode stream
 var streamMethodPermissions = map[string]string{
-	"/nodepb.NodeService.StreamCommands": "MANAGE_NODE",
+	"/nodepb.NodeService.StreamCommands":      "MANAGE_NODE",
+	"/nodepb.NodeService.ReportCommandResult": "MANAGE_NODE",
 }
 
 // gRPC pour méthodes unary

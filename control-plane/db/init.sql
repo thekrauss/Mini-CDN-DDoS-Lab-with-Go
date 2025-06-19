@@ -103,3 +103,11 @@ CREATE TABLE IF NOT EXISTS infra_audit_logs (
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     tenant_id UUID
 );
+
+CREATE TABLE IF NOT EXISTS node_configs (
+  node_id TEXT PRIMARY KEY,
+  ping_interval INTEGER NOT NULL DEFAULT 10,
+  metrics_interval INTEGER NOT NULL DEFAULT 30,
+  dynamic_config BOOLEAN NOT NULL DEFAULT true,
+  custom_labels JSONB DEFAULT '{}'
+);
