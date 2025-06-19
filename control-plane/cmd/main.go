@@ -57,11 +57,6 @@ func main() {
 	pkg.InitRedis(cfg)
 	monitoring.Init()
 
-	// flush périodique des heartbeat en DB
-	repo := db.NewNodeRepository(store.DB)
-	workers.StartPingFlushWorker(repo)
-	workers.StartMetricsFlushWorker(repo)
-
 	// Prometheus
 	if cfg.Metrics.PrometheusEnabled {
 		go func() {
@@ -88,7 +83,7 @@ func main() {
 
 	hub := ws.NewHub()
 
-	grpcServer := newGRPCServer(cfg)
+	grpcServer := newGRPCServer(cfg, authClient)
 	nodeServer := &services.NodeService{
 		Store:      store,
 		AuthClient: authClient,
@@ -108,6 +103,11 @@ func main() {
 		http.Handle("/ws/nodes", ws.NewWSServer(hub))
 		log.Fatal(http.ListenAndServe(":8088", nil))
 	}()
+
+	// flush périodique des heartbeat en DB
+	repo := db.NewNodeRepository(store.DB)
+	workers.StartPingFlushWorker(repo)
+	workers.StartMetricsFlushWorker(repo)
 
 	// gRPC Gateway
 	httpAddr := cfg.Server.Host + ":" + strconv.Itoa(cfg.Server.HTTPPort)
@@ -137,7 +137,7 @@ func main() {
 	waitForShutdown(grpcServer, gwServer)
 }
 
-func newGRPCServer(cfg *config.Config) *grpc.Server {
+func newGRPCServer(cfg *config.Config, authClient authpb.AuthServiceClient) *grpc.Server {
 	return grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
 			middleware.LoggingMiddleware(),
@@ -145,6 +145,10 @@ func newGRPCServer(cfg *config.Config) *grpc.Server {
 			middleware.RateLimitingMiddleware(),
 			middleware.TimeoutMiddleware(),
 			middleware.PrometheusMiddleware(),
+			middleware.CheckPermissionInterceptor(authClient),
+		),
+		grpc.ChainStreamInterceptor(
+			middleware.CheckPermissionStreamInterceptor(authClient),
 		),
 		grpc.KeepaliveParams(keepalive.ServerParameters{
 			MaxConnectionIdle:     15 * time.Minute,

@@ -6,7 +6,6 @@ import (
 	"log"
 	"time"
 
-	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/pkg/auth"
 	pkg "github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/pkg/redis"
 	pb "github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/proto"
 	"google.golang.org/grpc/codes"
@@ -19,14 +18,14 @@ func (s *NodeService) BlacklistNode(ctx context.Context, req *pb.NodeID) (*empty
 		return nil, status.Errorf(codes.InvalidArgument, "node_id requis")
 	}
 
-	claims, err := auth.ExtractJWTFromContext(ctx)
-	if err != nil {
-		return nil, status.Errorf(codes.Unauthenticated, "Token invalide")
-	}
+	// claims, err := auth.ExtractJWTFromContext(ctx)
+	// if err != nil {
+	// 	return nil, status.Errorf(codes.Unauthenticated, "Token invalide")
+	// }
 
-	if err := s.CheckAdminPermissions(ctx, claims, PermManageNode); err != nil {
-		return nil, err
-	}
+	// if err := s.CheckAdminPermissions(ctx, claims, PermManageNode); err != nil {
+	// 	return nil, err
+	// }
 
 	node, err := s.Repo.GetNodeByID(ctx, req.NodeId)
 	if err != nil {
@@ -48,14 +47,14 @@ func (s *NodeService) BlacklistNode(ctx context.Context, req *pb.NodeID) (*empty
 
 func (s *NodeService) UnblacklistNode(ctx context.Context, req *pb.NodeID) (*emptypb.Empty, error) {
 
-	claims, err := auth.ExtractJWTFromContext(ctx)
-	if err != nil {
-		return nil, status.Errorf(codes.Unauthenticated, "Token invalide")
-	}
+	// claims, err := auth.ExtractJWTFromContext(ctx)
+	// if err != nil {
+	// 	return nil, status.Errorf(codes.Unauthenticated, "Token invalide")
+	// }
 
-	if err := s.CheckAdminPermissions(ctx, claims, PermManageNode); err != nil {
-		return nil, err
-	}
+	// if err := s.CheckAdminPermissions(ctx, claims, PermManageNode); err != nil {
+	// 	return nil, err
+	// }
 
 	node, err := s.Repo.GetNodeByID(ctx, req.NodeId)
 	if err != nil {
@@ -79,6 +78,15 @@ func (s *NodeService) ListBlacklistedNodes(ctx context.Context, req *pb.ListNode
 	if req.TenantId == "" {
 		return nil, status.Errorf(codes.InvalidArgument, "tenant_id requis")
 	}
+
+	// claims, err := auth.ExtractJWTFromContext(ctx)
+	// if err != nil {
+	// 	return nil, status.Errorf(codes.Unauthenticated, "Token invalide")
+	// }
+
+	// if err := s.CheckAdminPermissions(ctx, claims, PermManageNode); err != nil {
+	// 	return nil, err
+	// }
 
 	nodes, err := s.Repo.ListBlacklistedNodes(ctx, req.TenantId)
 	if err != nil {

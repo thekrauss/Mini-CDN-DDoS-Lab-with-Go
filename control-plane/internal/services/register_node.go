@@ -8,8 +8,13 @@ import (
 	"strings"
 	"time"
 
+	authpb "github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/auth-service/proto"
+
 	"github.com/google/uuid"
+	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/config"
+	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/db"
 	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/internal/repository"
+	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/internal/ws"
 	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/pkg/auth"
 	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/pkg/logger"
 	pkg "github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/pkg/redis"
@@ -19,6 +24,15 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
+
+type NodeService struct {
+	pb.UnimplementedNodeServiceServer
+	Repo       repository.NodeRepository
+	Store      *db.DBStore
+	AuthClient authpb.AuthServiceClient
+	Config     config.Config
+	Hub        *ws.Hub
+}
 
 // RegisterNode permet d'enregistrer un nouveau worker-node dans l'infrastructure.
 //
@@ -61,9 +75,9 @@ func (s *NodeService) RegisterNode(ctx context.Context, req *pb.RegisterRequest)
 		return nil, status.Errorf(codes.Internal, "Impossible de récupérer les informations administrateur")
 	}
 
-	if err := s.CheckAdminPermissions(ctx, claims, PermManageNode); err != nil {
-		return nil, err
-	}
+	// if err := s.CheckAdminPermissions(ctx, claims, PermManageNode); err != nil {
+	// 	return nil, err
+	// }
 
 	//  si l'IP est déjà utilisée
 	exists, err := s.Repo.IsIPAlreadyRegistered(ctx, req.Ip)
@@ -156,9 +170,9 @@ func (s *NodeService) UpdateNodeMetadata(ctx context.Context, req *pb.UpdateNode
 		return nil, status.Errorf(codes.Internal, "Erreur accès utilisateur")
 	}
 
-	if err := s.CheckAdminPermissions(ctx, claims, PermManageNode); err != nil {
-		return nil, err
-	}
+	// if err := s.CheckAdminPermissions(ctx, claims, PermManageNode); err != nil {
+	// 	return nil, err
+	// }
 
 	if adminUser.TenantID != node.TenantID && adminUser.Role != "GLOBAL_ADMIN" {
 		return nil, status.Errorf(codes.PermissionDenied, "modification interdite sur ce nœud")

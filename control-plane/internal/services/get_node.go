@@ -34,9 +34,9 @@ func (s *NodeService) ListNodesByTenant(ctx context.Context, req *pb.TenantReque
 		return nil, status.Errorf(codes.Internal, "Impossible de récupérer les informations administrateur")
 	}
 
-	if err := s.CheckAdminPermissions(ctx, claims, PermReadNode); err != nil {
-		return nil, err
-	}
+	// if err := s.CheckAdminPermissions(ctx, claims, PermReadNode); err != nil {
+	// 	return nil, err
+	// }
 
 	if adminUser.TenantID != req.TenantId {
 		return nil, status.Errorf(codes.PermissionDenied, "accès interdit à ce tenant")
@@ -83,9 +83,9 @@ func (s *NodeService) SetNodeStatus(ctx context.Context, req *pb.NodeStatusReque
 		return nil, status.Errorf(codes.Unauthenticated, "Token invalide")
 	}
 
-	if err := s.CheckAdminPermissions(ctx, claims, PermManageNode); err != nil {
-		return nil, err
-	}
+	// if err := s.CheckAdminPermissions(ctx, claims, PermManageNode); err != nil {
+	// 	return nil, err
+	// }
 
 	node, err := s.Repo.GetNodeByID(ctx, req.NodeId)
 	if err != nil {
