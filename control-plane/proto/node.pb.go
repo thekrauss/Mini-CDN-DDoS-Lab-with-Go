@@ -1828,9 +1828,7 @@ const file_node_proto_rawDesc = "" +
 	"\rNODE_DEGRADED\x10\x032\xf1\r\n" +
 	"\vNodeService\x12_\n" +
 	"\fRegisterNode\x12\x17.nodepb.RegisterRequest\x1a\x18.nodepb.RegisterResponse\"\x1c\x82\xd3\xe4\x93\x02\x16:\x01*\"\x11/v1/register-node\x12F\n" +
-	"\x04Ping\x12\x13.nodepb.PingRequest\x1a\x14.nodepb.PingResponse\"\x13\x82\xd3\xe4\x93\x02\r:\x01*\"\b/v1/ping\x12O\n" +
-	"\vHealthCheck\x12\x16.google.protobuf.Empty\x1a\x14.nodepb.PingResponse\"\x12\x82\xd3\xe4\x93\x02\f\x12\n" +
-	"/v1/health\x12g\n" +
+	"\x04Ping\x12\x13.nodepb.PingRequest\x1a\x14.nodepb.PingResponse\"\x13\x82\xd3\xe4\x93\x02\r:\x01*\"\b/v1/ping\x12g\n" +
 	"\fGetAuditLogs\x12\x1b.nodepb.GetAuditLogsRequest\x1a\x1c.nodepb.GetAuditLogsResponse\"\x1c\x82\xd3\xe4\x93\x02\x16\x12\x14/v1/nodes/audit-logs\x12W\n" +
 	"\x11ListNodesByTenant\x12\x15.nodepb.TenantRequest\x1a\x18.nodepb.NodeListResponse\"\x11\x82\xd3\xe4\x93\x02\v\x12\t/v1/nodes\x12g\n" +
 	"\x12UpdateNodeMetadata\x12\x19.nodepb.UpdateNodeRequest\x1a\x16.google.protobuf.Empty\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\x1a\x13/v1/nodes/{node_id}\x12i\n" +

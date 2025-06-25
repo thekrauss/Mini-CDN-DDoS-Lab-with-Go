@@ -22,7 +22,6 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	NodeService_RegisterNode_FullMethodName         = "/nodepb.NodeService/RegisterNode"
 	NodeService_Ping_FullMethodName                 = "/nodepb.NodeService/Ping"
-	NodeService_HealthCheck_FullMethodName          = "/nodepb.NodeService/HealthCheck"
 	NodeService_GetAuditLogs_FullMethodName         = "/nodepb.NodeService/GetAuditLogs"
 	NodeService_ListNodesByTenant_FullMethodName    = "/nodepb.NodeService/ListNodesByTenant"
 	NodeService_UpdateNodeMetadata_FullMethodName   = "/nodepb.NodeService/UpdateNodeMetadata"
@@ -44,8 +43,6 @@ const (
 // NodeServiceClient is the client API for NodeService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-//
-// Service principal pour le contrôle des nœuds de l’infrastructure
 type NodeServiceClient interface {
 	// Enregistrement initial d’un nœud
 	RegisterNode(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
@@ -108,16 +105,6 @@ func (c *nodeServiceClient) Ping(ctx context.Context, in *PingRequest, opts ...g
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(PingResponse)
 	err := c.cc.Invoke(ctx, NodeService_Ping_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *nodeServiceClient) HealthCheck(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*PingResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(PingResponse)
-	err := c.cc.Invoke(ctx, NodeService_HealthCheck_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -287,8 +274,6 @@ func (c *nodeServiceClient) DeployNode(ctx context.Context, in *NodeID, opts ...
 // NodeServiceServer is the server API for NodeService service.
 // All implementations must embed UnimplementedNodeServiceServer
 // for forward compatibility.
-//
-// Service principal pour le contrôle des nœuds de l’infrastructure
 type NodeServiceServer interface {
 	// Enregistrement initial d’un nœud
 	RegisterNode(context.Context, *RegisterRequest) (*RegisterResponse, error)
@@ -342,9 +327,6 @@ func (UnimplementedNodeServiceServer) RegisterNode(context.Context, *RegisterReq
 }
 func (UnimplementedNodeServiceServer) Ping(context.Context, *PingRequest) (*PingResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Ping not implemented")
-}
-func (UnimplementedNodeServiceServer) HealthCheck(context.Context, *emptypb.Empty) (*PingResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method HealthCheck not implemented")
 }
 func (UnimplementedNodeServiceServer) GetAuditLogs(context.Context, *GetAuditLogsRequest) (*GetAuditLogsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAuditLogs not implemented")
@@ -447,24 +429,6 @@ func _NodeService_Ping_Handler(srv interface{}, ctx context.Context, dec func(in
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(NodeServiceServer).Ping(ctx, req.(*PingRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _NodeService_HealthCheck_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(emptypb.Empty)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(NodeServiceServer).HealthCheck(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: NodeService_HealthCheck_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(NodeServiceServer).HealthCheck(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -771,10 +735,6 @@ var NodeService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Ping",
 			Handler:    _NodeService_Ping_Handler,
-		},
-		{
-			MethodName: "HealthCheck",
-			Handler:    _NodeService_HealthCheck_Handler,
 		},
 		{
 			MethodName: "GetAuditLogs",

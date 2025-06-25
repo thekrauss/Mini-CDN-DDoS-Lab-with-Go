@@ -162,10 +162,6 @@ func newGRPCServer(cfg *config.Config) *grpc.Server {
 			middleware.RateLimitingMiddleware(),
 			middleware.TimeoutMiddleware(),
 			middleware.PrometheusMiddleware(),
-			middleware.CheckPermissionInterceptor(authClient),
-		),
-		grpc.ChainStreamInterceptor(
-			middleware.CheckPermissionStreamInterceptor(authClient),
 		),
 		// grpc.ChainStreamInterceptor(
 		// 	middleware.CheckPermissionStreamInterceptor(authClient),

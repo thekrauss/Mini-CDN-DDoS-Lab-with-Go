@@ -110,37 +110,6 @@ type AuditLogFilter struct {
 	TenantID *string
 }
 
-type NodeMetrics struct {
-	NodeID      string    `json:"node_id"`
-	TenantID    string    `json:"tenant_id"`
-	Timestamp   time.Time `json:"timestamp"`
-	CPU         float64   `json:"cpu"`
-	Memory      float64   `json:"memory"`
-	BandwidthRx int64     `json:"bandwidth_rx"`
-	BandwidthTx int64     `json:"bandwidth_tx"`
-	Connections int       `json:"connections"`
-	DiskIO      int64     `json:"disk_io"`
-	Uptime      int64     `json:"uptime"`
-	Status      string    `json:"status"`
-}
-
-type NodeFilter struct {
-	TenantID string
-	Query    string
-	Status   *NodeStatus
-	TagKey   string
-	TagValue string
-	IP       string
-}
-
-type NodeStatus string
-
-const (
-	NodeOnline   NodeStatus = "online"
-	NodeOffline  NodeStatus = "offline"
-	NodeDegraded NodeStatus = "degraded"
-)
-
 type NodeRepository interface {
 	// CRUD
 	CreateNode(ctx context.Context, node *Node) error
@@ -176,10 +145,4 @@ type NodeRepository interface {
 
 	// Métriques
 	StoreNodeMetrics(ctx context.Context, metrics *NodeMetrics) error
-
-	GetNodeConfig(ctx context.Context, nodeID string) (*NodeConfig, error)
-
-	CreateNodeConfig(ctx context.Context, config *NodeConfig) error
-	UpdateNodeConfig(ctx context.Context, config *NodeConfig) error
-	DeleteNodeConfig(ctx context.Context, nodeID string) error
 }

@@ -8,13 +8,8 @@ import (
 	"strings"
 	"time"
 
-	authpb "github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/auth-service/proto"
-
 	"github.com/google/uuid"
-	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/config"
-	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/db"
 	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/internal/repository"
-	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/internal/ws"
 	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/pkg/auth"
 	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/pkg/logger"
 	pkg "github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/pkg/redis"
@@ -24,15 +19,6 @@ import (
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
-
-type NodeService struct {
-	pb.UnimplementedNodeServiceServer
-	Repo       repository.NodeRepository
-	Store      *db.DBStore
-	AuthClient authpb.AuthServiceClient
-	Config     config.Config
-	Hub        *ws.Hub
-}
 
 // RegisterNode permet d'enregistrer un nouveau worker-node dans l'infrastructure.
 //

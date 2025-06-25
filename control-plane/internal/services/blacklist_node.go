@@ -21,14 +21,14 @@ func (s *NodeService) BlacklistNode(ctx context.Context, req *pb.NodeID) (*empty
 		return nil, status.Errorf(codes.InvalidArgument, "node_id requis")
 	}
 
-	// claims, err := auth.ExtractJWTFromContext(ctx)
-	// if err != nil {
-	// 	return nil, status.Errorf(codes.Unauthenticated, "Token invalide")
-	// }
+	claims, err := auth.ExtractJWTFromContext(ctx)
+	if err != nil {
+		return nil, status.Errorf(codes.Unauthenticated, "Token invalide")
+	}
 
-	// if err := s.CheckAdminPermissions(ctx, claims, PermManageNode); err != nil {
-	// 	return nil, err
-	// }
+	if err := s.CheckAdminPermissions(ctx, claims, PermManageNode); err != nil {
+		return nil, err
+	}
 
 	node, err := s.Repo.GetNodeByID(ctx, req.NodeId)
 	if err != nil {
