@@ -96,3 +96,10 @@ monitoringetat:
   critical_cpu_threshold: 95.0
   critical_mem_threshold: 95.0
   max_nodes_per_tenant: 20
+
+temporal:
+  enabled: true
+  address: "localhost:7233"
+  namespace: "cdn-platform"
+  task_queue: "cdn-workflows"
+  log_history: true

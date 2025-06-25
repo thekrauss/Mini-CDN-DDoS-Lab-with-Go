@@ -6,8 +6,11 @@ import (
 	"log"
 	"time"
 
+	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/internal/workflows"
+	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/pkg/auth"
 	pkg "github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/pkg/redis"
 	pb "github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/proto"
+	"go.temporal.io/sdk/client"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -41,16 +44,47 @@ func (s *NodeService) BlacklistNode(ctx context.Context, req *pb.NodeID) (*empty
 		return nil, status.Errorf(codes.Internal, "Impossible de blacklister le node: %v", err)
 	}
 
+	_ = pkg.RedisClient.Set(ctx, fmt.Sprintf("node:blacklist:%s", req.NodeId), "1", 0)
+
 	log.Printf("[BLACKLIST] Node %s (%s) blacklisté avec succès", node.ID, node.IP)
+
+	if s.TemporalClient != nil {
+		workflowOptions := client.StartWorkflowOptions{
+			ID:        fmt.Sprintf("audit-blacklist-%s-%d", req.NodeId, time.Now().Unix()),
+			TaskQueue: "AUDIT_TASK_QUEUE",
+		}
+
+		Ip, userAgent := GetRequestMetadata(ctx)
+
+		auditInput := workflows.AuditInput{
+			Action:    "blacklist",
+			TargetID:  node.ID,
+			UserID:    claims.UserID.String(),
+			TenantID:  node.TenantID,
+			Role:      claims.Role,
+			IPAddress: Ip,
+			UserAgent: userAgent,
+			Timestamp: time.Now(),
+		}
+
+		_, err := s.TemporalClient.ExecuteWorkflow(ctx, workflowOptions, workflows.AuditWorkflow, auditInput)
+		if err != nil {
+			log.Printf("Erreur lancement workflow d’audit : %v", err)
+		}
+
+	}
 	return &emptypb.Empty{}, nil
 }
 
 func (s *NodeService) UnblacklistNode(ctx context.Context, req *pb.NodeID) (*emptypb.Empty, error) {
+	if req.NodeId == "" {
+		return nil, status.Errorf(codes.InvalidArgument, "node_id requis")
+	}
 
-	// claims, err := auth.ExtractJWTFromContext(ctx)
-	// if err != nil {
-	// 	return nil, status.Errorf(codes.Unauthenticated, "Token invalide")
-	// }
+	claims, err := auth.ExtractJWTFromContext(ctx)
+	if err != nil {
+		return nil, status.Errorf(codes.Unauthenticated, "Token invalide")
+	}
 
 	// if err := s.CheckAdminPermissions(ctx, claims, PermManageNode); err != nil {
 	// 	return nil, err
@@ -69,7 +103,34 @@ func (s *NodeService) UnblacklistNode(ctx context.Context, req *pb.NodeID) (*emp
 		return nil, status.Errorf(codes.Internal, "Erreur suppression de blacklist: %v", err)
 	}
 
-	log.Printf("Node %s retiré de la blacklist", req.NodeId)
+	_ = pkg.RedisClient.Del(ctx, fmt.Sprintf("node:blacklist:%s", req.NodeId))
+
+	log.Printf("[UNBLACKLIST] Node %s retiré de la blacklist", req.NodeId)
+
+	if s.TemporalClient != nil {
+		workflowOptions := client.StartWorkflowOptions{
+			ID:        fmt.Sprintf("audit-unblacklist-%s-%d", req.NodeId, time.Now().Unix()),
+			TaskQueue: "AUDIT_TASK_QUEUE",
+		}
+
+		ip, userAgent := GetRequestMetadata(ctx)
+
+		auditInput := workflows.AuditInput{
+			Action:    "unblacklist",
+			TargetID:  node.ID,
+			UserID:    claims.UserID.String(),
+			TenantID:  node.TenantID,
+			Role:      claims.Role,
+			IPAddress: ip,
+			UserAgent: userAgent,
+			Timestamp: time.Now(),
+		}
+
+		_, err := s.TemporalClient.ExecuteWorkflow(ctx, workflowOptions, workflows.AuditWorkflow, auditInput)
+		if err != nil {
+			log.Printf("⚠ Erreur lancement workflow d’audit unblacklist : %v", err)
+		}
+	}
 
 	return &emptypb.Empty{}, nil
 }
@@ -114,13 +175,4 @@ func (s *NodeService) ListBlacklistedNodes(ctx context.Context, req *pb.ListNode
 	}
 
 	return &pb.ListNodesResponse{Nodes: pbNodes}, nil
-}
-
-func IsNodeBlacklisted(ctx context.Context, nodeID string) bool {
-	val, err := pkg.RedisClient.Get(ctx, fmt.Sprintf("node:blacklist:%s", nodeID)).Result()
-	if err == nil && val == "1" {
-		return true
-	}
-	// fallback lent DB si besoin
-	return false
 }

@@ -7,11 +7,12 @@ import (
 	"log"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/internal/repository"
+	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/internal/workflows"
 	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/pkg/auth"
 	pkg "github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/pkg/redis"
 	pb "github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/proto"
+	"go.temporal.io/sdk/client"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -92,18 +93,16 @@ func (s *NodeService) SetNodeStatus(ctx context.Context, req *pb.NodeStatusReque
 		return nil, status.Errorf(codes.NotFound, "Nœud introuvable: %v", err)
 	}
 
-	//enum → string
 	statusStr, err := NodeStatusToString(req.Status)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
 
-	//met à jour PostgreSQL
 	if err := s.Repo.SetNodeStatus(ctx, req.NodeId, statusStr); err != nil {
 		return nil, status.Errorf(codes.Internal, "Erreur mise à jour du statut: %v", err)
 	}
 
-	// redis
+	// Redis
 	keyStatus := fmt.Sprintf("node:status:%s", req.NodeId)
 	if statusStr == string(repository.NodeOffline) {
 		_ = pkg.RedisClient.Del(ctx, keyStatus)
@@ -111,22 +110,32 @@ func (s *NodeService) SetNodeStatus(ctx context.Context, req *pb.NodeStatusReque
 		_ = pkg.RedisClient.Set(ctx, keyStatus, statusStr, 2*time.Minute).Err()
 	}
 
-	ip, userAgent := GetRequestMetadata(ctx)
+	// Journalisation via Temporal
+	if s.TemporalClient != nil {
+		ip, userAgent := GetRequestMetadata(ctx)
 
-	// journalisation audit
-	logEntry := &repository.AuditLog{
-		ID:        uuid.New(),
-		UserID:    claims.UserID,
-		Role:      claims.Role,
-		Action:    "SetNodeStatus",
-		Target:    req.NodeId,
-		Details:   fmt.Sprintf("Changement du statut en %s", statusStr),
-		Timestamp: time.Now(),
-		TenantID:  uuid.MustParse(node.TenantID),
-		IPAddress: ip,
-		UserAgent: userAgent,
+		workflowOptions := client.StartWorkflowOptions{
+			ID:        fmt.Sprintf("audit-set-status-%s-%d", req.NodeId, time.Now().Unix()),
+			TaskQueue: "AUDIT_TASK_QUEUE",
+		}
+
+		auditInput := workflows.AuditInput{
+			Action:    "SetNodeStatus",
+			TargetID:  req.NodeId,
+			UserID:    claims.UserID.String(),
+			TenantID:  node.TenantID,
+			Role:      claims.Role,
+			IPAddress: ip,
+			UserAgent: userAgent,
+			Timestamp: time.Now(),
+			Details:   fmt.Sprintf("Statut mis à jour vers %s", statusStr),
+		}
+
+		_, err := s.TemporalClient.ExecuteWorkflow(ctx, workflowOptions, workflows.AuditWorkflow, auditInput)
+		if err != nil {
+			log.Printf("⚠ Erreur lancement workflow d’audit SetNodeStatus : %v", err)
+		}
 	}
-	_ = s.Repo.InsertAuditLog(ctx, logEntry)
 
 	return &emptypb.Empty{}, nil
 }

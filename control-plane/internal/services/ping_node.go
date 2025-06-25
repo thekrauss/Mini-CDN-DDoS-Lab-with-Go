@@ -55,6 +55,11 @@ func (s *NodeService) Ping(ctx context.Context, req *pb.PingRequest) (*pb.PingRe
 		return nil, status.Errorf(codes.InvalidArgument, "node_id requis")
 	}
 
+	if IsNodeBlacklisted(ctx, req.NodeId) {
+		log.Printf("[PING BLOCKED] Ping rejeté (Redis) pour node: %s", req.NodeId)
+		return nil, status.Errorf(codes.PermissionDenied, "Node %s blacklisté", req.NodeId)
+	}
+
 	node, err := s.Repo.GetNodeByID(ctx, req.NodeId)
 	if err != nil {
 		return nil, status.Errorf(codes.NotFound, "Node non trouvé: %v", err)
@@ -166,4 +171,13 @@ func (s *NodeService) Ping(ctx context.Context, req *pb.PingRequest) (*pb.PingRe
 	return &pb.PingResponse{
 		Status: "ok",
 	}, nil
+}
+
+func IsNodeBlacklisted(ctx context.Context, nodeID string) bool {
+	val, err := pkg.RedisClient.Get(ctx, fmt.Sprintf("node:blacklist:%s", nodeID)).Result()
+	if err == nil && val == "1" {
+		return true
+	}
+	// fallback lent DB si besoin
+	return false
 }

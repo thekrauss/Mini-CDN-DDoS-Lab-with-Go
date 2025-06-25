@@ -6,10 +6,10 @@ package services
 // 	"log"
 // 	"time"
 
-// 	authpb "github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/auth-service/proto"
-// 	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/db"
-// 	pkg "github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/pkg/redis"
-// 	pb "github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/proto"
+	authpb "github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/auth-service/proto"
+	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/db"
+	pkg "github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/pkg/redis"
+	pb "github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/proto"
 
 // 	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/config"
 // 	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/internal/repository"
@@ -20,22 +20,31 @@ package services
 // 	"google.golang.org/grpc/status"
 // )
 
-// const (
-// 	PermManageNode        = "MANAGE_NODE"
-// 	PermReadNode          = "READ_NODE"
-// 	PermPingNode          = "PING_NODE"
-// 	PermSendMetrics       = "SEND_METRICS"
-// 	PermReadMetrics       = "READ_METRICS"
-// 	PermReadAuditLogs     = "READ_AUDIT_LOGS"
-// 	PermManageConfig      = "MANAGE_CONFIG"
-// 	PermManageTenant      = "MANAGE_TENANT"
-// 	PermReadTenant        = "READ_TENANT"
-// 	PermManageUsers       = "MANAGE_USERS"
-// 	PermManagePermissions = "MANAGE_PERMISSIONS"
-// 	PermRestartService    = "RESTART_NODE_SERVICE"
-// 	PermStopService       = "STOP_NODE_SERVICE"
-// 	PermUpdateConfig      = "UPDATE_NODE_CONFIG"
-// )
+type NodeService struct {
+	pb.UnimplementedNodeServiceServer
+	Repo       repository.NodeRepository
+	Store      *db.DBStore
+	AuthClient authpb.AuthServiceClient
+	Config     config.Config
+	Hub        *ws.Hub
+}
+
+const (
+	PermManageNode        = "MANAGE_NODE"
+	PermReadNode          = "READ_NODE"
+	PermPingNode          = "PING_NODE"
+	PermSendMetrics       = "SEND_METRICS"
+	PermReadMetrics       = "READ_METRICS"
+	PermReadAuditLogs     = "READ_AUDIT_LOGS"
+	PermManageConfig      = "MANAGE_CONFIG"
+	PermManageTenant      = "MANAGE_TENANT"
+	PermReadTenant        = "READ_TENANT"
+	PermManageUsers       = "MANAGE_USERS"
+	PermManagePermissions = "MANAGE_PERMISSIONS"
+	PermRestartService    = "RESTART_NODE_SERVICE"
+	PermStopService       = "STOP_NODE_SERVICE"
+	PermUpdateConfig      = "UPDATE_NODE_CONFIG"
+)
 
 // func (s *NodeService) CheckAdminPermissions(ctx context.Context, claims *auth.Claims, permission string) error {
 

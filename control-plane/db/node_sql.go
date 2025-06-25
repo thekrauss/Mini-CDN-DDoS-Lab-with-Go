@@ -236,6 +236,91 @@ func (r *SQLNodeRepository) CountActiveNodes(ctx context.Context, tenantID strin
 	return count, nil
 }
 
+func (r *SQLNodeRepository) GetNodeConfig(ctx context.Context, nodeID string) (*repository.NodeConfig, error) {
+	cacheKey := fmt.Sprintf("node:config:%s", nodeID)
+
+	if cached, err := pkg.RedisClient.Get(ctx, cacheKey).Result(); err == nil {
+		var cfg repository.NodeConfig
+		if err := json.Unmarshal([]byte(cached), &cfg); err == nil {
+			return &cfg, nil
+		}
+		log.Printf("[Redis] Cache node_config corrompu pour %s: %v", nodeID, err)
+	}
+
+	query := `
+		SELECT ping_interval, metrics_interval, dynamic_config, custom_labels
+		FROM node_configs
+		WHERE node_id = $1
+	`
+
+	var cfg repository.NodeConfig
+	var labelsJSON []byte
+
+	err := r.DB.QueryRowContext(ctx, query, nodeID).Scan(
+		&cfg.PingInterval,
+		&cfg.MetricsInterval,
+		&cfg.DynamicConfig,
+		&labelsJSON,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	cfg.NodeID = nodeID
+	if err := json.Unmarshal(labelsJSON, &cfg.CustomLabels); err != nil {
+		cfg.CustomLabels = map[string]string{}
+	}
+
+	if raw, err := json.Marshal(cfg); err == nil {
+		_ = pkg.RedisClient.Set(ctx, cacheKey, raw, 2*time.Minute).Err()
+	}
+
+	return &cfg, nil
+}
+
+func (r *SQLNodeRepository) UpdateNodeConfig(ctx context.Context, cfg *repository.NodeConfig) error {
+	query := `
+		INSERT INTO node_configs (node_id, ping_interval, metrics_interval, dynamic_config, custom_labels)
+		VALUES ($1, $2, $3, $4, $5)
+		ON CONFLICT (node_id) DO UPDATE
+		SET ping_interval = EXCLUDED.ping_interval,
+		    metrics_interval = EXCLUDED.metrics_interval,
+		    dynamic_config = EXCLUDED.dynamic_config,
+		    custom_labels = EXCLUDED.custom_labels
+	`
+
+	labelsJSON, err := json.Marshal(cfg.CustomLabels)
+	if err != nil {
+		return err
+	}
+
+	_, err = r.DB.ExecContext(ctx, query, cfg.NodeID, cfg.PingInterval, cfg.MetricsInterval, cfg.DynamicConfig, labelsJSON)
+	if err != nil {
+		return err
+	}
+
+	cacheKey := fmt.Sprintf("node:config:%s", cfg.NodeID)
+	if delErr := pkg.RedisClient.Del(ctx, cacheKey).Err(); delErr != nil {
+		logger.Log.Warn("Failed to invalidate config cache", zap.String("node_id", cfg.NodeID), zap.Error(delErr))
+	}
+	return nil
+}
+
+func (r *SQLNodeRepository) DeleteNodeConfig(ctx context.Context, nodeID string) error {
+	query := `DELETE FROM node_configs WHERE node_id = $1`
+
+	_, err := r.DB.ExecContext(ctx, query, nodeID)
+	if err != nil {
+		return err
+	}
+
+	cacheKey := fmt.Sprintf("node:config:%s", nodeID)
+	if delErr := pkg.RedisClient.Del(ctx, cacheKey).Err(); delErr != nil {
+		logger.Log.Warn("Failed to invalidate config cache", zap.String("node_id", nodeID), zap.Error(delErr))
+	}
+	return nil
+}
+
 // --- Statut / Orchestration ---
 
 func (r *SQLNodeRepository) SetNodeStatus(ctx context.Context, id string, status string) error {

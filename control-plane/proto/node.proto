@@ -7,10 +7,12 @@ option go_package = "github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plan
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 
-// Service principal pour le contrôle des nœuds de l’infrastructure
-service NodeService {
+//
+// ===================== Service =====================
+//
 
-  // Enregistrement initial d’un nœud dans le système
+service NodeService {
+  // Enregistrement initial d’un nœud
   rpc RegisterNode(RegisterRequest) returns (RegisterResponse) {
     option (google.api.http) = {
       post: "/v1/register-node"
@@ -18,7 +20,7 @@ service NodeService {
     };
   }
 
-  // Ping périodique des nœuds (heartbeat + metrics)
+  // Ping de santé et métriques
   rpc Ping(PingRequest) returns (PingResponse) {
     option (google.api.http) = {
       post: "/v1/ping"
@@ -26,28 +28,21 @@ service NodeService {
     };
   }
 
-  // Vérifie que le control-plane est en ligne
-  rpc HealthCheck(google.protobuf.Empty) returns (PingResponse) {
-    option (google.api.http) = {
-      get: "/v1/health"
-    };
-  }
-
-  // Récupération des journaux d’audit (actions admin)
+  // Récupération des logs d’audit
   rpc GetAuditLogs(GetAuditLogsRequest) returns (GetAuditLogsResponse) {
     option (google.api.http) = {
       get: "/v1/nodes/audit-logs"
     };
   }
 
-  // Liste des nœuds d’un tenant
+  // Liste les nœuds d’un tenant
   rpc ListNodesByTenant(TenantRequest) returns (NodeListResponse) {
     option (google.api.http) = {
       get: "/v1/nodes"
     };
   }
 
-  // Mise à jour des métadonnées du nœud (IP, nom, tags…)
+  // Mise à jour des métadonnées d’un nœud (nom, IP, tags)
   rpc UpdateNodeMetadata(UpdateNodeRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       put: "/v1/nodes/{node_id}"
@@ -55,7 +50,7 @@ service NodeService {
     };
   }
 
-  // Mise à jour manuelle du statut du nœud (offline, degraded…)
+  // Changement de statut du nœud (online, offline, degraded)
   rpc SetNodeStatus(NodeStatusRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/v1/nodes/{node_id}/status"
@@ -63,14 +58,14 @@ service NodeService {
     };
   }
 
-  // Récupération détaillée d’un nœud
+  // Détail d’un nœud par ID
   rpc GetNodeByID(GetNodeRequest) returns (Node) {
     option (google.api.http) = {
       get: "/v1/nodes/{node_id}"
     };
   }
 
-  // Nombre de nœuds actifs sur une période
+  // Compte les nœuds actifs sur une période
   rpc CountActiveNodes(CountActiveNodesRequest) returns (CountActiveNodesResponse) {
     option (google.api.http) = {
       get: "/v1/nodes/active_count"
@@ -78,77 +73,81 @@ service NodeService {
   }
 
   // Liste des nœuds blacklistés
+  // Liste des nœuds blacklistés
   rpc ListBlacklistedNodes(ListNodesRequest) returns (ListNodesResponse) {
     option (google.api.http) = {
       get: "/v1/nodes/blacklisted"
     };
   }
 
-  // Blacklister un nœud (temporairement désactivé)
+  // Ajout à la blacklist
   rpc BlacklistNode(NodeID) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/v1/nodes/{node_id}/blacklist"
     };
   }
 
-  // Enlever un nœud de la blacklist
+  // Retrait de la blacklist
   rpc UnblacklistNode(NodeID) returns (google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/v1/nodes/{node_id}/unblacklist"
     };
   }
 
-  // Rechercher des nœuds par tag, IP, nom…
+  // Recherche de nœuds
   rpc SearchNodes(SearchRequest) returns (SearchResponse) {
     option (google.api.http) = {
       get: "/v1/nodes/search"
     };
   }
 
-  rpc GetNodeConfig(GetNodeConfigRequest) returns (GetNodeConfigResponse) {
+  // Mise à jour de la configuration d’un nœud
+  rpc UpdateNodeConfig(UpdateNodeConfigRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      put: "/v1/nodes/{node_id}/config"
+      body: "*"
+    };
+  }
+
+  // Suppression de la configuration d’un nœud
+  rpc DeleteNodeConfig(NodeID) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/nodes/{node_id}/config"
+    };
+  }
+
+  // Récupération de la configuration d’un nœud
+  rpc GetNodeConfig(GetNodeRequest) returns (NodeConfigResponse) {
     option (google.api.http) = {
       get: "/v1/nodes/{node_id}/config"
     };
   }
 
-  // Stream de commandes vers les nœuds
-  rpc StreamCommands(stream CommandRequest) returns (stream Command);
-
-  // Réception des résultats de commandes exécutées
-  rpc ReportCommandResult(CommandResultRequest) returns (google.protobuf.Empty);
-
-  // Un nœud signale une erreur système
-  rpc ReportNodeError(NodeErrorRequest) returns (google.protobuf.Empty) {
+  // Redémarrage orchestré via Temporal
+  rpc RestartNode(NodeID) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/v1/nodes/{node_id}/errors"
-      body: "*"
+      post: "/v1/nodes/{node_id}/restart"
     };
   }
 
-  // Historique des statuts d’un nœud
-  rpc GetNodeStatusHistory(GetNodeRequest) returns (StatusHistoryResponse) {
+  // Mise à jour de l’agent logiciel
+  rpc UpdateAgent(NodeID) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      get: "/v1/nodes/{node_id}/status-history"
+      post: "/v1/nodes/{node_id}/update-agent"
     };
   }
 
-  // Ajoute ou met à jour des annotations (métadonnées libres)
-  rpc AnnotateNode(AnnotateNodeRequest) returns (google.protobuf.Empty) {
+  // Déploiement (config, version, etc.)
+  rpc DeployNode(NodeID) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/v1/nodes/{node_id}/annotations"
-      body: "*"
-    };
-  }
-
-  // Déclenche une action sur le nœud (ex: restart, update)
-  rpc TriggerNodeAction(NodeActionRequest) returns (google.protobuf.Empty) {
-    option (google.api.http) = {
-      post: "/v1/nodes/{node_id}/action"
-      body: "*"
+      post: "/v1/nodes/{node_id}/deploy"
     };
   }
 }
 
+//
+// ===================== Enums =====================
+//
 
 enum NodeStatus {
   NODE_STATUS_UNSPECIFIED = 0;
@@ -156,6 +155,12 @@ enum NodeStatus {
   NODE_OFFLINE = 2;
   NODE_DEGRADED = 3;
 }
+
+//
+// ===================== Messages =====================
+//
+
+// -- Registration & Health --
 
 message RegisterRequest {
   string node_id = 1;
@@ -186,6 +191,8 @@ message PingResponse {
   string status = 1; // ok, failed, warning
 }
 
+// -- Audit Logs --
+
 message GetAuditLogsRequest {
   int32 limit = 1;
   int32 offset = 2;
@@ -211,6 +218,8 @@ message GetAuditLogsResponse {
   repeated AuditLogEntry logs = 1;
   int32 total = 2;
 }
+
+// -- Node Management --
 
 message TenantRequest {
   string tenant_id = 1;
@@ -257,9 +266,11 @@ message Node {
   bool is_blacklisted = 14;
 }
 
+// -- Command Stream --
+
 message CommandRequest {
   string node_id = 1;
-  string type = 2; // restart, update, etc.
+  string type = 2;    // restart, update, etc.
   string payload = 3;
 }
 
@@ -278,6 +289,8 @@ message CommandResultRequest {
   string timestamp = 5;
 }
 
+// -- Search & Filter --
+
 message SearchRequest {
   string tenant_id = 1;
   string query = 2;
@@ -295,63 +308,31 @@ message ListNodesResponse {
   repeated Node nodes = 1;
 }
 
+// -- Analytics --
+
 message CountActiveNodesRequest {
   string tenant_id = 1;
-  int32 since_seconds = 2; // 3600 pour 1h
+  int32 since_seconds = 2; // 3600 = dernière heure
 }
 
 message CountActiveNodesResponse {
   int32 count = 1;
 }
 
-// Requête pour reporter une erreur système côté nœud
-message NodeErrorRequest {
-  string node_id = 1;           // ID du nœud qui a rencontré l’erreur
-  string error_message = 2;     // Description de l’erreur
-  string error_type = 3;        // Type (network, cpu, disk, etc.)
-  string occurred_at = 4;       // Timestamp au format RFC3339
-}
+// -- Configuration --
 
-// Requête pour déclencher une action sur un nœud
-message NodeActionRequest {
-  string node_id = 1;           // Nœud cible
-  string action_type = 2;       // Ex: restart, update, reload
-  map<string, string> params = 3; // Paramètres de l’action
-}
-
-// Réponse contenant l’historique des statuts d’un nœud
-message StatusHistoryResponse {
-  repeated NodeStatusEntry entries = 1;
-}
-
-message NodeStatusEntry {
-  string status = 1;            // online, degraded, offline
-  string timestamp = 2;         // RFC3339
-}
-
-// Réponse contenant la configuration du nœud (par ex. limites, intervalle de ping, etc.)
-message NodeConfigResponse {
-  string node_id = 1;
-  int32 ping_interval_seconds = 2;
-  float max_cpu = 3;
-  float max_memory = 4;
-  map<string, string> custom = 5; // configuration personnalisée
-}
-
-// Requête pour annoter un nœud avec des métadonnées libres
-message AnnotateNodeRequest {
-  string node_id = 1;
-  map<string, string> annotations = 2; // Ex: {"datacenter": "eu-west-1", "rack": "R12"}
-}
-
-message GetNodeConfigRequest {
-  string node_id = 1;
-}
-
-message GetNodeConfigResponse {
+message UpdateNodeConfigRequest {
   string node_id = 1;
   int32 ping_interval = 2;
   int32 metrics_interval = 3;
-  bool dynamic_config_enabled = 4;
+  bool dynamic_config = 4;
+  map<string, string> custom_labels = 5;
+}
+
+message NodeConfigResponse {
+  string node_id = 1;
+  int32 ping_interval = 2;
+  int32 metrics_interval = 3;
+  bool dynamic_config = 4;
   map<string, string> custom_labels = 5;
 }

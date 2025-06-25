@@ -33,13 +33,12 @@ const (
 	NodeService_BlacklistNode_FullMethodName        = "/nodepb.NodeService/BlacklistNode"
 	NodeService_UnblacklistNode_FullMethodName      = "/nodepb.NodeService/UnblacklistNode"
 	NodeService_SearchNodes_FullMethodName          = "/nodepb.NodeService/SearchNodes"
+	NodeService_UpdateNodeConfig_FullMethodName     = "/nodepb.NodeService/UpdateNodeConfig"
+	NodeService_DeleteNodeConfig_FullMethodName     = "/nodepb.NodeService/DeleteNodeConfig"
 	NodeService_GetNodeConfig_FullMethodName        = "/nodepb.NodeService/GetNodeConfig"
-	NodeService_StreamCommands_FullMethodName       = "/nodepb.NodeService/StreamCommands"
-	NodeService_ReportCommandResult_FullMethodName  = "/nodepb.NodeService/ReportCommandResult"
-	NodeService_ReportNodeError_FullMethodName      = "/nodepb.NodeService/ReportNodeError"
-	NodeService_GetNodeStatusHistory_FullMethodName = "/nodepb.NodeService/GetNodeStatusHistory"
-	NodeService_AnnotateNode_FullMethodName         = "/nodepb.NodeService/AnnotateNode"
-	NodeService_TriggerNodeAction_FullMethodName    = "/nodepb.NodeService/TriggerNodeAction"
+	NodeService_RestartNode_FullMethodName          = "/nodepb.NodeService/RestartNode"
+	NodeService_UpdateAgent_FullMethodName          = "/nodepb.NodeService/UpdateAgent"
+	NodeService_DeployNode_FullMethodName           = "/nodepb.NodeService/DeployNode"
 )
 
 // NodeServiceClient is the client API for NodeService service.
@@ -48,45 +47,43 @@ const (
 //
 // Service principal pour le contrôle des nœuds de l’infrastructure
 type NodeServiceClient interface {
-	// Enregistrement initial d’un nœud dans le système
+	// Enregistrement initial d’un nœud
 	RegisterNode(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
-	// Ping périodique des nœuds (heartbeat + metrics)
+	// Ping de santé et métriques
 	Ping(ctx context.Context, in *PingRequest, opts ...grpc.CallOption) (*PingResponse, error)
-	// Vérifie que le control-plane est en ligne
-	HealthCheck(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*PingResponse, error)
-	// Récupération des journaux d’audit (actions admin)
+	// Récupération des logs d’audit
 	GetAuditLogs(ctx context.Context, in *GetAuditLogsRequest, opts ...grpc.CallOption) (*GetAuditLogsResponse, error)
-	// Liste des nœuds d’un tenant
+	// Liste les nœuds d’un tenant
 	ListNodesByTenant(ctx context.Context, in *TenantRequest, opts ...grpc.CallOption) (*NodeListResponse, error)
-	// Mise à jour des métadonnées du nœud (IP, nom, tags…)
+	// Mise à jour des métadonnées d’un nœud (nom, IP, tags)
 	UpdateNodeMetadata(ctx context.Context, in *UpdateNodeRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// Mise à jour manuelle du statut du nœud (offline, degraded…)
+	// Changement de statut du nœud (online, offline, degraded)
 	SetNodeStatus(ctx context.Context, in *NodeStatusRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// Récupération détaillée d’un nœud
+	// Détail d’un nœud par ID
 	GetNodeByID(ctx context.Context, in *GetNodeRequest, opts ...grpc.CallOption) (*Node, error)
-	// Nombre de nœuds actifs sur une période
+	// Compte les nœuds actifs sur une période
 	CountActiveNodes(ctx context.Context, in *CountActiveNodesRequest, opts ...grpc.CallOption) (*CountActiveNodesResponse, error)
 	// Liste des nœuds blacklistés
+	// Liste des nœuds blacklistés
 	ListBlacklistedNodes(ctx context.Context, in *ListNodesRequest, opts ...grpc.CallOption) (*ListNodesResponse, error)
-	// Blacklister un nœud (temporairement désactivé)
+	// Ajout à la blacklist
 	BlacklistNode(ctx context.Context, in *NodeID, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// Enlever un nœud de la blacklist
+	// Retrait de la blacklist
 	UnblacklistNode(ctx context.Context, in *NodeID, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// Rechercher des nœuds par tag, IP, nom…
+	// Recherche de nœuds
 	SearchNodes(ctx context.Context, in *SearchRequest, opts ...grpc.CallOption) (*SearchResponse, error)
-	GetNodeConfig(ctx context.Context, in *GetNodeConfigRequest, opts ...grpc.CallOption) (*GetNodeConfigResponse, error)
-	// Stream de commandes vers les nœuds
-	StreamCommands(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[CommandRequest, Command], error)
-	// Réception des résultats de commandes exécutées
-	ReportCommandResult(ctx context.Context, in *CommandResultRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// Un nœud signale une erreur système
-	ReportNodeError(ctx context.Context, in *NodeErrorRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// Historique des statuts d’un nœud
-	GetNodeStatusHistory(ctx context.Context, in *GetNodeRequest, opts ...grpc.CallOption) (*StatusHistoryResponse, error)
-	// Ajoute ou met à jour des annotations (métadonnées libres)
-	AnnotateNode(ctx context.Context, in *AnnotateNodeRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// Déclenche une action sur le nœud (ex: restart, update)
-	TriggerNodeAction(ctx context.Context, in *NodeActionRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// Mise à jour de la configuration d’un nœud
+	UpdateNodeConfig(ctx context.Context, in *UpdateNodeConfigRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// Suppression de la configuration d’un nœud
+	DeleteNodeConfig(ctx context.Context, in *NodeID, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// Récupération de la configuration d’un nœud
+	GetNodeConfig(ctx context.Context, in *GetNodeRequest, opts ...grpc.CallOption) (*NodeConfigResponse, error)
+	// Redémarrage orchestré via Temporal
+	RestartNode(ctx context.Context, in *NodeID, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// Mise à jour de l’agent logiciel
+	UpdateAgent(ctx context.Context, in *NodeID, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// Déploiement (config, version, etc.)
+	DeployNode(ctx context.Context, in *NodeID, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type nodeServiceClient struct {
@@ -227,9 +224,29 @@ func (c *nodeServiceClient) SearchNodes(ctx context.Context, in *SearchRequest, 
 	return out, nil
 }
 
-func (c *nodeServiceClient) GetNodeConfig(ctx context.Context, in *GetNodeConfigRequest, opts ...grpc.CallOption) (*GetNodeConfigResponse, error) {
+func (c *nodeServiceClient) UpdateNodeConfig(ctx context.Context, in *UpdateNodeConfigRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetNodeConfigResponse)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, NodeService_UpdateNodeConfig_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nodeServiceClient) DeleteNodeConfig(ctx context.Context, in *NodeID, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, NodeService_DeleteNodeConfig_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *nodeServiceClient) GetNodeConfig(ctx context.Context, in *GetNodeRequest, opts ...grpc.CallOption) (*NodeConfigResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(NodeConfigResponse)
 	err := c.cc.Invoke(ctx, NodeService_GetNodeConfig_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -237,63 +254,30 @@ func (c *nodeServiceClient) GetNodeConfig(ctx context.Context, in *GetNodeConfig
 	return out, nil
 }
 
-func (c *nodeServiceClient) StreamCommands(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[CommandRequest, Command], error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &NodeService_ServiceDesc.Streams[0], NodeService_StreamCommands_FullMethodName, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &grpc.GenericClientStream[CommandRequest, Command]{ClientStream: stream}
-	return x, nil
-}
-
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type NodeService_StreamCommandsClient = grpc.BidiStreamingClient[CommandRequest, Command]
-
-func (c *nodeServiceClient) ReportCommandResult(ctx context.Context, in *CommandResultRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *nodeServiceClient) RestartNode(ctx context.Context, in *NodeID, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, NodeService_ReportCommandResult_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, NodeService_RestartNode_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *nodeServiceClient) ReportNodeError(ctx context.Context, in *NodeErrorRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *nodeServiceClient) UpdateAgent(ctx context.Context, in *NodeID, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, NodeService_ReportNodeError_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, NodeService_UpdateAgent_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *nodeServiceClient) GetNodeStatusHistory(ctx context.Context, in *GetNodeRequest, opts ...grpc.CallOption) (*StatusHistoryResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(StatusHistoryResponse)
-	err := c.cc.Invoke(ctx, NodeService_GetNodeStatusHistory_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *nodeServiceClient) AnnotateNode(ctx context.Context, in *AnnotateNodeRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *nodeServiceClient) DeployNode(ctx context.Context, in *NodeID, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, NodeService_AnnotateNode_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *nodeServiceClient) TriggerNodeAction(ctx context.Context, in *NodeActionRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, NodeService_TriggerNodeAction_FullMethodName, in, out, cOpts...)
+	err := c.cc.Invoke(ctx, NodeService_DeployNode_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -306,45 +290,43 @@ func (c *nodeServiceClient) TriggerNodeAction(ctx context.Context, in *NodeActio
 //
 // Service principal pour le contrôle des nœuds de l’infrastructure
 type NodeServiceServer interface {
-	// Enregistrement initial d’un nœud dans le système
+	// Enregistrement initial d’un nœud
 	RegisterNode(context.Context, *RegisterRequest) (*RegisterResponse, error)
-	// Ping périodique des nœuds (heartbeat + metrics)
+	// Ping de santé et métriques
 	Ping(context.Context, *PingRequest) (*PingResponse, error)
-	// Vérifie que le control-plane est en ligne
-	HealthCheck(context.Context, *emptypb.Empty) (*PingResponse, error)
-	// Récupération des journaux d’audit (actions admin)
+	// Récupération des logs d’audit
 	GetAuditLogs(context.Context, *GetAuditLogsRequest) (*GetAuditLogsResponse, error)
-	// Liste des nœuds d’un tenant
+	// Liste les nœuds d’un tenant
 	ListNodesByTenant(context.Context, *TenantRequest) (*NodeListResponse, error)
-	// Mise à jour des métadonnées du nœud (IP, nom, tags…)
+	// Mise à jour des métadonnées d’un nœud (nom, IP, tags)
 	UpdateNodeMetadata(context.Context, *UpdateNodeRequest) (*emptypb.Empty, error)
-	// Mise à jour manuelle du statut du nœud (offline, degraded…)
+	// Changement de statut du nœud (online, offline, degraded)
 	SetNodeStatus(context.Context, *NodeStatusRequest) (*emptypb.Empty, error)
-	// Récupération détaillée d’un nœud
+	// Détail d’un nœud par ID
 	GetNodeByID(context.Context, *GetNodeRequest) (*Node, error)
-	// Nombre de nœuds actifs sur une période
+	// Compte les nœuds actifs sur une période
 	CountActiveNodes(context.Context, *CountActiveNodesRequest) (*CountActiveNodesResponse, error)
 	// Liste des nœuds blacklistés
+	// Liste des nœuds blacklistés
 	ListBlacklistedNodes(context.Context, *ListNodesRequest) (*ListNodesResponse, error)
-	// Blacklister un nœud (temporairement désactivé)
+	// Ajout à la blacklist
 	BlacklistNode(context.Context, *NodeID) (*emptypb.Empty, error)
-	// Enlever un nœud de la blacklist
+	// Retrait de la blacklist
 	UnblacklistNode(context.Context, *NodeID) (*emptypb.Empty, error)
-	// Rechercher des nœuds par tag, IP, nom…
+	// Recherche de nœuds
 	SearchNodes(context.Context, *SearchRequest) (*SearchResponse, error)
-	GetNodeConfig(context.Context, *GetNodeConfigRequest) (*GetNodeConfigResponse, error)
-	// Stream de commandes vers les nœuds
-	StreamCommands(grpc.BidiStreamingServer[CommandRequest, Command]) error
-	// Réception des résultats de commandes exécutées
-	ReportCommandResult(context.Context, *CommandResultRequest) (*emptypb.Empty, error)
-	// Un nœud signale une erreur système
-	ReportNodeError(context.Context, *NodeErrorRequest) (*emptypb.Empty, error)
-	// Historique des statuts d’un nœud
-	GetNodeStatusHistory(context.Context, *GetNodeRequest) (*StatusHistoryResponse, error)
-	// Ajoute ou met à jour des annotations (métadonnées libres)
-	AnnotateNode(context.Context, *AnnotateNodeRequest) (*emptypb.Empty, error)
-	// Déclenche une action sur le nœud (ex: restart, update)
-	TriggerNodeAction(context.Context, *NodeActionRequest) (*emptypb.Empty, error)
+	// Mise à jour de la configuration d’un nœud
+	UpdateNodeConfig(context.Context, *UpdateNodeConfigRequest) (*emptypb.Empty, error)
+	// Suppression de la configuration d’un nœud
+	DeleteNodeConfig(context.Context, *NodeID) (*emptypb.Empty, error)
+	// Récupération de la configuration d’un nœud
+	GetNodeConfig(context.Context, *GetNodeRequest) (*NodeConfigResponse, error)
+	// Redémarrage orchestré via Temporal
+	RestartNode(context.Context, *NodeID) (*emptypb.Empty, error)
+	// Mise à jour de l’agent logiciel
+	UpdateAgent(context.Context, *NodeID) (*emptypb.Empty, error)
+	// Déploiement (config, version, etc.)
+	DeployNode(context.Context, *NodeID) (*emptypb.Empty, error)
 	mustEmbedUnimplementedNodeServiceServer()
 }
 
@@ -394,26 +376,23 @@ func (UnimplementedNodeServiceServer) UnblacklistNode(context.Context, *NodeID) 
 func (UnimplementedNodeServiceServer) SearchNodes(context.Context, *SearchRequest) (*SearchResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SearchNodes not implemented")
 }
-func (UnimplementedNodeServiceServer) GetNodeConfig(context.Context, *GetNodeConfigRequest) (*GetNodeConfigResponse, error) {
+func (UnimplementedNodeServiceServer) UpdateNodeConfig(context.Context, *UpdateNodeConfigRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateNodeConfig not implemented")
+}
+func (UnimplementedNodeServiceServer) DeleteNodeConfig(context.Context, *NodeID) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteNodeConfig not implemented")
+}
+func (UnimplementedNodeServiceServer) GetNodeConfig(context.Context, *GetNodeRequest) (*NodeConfigResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetNodeConfig not implemented")
 }
-func (UnimplementedNodeServiceServer) StreamCommands(grpc.BidiStreamingServer[CommandRequest, Command]) error {
-	return status.Errorf(codes.Unimplemented, "method StreamCommands not implemented")
+func (UnimplementedNodeServiceServer) RestartNode(context.Context, *NodeID) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RestartNode not implemented")
 }
-func (UnimplementedNodeServiceServer) ReportCommandResult(context.Context, *CommandResultRequest) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ReportCommandResult not implemented")
+func (UnimplementedNodeServiceServer) UpdateAgent(context.Context, *NodeID) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateAgent not implemented")
 }
-func (UnimplementedNodeServiceServer) ReportNodeError(context.Context, *NodeErrorRequest) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ReportNodeError not implemented")
-}
-func (UnimplementedNodeServiceServer) GetNodeStatusHistory(context.Context, *GetNodeRequest) (*StatusHistoryResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetNodeStatusHistory not implemented")
-}
-func (UnimplementedNodeServiceServer) AnnotateNode(context.Context, *AnnotateNodeRequest) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AnnotateNode not implemented")
-}
-func (UnimplementedNodeServiceServer) TriggerNodeAction(context.Context, *NodeActionRequest) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method TriggerNodeAction not implemented")
+func (UnimplementedNodeServiceServer) DeployNode(context.Context, *NodeID) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeployNode not implemented")
 }
 func (UnimplementedNodeServiceServer) mustEmbedUnimplementedNodeServiceServer() {}
 func (UnimplementedNodeServiceServer) testEmbeddedByValue()                     {}
@@ -670,8 +649,44 @@ func _NodeService_SearchNodes_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _NodeService_UpdateNodeConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateNodeConfigRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NodeServiceServer).UpdateNodeConfig(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NodeService_UpdateNodeConfig_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NodeServiceServer).UpdateNodeConfig(ctx, req.(*UpdateNodeConfigRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _NodeService_DeleteNodeConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(NodeID)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NodeServiceServer).DeleteNodeConfig(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NodeService_DeleteNodeConfig_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NodeServiceServer).DeleteNodeConfig(ctx, req.(*NodeID))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _NodeService_GetNodeConfig_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetNodeConfigRequest)
+	in := new(GetNodeRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -683,104 +698,61 @@ func _NodeService_GetNodeConfig_Handler(srv interface{}, ctx context.Context, de
 		FullMethod: NodeService_GetNodeConfig_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(NodeServiceServer).GetNodeConfig(ctx, req.(*GetNodeConfigRequest))
+		return srv.(NodeServiceServer).GetNodeConfig(ctx, req.(*GetNodeRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _NodeService_StreamCommands_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(NodeServiceServer).StreamCommands(&grpc.GenericServerStream[CommandRequest, Command]{ServerStream: stream})
-}
-
-// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type NodeService_StreamCommandsServer = grpc.BidiStreamingServer[CommandRequest, Command]
-
-func _NodeService_ReportCommandResult_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CommandResultRequest)
+func _NodeService_RestartNode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(NodeID)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(NodeServiceServer).ReportCommandResult(ctx, in)
+		return srv.(NodeServiceServer).RestartNode(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: NodeService_ReportCommandResult_FullMethodName,
+		FullMethod: NodeService_RestartNode_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(NodeServiceServer).ReportCommandResult(ctx, req.(*CommandResultRequest))
+		return srv.(NodeServiceServer).RestartNode(ctx, req.(*NodeID))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _NodeService_ReportNodeError_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(NodeErrorRequest)
+func _NodeService_UpdateAgent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(NodeID)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(NodeServiceServer).ReportNodeError(ctx, in)
+		return srv.(NodeServiceServer).UpdateAgent(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: NodeService_ReportNodeError_FullMethodName,
+		FullMethod: NodeService_UpdateAgent_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(NodeServiceServer).ReportNodeError(ctx, req.(*NodeErrorRequest))
+		return srv.(NodeServiceServer).UpdateAgent(ctx, req.(*NodeID))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _NodeService_GetNodeStatusHistory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetNodeRequest)
+func _NodeService_DeployNode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(NodeID)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(NodeServiceServer).GetNodeStatusHistory(ctx, in)
+		return srv.(NodeServiceServer).DeployNode(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: NodeService_GetNodeStatusHistory_FullMethodName,
+		FullMethod: NodeService_DeployNode_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(NodeServiceServer).GetNodeStatusHistory(ctx, req.(*GetNodeRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _NodeService_AnnotateNode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AnnotateNodeRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(NodeServiceServer).AnnotateNode(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: NodeService_AnnotateNode_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(NodeServiceServer).AnnotateNode(ctx, req.(*AnnotateNodeRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _NodeService_TriggerNodeAction_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(NodeActionRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(NodeServiceServer).TriggerNodeAction(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: NodeService_TriggerNodeAction_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(NodeServiceServer).TriggerNodeAction(ctx, req.(*NodeActionRequest))
+		return srv.(NodeServiceServer).DeployNode(ctx, req.(*NodeID))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -845,37 +817,30 @@ var NodeService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _NodeService_SearchNodes_Handler,
 		},
 		{
+			MethodName: "UpdateNodeConfig",
+			Handler:    _NodeService_UpdateNodeConfig_Handler,
+		},
+		{
+			MethodName: "DeleteNodeConfig",
+			Handler:    _NodeService_DeleteNodeConfig_Handler,
+		},
+		{
 			MethodName: "GetNodeConfig",
 			Handler:    _NodeService_GetNodeConfig_Handler,
 		},
 		{
-			MethodName: "ReportCommandResult",
-			Handler:    _NodeService_ReportCommandResult_Handler,
+			MethodName: "RestartNode",
+			Handler:    _NodeService_RestartNode_Handler,
 		},
 		{
-			MethodName: "ReportNodeError",
-			Handler:    _NodeService_ReportNodeError_Handler,
+			MethodName: "UpdateAgent",
+			Handler:    _NodeService_UpdateAgent_Handler,
 		},
 		{
-			MethodName: "GetNodeStatusHistory",
-			Handler:    _NodeService_GetNodeStatusHistory_Handler,
-		},
-		{
-			MethodName: "AnnotateNode",
-			Handler:    _NodeService_AnnotateNode_Handler,
-		},
-		{
-			MethodName: "TriggerNodeAction",
-			Handler:    _NodeService_TriggerNodeAction_Handler,
+			MethodName: "DeployNode",
+			Handler:    _NodeService_DeployNode_Handler,
 		},
 	},
-	Streams: []grpc.StreamDesc{
-		{
-			StreamName:    "StreamCommands",
-			Handler:       _NodeService_StreamCommands_Handler,
-			ServerStreams: true,
-			ClientStreams: true,
-		},
-	},
+	Streams:  []grpc.StreamDesc{},
 	Metadata: "node.proto",
 }

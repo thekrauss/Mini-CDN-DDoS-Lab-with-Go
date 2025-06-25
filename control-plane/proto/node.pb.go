@@ -1434,7 +1434,7 @@ func (x *ListNodesResponse) GetNodes() []*Node {
 type CountActiveNodesRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	TenantId      string                 `protobuf:"bytes,1,opt,name=tenant_id,json=tenantId,proto3" json:"tenant_id,omitempty"`
-	SinceSeconds  int32                  `protobuf:"varint,2,opt,name=since_seconds,json=sinceSeconds,proto3" json:"since_seconds,omitempty"` // 3600 pour 1h
+	SinceSeconds  int32                  `protobuf:"varint,2,opt,name=since_seconds,json=sinceSeconds,proto3" json:"since_seconds,omitempty"` // 3600 = dernière heure
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1527,31 +1527,31 @@ func (x *CountActiveNodesResponse) GetCount() int32 {
 	return 0
 }
 
-// Requête pour reporter une erreur système côté nœud
-type NodeErrorRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	NodeId        string                 `protobuf:"bytes,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`                   // ID du nœud qui a rencontré l’erreur
-	ErrorMessage  string                 `protobuf:"bytes,2,opt,name=error_message,json=errorMessage,proto3" json:"error_message,omitempty"` // Description de l’erreur
-	ErrorType     string                 `protobuf:"bytes,3,opt,name=error_type,json=errorType,proto3" json:"error_type,omitempty"`          // Type (network, cpu, disk, etc.)
-	OccurredAt    string                 `protobuf:"bytes,4,opt,name=occurred_at,json=occurredAt,proto3" json:"occurred_at,omitempty"`       // Timestamp au format RFC3339
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+type UpdateNodeConfigRequest struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	NodeId          string                 `protobuf:"bytes,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
+	PingInterval    int32                  `protobuf:"varint,2,opt,name=ping_interval,json=pingInterval,proto3" json:"ping_interval,omitempty"`
+	MetricsInterval int32                  `protobuf:"varint,3,opt,name=metrics_interval,json=metricsInterval,proto3" json:"metrics_interval,omitempty"`
+	DynamicConfig   bool                   `protobuf:"varint,4,opt,name=dynamic_config,json=dynamicConfig,proto3" json:"dynamic_config,omitempty"`
+	CustomLabels    map[string]string      `protobuf:"bytes,5,rep,name=custom_labels,json=customLabels,proto3" json:"custom_labels,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
-func (x *NodeErrorRequest) Reset() {
-	*x = NodeErrorRequest{}
+func (x *UpdateNodeConfigRequest) Reset() {
+	*x = UpdateNodeConfigRequest{}
 	mi := &file_node_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *NodeErrorRequest) String() string {
+func (x *UpdateNodeConfigRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*NodeErrorRequest) ProtoMessage() {}
+func (*UpdateNodeConfigRequest) ProtoMessage() {}
 
-func (x *NodeErrorRequest) ProtoReflect() protoreflect.Message {
+func (x *UpdateNodeConfigRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_node_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1563,212 +1563,60 @@ func (x *NodeErrorRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use NodeErrorRequest.ProtoReflect.Descriptor instead.
-func (*NodeErrorRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use UpdateNodeConfigRequest.ProtoReflect.Descriptor instead.
+func (*UpdateNodeConfigRequest) Descriptor() ([]byte, []int) {
 	return file_node_proto_rawDescGZIP(), []int{23}
 }
 
-func (x *NodeErrorRequest) GetNodeId() string {
+func (x *UpdateNodeConfigRequest) GetNodeId() string {
 	if x != nil {
 		return x.NodeId
 	}
 	return ""
 }
 
-func (x *NodeErrorRequest) GetErrorMessage() string {
+func (x *UpdateNodeConfigRequest) GetPingInterval() int32 {
 	if x != nil {
-		return x.ErrorMessage
+		return x.PingInterval
 	}
-	return ""
+	return 0
 }
 
-func (x *NodeErrorRequest) GetErrorType() string {
+func (x *UpdateNodeConfigRequest) GetMetricsInterval() int32 {
 	if x != nil {
-		return x.ErrorType
+		return x.MetricsInterval
 	}
-	return ""
+	return 0
 }
 
-func (x *NodeErrorRequest) GetOccurredAt() string {
+func (x *UpdateNodeConfigRequest) GetDynamicConfig() bool {
 	if x != nil {
-		return x.OccurredAt
+		return x.DynamicConfig
 	}
-	return ""
+	return false
 }
 
-// Requête pour déclencher une action sur un nœud
-type NodeActionRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	NodeId        string                 `protobuf:"bytes,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`                                                             // Nœud cible
-	ActionType    string                 `protobuf:"bytes,2,opt,name=action_type,json=actionType,proto3" json:"action_type,omitempty"`                                                 // Ex: restart, update, reload
-	Params        map[string]string      `protobuf:"bytes,3,rep,name=params,proto3" json:"params,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"` // Paramètres de l’action
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *NodeActionRequest) Reset() {
-	*x = NodeActionRequest{}
-	mi := &file_node_proto_msgTypes[24]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *NodeActionRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*NodeActionRequest) ProtoMessage() {}
-
-func (x *NodeActionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_node_proto_msgTypes[24]
+func (x *UpdateNodeConfigRequest) GetCustomLabels() map[string]string {
 	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use NodeActionRequest.ProtoReflect.Descriptor instead.
-func (*NodeActionRequest) Descriptor() ([]byte, []int) {
-	return file_node_proto_rawDescGZIP(), []int{24}
-}
-
-func (x *NodeActionRequest) GetNodeId() string {
-	if x != nil {
-		return x.NodeId
-	}
-	return ""
-}
-
-func (x *NodeActionRequest) GetActionType() string {
-	if x != nil {
-		return x.ActionType
-	}
-	return ""
-}
-
-func (x *NodeActionRequest) GetParams() map[string]string {
-	if x != nil {
-		return x.Params
+		return x.CustomLabels
 	}
 	return nil
 }
 
-// Réponse contenant l’historique des statuts d’un nœud
-type StatusHistoryResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Entries       []*NodeStatusEntry     `protobuf:"bytes,1,rep,name=entries,proto3" json:"entries,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *StatusHistoryResponse) Reset() {
-	*x = StatusHistoryResponse{}
-	mi := &file_node_proto_msgTypes[25]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *StatusHistoryResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*StatusHistoryResponse) ProtoMessage() {}
-
-func (x *StatusHistoryResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_node_proto_msgTypes[25]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use StatusHistoryResponse.ProtoReflect.Descriptor instead.
-func (*StatusHistoryResponse) Descriptor() ([]byte, []int) {
-	return file_node_proto_rawDescGZIP(), []int{25}
-}
-
-func (x *StatusHistoryResponse) GetEntries() []*NodeStatusEntry {
-	if x != nil {
-		return x.Entries
-	}
-	return nil
-}
-
-type NodeStatusEntry struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Status        string                 `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`       // online, degraded, offline
-	Timestamp     string                 `protobuf:"bytes,2,opt,name=timestamp,proto3" json:"timestamp,omitempty"` // RFC3339
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *NodeStatusEntry) Reset() {
-	*x = NodeStatusEntry{}
-	mi := &file_node_proto_msgTypes[26]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *NodeStatusEntry) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*NodeStatusEntry) ProtoMessage() {}
-
-func (x *NodeStatusEntry) ProtoReflect() protoreflect.Message {
-	mi := &file_node_proto_msgTypes[26]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use NodeStatusEntry.ProtoReflect.Descriptor instead.
-func (*NodeStatusEntry) Descriptor() ([]byte, []int) {
-	return file_node_proto_rawDescGZIP(), []int{26}
-}
-
-func (x *NodeStatusEntry) GetStatus() string {
-	if x != nil {
-		return x.Status
-	}
-	return ""
-}
-
-func (x *NodeStatusEntry) GetTimestamp() string {
-	if x != nil {
-		return x.Timestamp
-	}
-	return ""
-}
-
-// Réponse contenant la configuration du nœud (par ex. limites, intervalle de ping, etc.)
 type NodeConfigResponse struct {
-	state               protoimpl.MessageState `protogen:"open.v1"`
-	NodeId              string                 `protobuf:"bytes,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
-	PingIntervalSeconds int32                  `protobuf:"varint,2,opt,name=ping_interval_seconds,json=pingIntervalSeconds,proto3" json:"ping_interval_seconds,omitempty"`
-	MaxCpu              float32                `protobuf:"fixed32,3,opt,name=max_cpu,json=maxCpu,proto3" json:"max_cpu,omitempty"`
-	MaxMemory           float32                `protobuf:"fixed32,4,opt,name=max_memory,json=maxMemory,proto3" json:"max_memory,omitempty"`
-	Custom              map[string]string      `protobuf:"bytes,5,rep,name=custom,proto3" json:"custom,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"` // configuration personnalisée
-	unknownFields       protoimpl.UnknownFields
-	sizeCache           protoimpl.SizeCache
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	NodeId          string                 `protobuf:"bytes,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
+	PingInterval    int32                  `protobuf:"varint,2,opt,name=ping_interval,json=pingInterval,proto3" json:"ping_interval,omitempty"`
+	MetricsInterval int32                  `protobuf:"varint,3,opt,name=metrics_interval,json=metricsInterval,proto3" json:"metrics_interval,omitempty"`
+	DynamicConfig   bool                   `protobuf:"varint,4,opt,name=dynamic_config,json=dynamicConfig,proto3" json:"dynamic_config,omitempty"`
+	CustomLabels    map[string]string      `protobuf:"bytes,5,rep,name=custom_labels,json=customLabels,proto3" json:"custom_labels,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *NodeConfigResponse) Reset() {
 	*x = NodeConfigResponse{}
-	mi := &file_node_proto_msgTypes[27]
+	mi := &file_node_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1780,7 +1628,7 @@ func (x *NodeConfigResponse) String() string {
 func (*NodeConfigResponse) ProtoMessage() {}
 
 func (x *NodeConfigResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_node_proto_msgTypes[27]
+	mi := &file_node_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1793,7 +1641,7 @@ func (x *NodeConfigResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NodeConfigResponse.ProtoReflect.Descriptor instead.
 func (*NodeConfigResponse) Descriptor() ([]byte, []int) {
-	return file_node_proto_rawDescGZIP(), []int{27}
+	return file_node_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *NodeConfigResponse) GetNodeId() string {
@@ -1803,201 +1651,28 @@ func (x *NodeConfigResponse) GetNodeId() string {
 	return ""
 }
 
-func (x *NodeConfigResponse) GetPingIntervalSeconds() int32 {
-	if x != nil {
-		return x.PingIntervalSeconds
-	}
-	return 0
-}
-
-func (x *NodeConfigResponse) GetMaxCpu() float32 {
-	if x != nil {
-		return x.MaxCpu
-	}
-	return 0
-}
-
-func (x *NodeConfigResponse) GetMaxMemory() float32 {
-	if x != nil {
-		return x.MaxMemory
-	}
-	return 0
-}
-
-func (x *NodeConfigResponse) GetCustom() map[string]string {
-	if x != nil {
-		return x.Custom
-	}
-	return nil
-}
-
-// Requête pour annoter un nœud avec des métadonnées libres
-type AnnotateNodeRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	NodeId        string                 `protobuf:"bytes,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
-	Annotations   map[string]string      `protobuf:"bytes,2,rep,name=annotations,proto3" json:"annotations,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"` // Ex: {"datacenter": "eu-west-1", "rack": "R12"}
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *AnnotateNodeRequest) Reset() {
-	*x = AnnotateNodeRequest{}
-	mi := &file_node_proto_msgTypes[28]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *AnnotateNodeRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*AnnotateNodeRequest) ProtoMessage() {}
-
-func (x *AnnotateNodeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_node_proto_msgTypes[28]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use AnnotateNodeRequest.ProtoReflect.Descriptor instead.
-func (*AnnotateNodeRequest) Descriptor() ([]byte, []int) {
-	return file_node_proto_rawDescGZIP(), []int{28}
-}
-
-func (x *AnnotateNodeRequest) GetNodeId() string {
-	if x != nil {
-		return x.NodeId
-	}
-	return ""
-}
-
-func (x *AnnotateNodeRequest) GetAnnotations() map[string]string {
-	if x != nil {
-		return x.Annotations
-	}
-	return nil
-}
-
-type GetNodeConfigRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	NodeId        string                 `protobuf:"bytes,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetNodeConfigRequest) Reset() {
-	*x = GetNodeConfigRequest{}
-	mi := &file_node_proto_msgTypes[29]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetNodeConfigRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetNodeConfigRequest) ProtoMessage() {}
-
-func (x *GetNodeConfigRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_node_proto_msgTypes[29]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetNodeConfigRequest.ProtoReflect.Descriptor instead.
-func (*GetNodeConfigRequest) Descriptor() ([]byte, []int) {
-	return file_node_proto_rawDescGZIP(), []int{29}
-}
-
-func (x *GetNodeConfigRequest) GetNodeId() string {
-	if x != nil {
-		return x.NodeId
-	}
-	return ""
-}
-
-type GetNodeConfigResponse struct {
-	state                protoimpl.MessageState `protogen:"open.v1"`
-	NodeId               string                 `protobuf:"bytes,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
-	PingInterval         int32                  `protobuf:"varint,2,opt,name=ping_interval,json=pingInterval,proto3" json:"ping_interval,omitempty"`
-	MetricsInterval      int32                  `protobuf:"varint,3,opt,name=metrics_interval,json=metricsInterval,proto3" json:"metrics_interval,omitempty"`
-	DynamicConfigEnabled bool                   `protobuf:"varint,4,opt,name=dynamic_config_enabled,json=dynamicConfigEnabled,proto3" json:"dynamic_config_enabled,omitempty"`
-	CustomLabels         map[string]string      `protobuf:"bytes,5,rep,name=custom_labels,json=customLabels,proto3" json:"custom_labels,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	unknownFields        protoimpl.UnknownFields
-	sizeCache            protoimpl.SizeCache
-}
-
-func (x *GetNodeConfigResponse) Reset() {
-	*x = GetNodeConfigResponse{}
-	mi := &file_node_proto_msgTypes[30]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetNodeConfigResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetNodeConfigResponse) ProtoMessage() {}
-
-func (x *GetNodeConfigResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_node_proto_msgTypes[30]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetNodeConfigResponse.ProtoReflect.Descriptor instead.
-func (*GetNodeConfigResponse) Descriptor() ([]byte, []int) {
-	return file_node_proto_rawDescGZIP(), []int{30}
-}
-
-func (x *GetNodeConfigResponse) GetNodeId() string {
-	if x != nil {
-		return x.NodeId
-	}
-	return ""
-}
-
-func (x *GetNodeConfigResponse) GetPingInterval() int32 {
+func (x *NodeConfigResponse) GetPingInterval() int32 {
 	if x != nil {
 		return x.PingInterval
 	}
 	return 0
 }
 
-func (x *GetNodeConfigResponse) GetMetricsInterval() int32 {
+func (x *NodeConfigResponse) GetMetricsInterval() int32 {
 	if x != nil {
 		return x.MetricsInterval
 	}
 	return 0
 }
 
-func (x *GetNodeConfigResponse) GetDynamicConfigEnabled() bool {
+func (x *NodeConfigResponse) GetDynamicConfig() bool {
 	if x != nil {
-		return x.DynamicConfigEnabled
+		return x.DynamicConfig
 	}
 	return false
 }
 
-func (x *GetNodeConfigResponse) GetCustomLabels() map[string]string {
+func (x *NodeConfigResponse) GetCustomLabels() map[string]string {
 	if x != nil {
 		return x.CustomLabels
 	}
@@ -2126,51 +1801,22 @@ const file_node_proto_rawDesc = "" +
 	"\ttenant_id\x18\x01 \x01(\tR\btenantId\x12#\n" +
 	"\rsince_seconds\x18\x02 \x01(\x05R\fsinceSeconds\"0\n" +
 	"\x18CountActiveNodesResponse\x12\x14\n" +
-	"\x05count\x18\x01 \x01(\x05R\x05count\"\x90\x01\n" +
-	"\x10NodeErrorRequest\x12\x17\n" +
-	"\anode_id\x18\x01 \x01(\tR\x06nodeId\x12#\n" +
-	"\rerror_message\x18\x02 \x01(\tR\ferrorMessage\x12\x1d\n" +
-	"\n" +
-	"error_type\x18\x03 \x01(\tR\terrorType\x12\x1f\n" +
-	"\voccurred_at\x18\x04 \x01(\tR\n" +
-	"occurredAt\"\xc7\x01\n" +
-	"\x11NodeActionRequest\x12\x17\n" +
-	"\anode_id\x18\x01 \x01(\tR\x06nodeId\x12\x1f\n" +
-	"\vaction_type\x18\x02 \x01(\tR\n" +
-	"actionType\x12=\n" +
-	"\x06params\x18\x03 \x03(\v2%.nodepb.NodeActionRequest.ParamsEntryR\x06params\x1a9\n" +
-	"\vParamsEntry\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"J\n" +
-	"\x15StatusHistoryResponse\x121\n" +
-	"\aentries\x18\x01 \x03(\v2\x17.nodepb.NodeStatusEntryR\aentries\"G\n" +
-	"\x0fNodeStatusEntry\x12\x16\n" +
-	"\x06status\x18\x01 \x01(\tR\x06status\x12\x1c\n" +
-	"\ttimestamp\x18\x02 \x01(\tR\ttimestamp\"\x94\x02\n" +
-	"\x12NodeConfigResponse\x12\x17\n" +
-	"\anode_id\x18\x01 \x01(\tR\x06nodeId\x122\n" +
-	"\x15ping_interval_seconds\x18\x02 \x01(\x05R\x13pingIntervalSeconds\x12\x17\n" +
-	"\amax_cpu\x18\x03 \x01(\x02R\x06maxCpu\x12\x1d\n" +
-	"\n" +
-	"max_memory\x18\x04 \x01(\x02R\tmaxMemory\x12>\n" +
-	"\x06custom\x18\x05 \x03(\v2&.nodepb.NodeConfigResponse.CustomEntryR\x06custom\x1a9\n" +
-	"\vCustomEntry\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xbe\x01\n" +
-	"\x13AnnotateNodeRequest\x12\x17\n" +
-	"\anode_id\x18\x01 \x01(\tR\x06nodeId\x12N\n" +
-	"\vannotations\x18\x02 \x03(\v2,.nodepb.AnnotateNodeRequest.AnnotationsEntryR\vannotations\x1a>\n" +
-	"\x10AnnotationsEntry\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"/\n" +
-	"\x14GetNodeConfigRequest\x12\x17\n" +
-	"\anode_id\x18\x01 \x01(\tR\x06nodeId\"\xcd\x02\n" +
-	"\x15GetNodeConfigResponse\x12\x17\n" +
+	"\x05count\x18\x01 \x01(\x05R\x05count\"\xc2\x02\n" +
+	"\x17UpdateNodeConfigRequest\x12\x17\n" +
 	"\anode_id\x18\x01 \x01(\tR\x06nodeId\x12#\n" +
 	"\rping_interval\x18\x02 \x01(\x05R\fpingInterval\x12)\n" +
-	"\x10metrics_interval\x18\x03 \x01(\x05R\x0fmetricsInterval\x124\n" +
-	"\x16dynamic_config_enabled\x18\x04 \x01(\bR\x14dynamicConfigEnabled\x12T\n" +
-	"\rcustom_labels\x18\x05 \x03(\v2/.nodepb.GetNodeConfigResponse.CustomLabelsEntryR\fcustomLabels\x1a?\n" +
+	"\x10metrics_interval\x18\x03 \x01(\x05R\x0fmetricsInterval\x12%\n" +
+	"\x0edynamic_config\x18\x04 \x01(\bR\rdynamicConfig\x12V\n" +
+	"\rcustom_labels\x18\x05 \x03(\v21.nodepb.UpdateNodeConfigRequest.CustomLabelsEntryR\fcustomLabels\x1a?\n" +
+	"\x11CustomLabelsEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\xb8\x02\n" +
+	"\x12NodeConfigResponse\x12\x17\n" +
+	"\anode_id\x18\x01 \x01(\tR\x06nodeId\x12#\n" +
+	"\rping_interval\x18\x02 \x01(\x05R\fpingInterval\x12)\n" +
+	"\x10metrics_interval\x18\x03 \x01(\x05R\x0fmetricsInterval\x12%\n" +
+	"\x0edynamic_config\x18\x04 \x01(\bR\rdynamicConfig\x12Q\n" +
+	"\rcustom_labels\x18\x05 \x03(\v2,.nodepb.NodeConfigResponse.CustomLabelsEntryR\fcustomLabels\x1a?\n" +
 	"\x11CustomLabelsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01*_\n" +
@@ -2179,7 +1825,7 @@ const file_node_proto_rawDesc = "" +
 	"\x17NODE_STATUS_UNSPECIFIED\x10\x00\x12\x0f\n" +
 	"\vNODE_ONLINE\x10\x01\x12\x10\n" +
 	"\fNODE_OFFLINE\x10\x02\x12\x11\n" +
-	"\rNODE_DEGRADED\x10\x032\xb3\x0f\n" +
+	"\rNODE_DEGRADED\x10\x032\xf1\r\n" +
 	"\vNodeService\x12_\n" +
 	"\fRegisterNode\x12\x17.nodepb.RegisterRequest\x1a\x18.nodepb.RegisterResponse\"\x1c\x82\xd3\xe4\x93\x02\x16:\x01*\"\x11/v1/register-node\x12F\n" +
 	"\x04Ping\x12\x13.nodepb.PingRequest\x1a\x14.nodepb.PingResponse\"\x13\x82\xd3\xe4\x93\x02\r:\x01*\"\b/v1/ping\x12O\n" +
@@ -2194,14 +1840,14 @@ const file_node_proto_rawDesc = "" +
 	"\x14ListBlacklistedNodes\x12\x18.nodepb.ListNodesRequest\x1a\x19.nodepb.ListNodesResponse\"\x1d\x82\xd3\xe4\x93\x02\x17\x12\x15/v1/nodes/blacklisted\x12^\n" +
 	"\rBlacklistNode\x12\x0e.nodepb.NodeID\x1a\x16.google.protobuf.Empty\"%\x82\xd3\xe4\x93\x02\x1f\"\x1d/v1/nodes/{node_id}/blacklist\x12b\n" +
 	"\x0fUnblacklistNode\x12\x0e.nodepb.NodeID\x1a\x16.google.protobuf.Empty\"'\x82\xd3\xe4\x93\x02!\"\x1f/v1/nodes/{node_id}/unblacklist\x12V\n" +
-	"\vSearchNodes\x12\x15.nodepb.SearchRequest\x1a\x16.nodepb.SearchResponse\"\x18\x82\xd3\xe4\x93\x02\x12\x12\x10/v1/nodes/search\x12p\n" +
-	"\rGetNodeConfig\x12\x1c.nodepb.GetNodeConfigRequest\x1a\x1d.nodepb.GetNodeConfigResponse\"\"\x82\xd3\xe4\x93\x02\x1c\x12\x1a/v1/nodes/{node_id}/config\x12=\n" +
-	"\x0eStreamCommands\x12\x16.nodepb.CommandRequest\x1a\x0f.nodepb.Command(\x010\x01\x12K\n" +
-	"\x13ReportCommandResult\x12\x1c.nodepb.CommandResultRequest\x1a\x16.google.protobuf.Empty\x12j\n" +
-	"\x0fReportNodeError\x12\x18.nodepb.NodeErrorRequest\x1a\x16.google.protobuf.Empty\"%\x82\xd3\xe4\x93\x02\x1f:\x01*\"\x1a/v1/nodes/{node_id}/errors\x12y\n" +
-	"\x14GetNodeStatusHistory\x12\x16.nodepb.GetNodeRequest\x1a\x1d.nodepb.StatusHistoryResponse\"*\x82\xd3\xe4\x93\x02$\x12\"/v1/nodes/{node_id}/status-history\x12o\n" +
-	"\fAnnotateNode\x12\x1b.nodepb.AnnotateNodeRequest\x1a\x16.google.protobuf.Empty\"*\x82\xd3\xe4\x93\x02$:\x01*\"\x1f/v1/nodes/{node_id}/annotations\x12m\n" +
-	"\x11TriggerNodeAction\x12\x19.nodepb.NodeActionRequest\x1a\x16.google.protobuf.Empty\"%\x82\xd3\xe4\x93\x02\x1f:\x01*\"\x1a/v1/nodes/{node_id}/actionBDZBgithub.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/protob\x06proto3"
+	"\vSearchNodes\x12\x15.nodepb.SearchRequest\x1a\x16.nodepb.SearchResponse\"\x18\x82\xd3\xe4\x93\x02\x12\x12\x10/v1/nodes/search\x12r\n" +
+	"\x10UpdateNodeConfig\x12\x1f.nodepb.UpdateNodeConfigRequest\x1a\x16.google.protobuf.Empty\"%\x82\xd3\xe4\x93\x02\x1f:\x01*\x1a\x1a/v1/nodes/{node_id}/config\x12^\n" +
+	"\x10DeleteNodeConfig\x12\x0e.nodepb.NodeID\x1a\x16.google.protobuf.Empty\"\"\x82\xd3\xe4\x93\x02\x1c*\x1a/v1/nodes/{node_id}/config\x12g\n" +
+	"\rGetNodeConfig\x12\x16.nodepb.GetNodeRequest\x1a\x1a.nodepb.NodeConfigResponse\"\"\x82\xd3\xe4\x93\x02\x1c\x12\x1a/v1/nodes/{node_id}/config\x12Z\n" +
+	"\vRestartNode\x12\x0e.nodepb.NodeID\x1a\x16.google.protobuf.Empty\"#\x82\xd3\xe4\x93\x02\x1d\"\x1b/v1/nodes/{node_id}/restart\x12_\n" +
+	"\vUpdateAgent\x12\x0e.nodepb.NodeID\x1a\x16.google.protobuf.Empty\"(\x82\xd3\xe4\x93\x02\"\" /v1/nodes/{node_id}/update-agent\x12X\n" +
+	"\n" +
+	"DeployNode\x12\x0e.nodepb.NodeID\x1a\x16.google.protobuf.Empty\"\"\x82\xd3\xe4\x93\x02\x1c\"\x1a/v1/nodes/{node_id}/deployBDZBgithub.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/protob\x06proto3"
 
 var (
 	file_node_proto_rawDescOnce sync.Once
@@ -2216,7 +1862,7 @@ func file_node_proto_rawDescGZIP() []byte {
 }
 
 var file_node_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_node_proto_msgTypes = make([]protoimpl.MessageInfo, 36)
+var file_node_proto_msgTypes = make([]protoimpl.MessageInfo, 28)
 var file_node_proto_goTypes = []any{
 	(NodeStatus)(0),                  // 0: nodepb.NodeStatus
 	(*RegisterRequest)(nil),          // 1: nodepb.RegisterRequest
@@ -2242,78 +1888,63 @@ var file_node_proto_goTypes = []any{
 	(*ListNodesResponse)(nil),        // 21: nodepb.ListNodesResponse
 	(*CountActiveNodesRequest)(nil),  // 22: nodepb.CountActiveNodesRequest
 	(*CountActiveNodesResponse)(nil), // 23: nodepb.CountActiveNodesResponse
-	(*NodeErrorRequest)(nil),         // 24: nodepb.NodeErrorRequest
-	(*NodeActionRequest)(nil),        // 25: nodepb.NodeActionRequest
-	(*StatusHistoryResponse)(nil),    // 26: nodepb.StatusHistoryResponse
-	(*NodeStatusEntry)(nil),          // 27: nodepb.NodeStatusEntry
-	(*NodeConfigResponse)(nil),       // 28: nodepb.NodeConfigResponse
-	(*AnnotateNodeRequest)(nil),      // 29: nodepb.AnnotateNodeRequest
-	(*GetNodeConfigRequest)(nil),     // 30: nodepb.GetNodeConfigRequest
-	(*GetNodeConfigResponse)(nil),    // 31: nodepb.GetNodeConfigResponse
-	nil,                              // 32: nodepb.UpdateNodeRequest.TagsEntry
-	nil,                              // 33: nodepb.NodeActionRequest.ParamsEntry
-	nil,                              // 34: nodepb.NodeConfigResponse.CustomEntry
-	nil,                              // 35: nodepb.AnnotateNodeRequest.AnnotationsEntry
-	nil,                              // 36: nodepb.GetNodeConfigResponse.CustomLabelsEntry
-	(*emptypb.Empty)(nil),            // 37: google.protobuf.Empty
+	(*UpdateNodeConfigRequest)(nil),  // 24: nodepb.UpdateNodeConfigRequest
+	(*NodeConfigResponse)(nil),       // 25: nodepb.NodeConfigResponse
+	nil,                              // 26: nodepb.UpdateNodeRequest.TagsEntry
+	nil,                              // 27: nodepb.UpdateNodeConfigRequest.CustomLabelsEntry
+	nil,                              // 28: nodepb.NodeConfigResponse.CustomLabelsEntry
+	(*emptypb.Empty)(nil),            // 29: google.protobuf.Empty
 }
 var file_node_proto_depIdxs = []int32{
 	6,  // 0: nodepb.GetAuditLogsResponse.logs:type_name -> nodepb.AuditLogEntry
 	14, // 1: nodepb.NodeListResponse.nodes:type_name -> nodepb.Node
-	32, // 2: nodepb.UpdateNodeRequest.tags:type_name -> nodepb.UpdateNodeRequest.TagsEntry
+	26, // 2: nodepb.UpdateNodeRequest.tags:type_name -> nodepb.UpdateNodeRequest.TagsEntry
 	0,  // 3: nodepb.NodeStatusRequest.status:type_name -> nodepb.NodeStatus
 	14, // 4: nodepb.SearchResponse.nodes:type_name -> nodepb.Node
 	14, // 5: nodepb.ListNodesResponse.nodes:type_name -> nodepb.Node
-	33, // 6: nodepb.NodeActionRequest.params:type_name -> nodepb.NodeActionRequest.ParamsEntry
-	27, // 7: nodepb.StatusHistoryResponse.entries:type_name -> nodepb.NodeStatusEntry
-	34, // 8: nodepb.NodeConfigResponse.custom:type_name -> nodepb.NodeConfigResponse.CustomEntry
-	35, // 9: nodepb.AnnotateNodeRequest.annotations:type_name -> nodepb.AnnotateNodeRequest.AnnotationsEntry
-	36, // 10: nodepb.GetNodeConfigResponse.custom_labels:type_name -> nodepb.GetNodeConfigResponse.CustomLabelsEntry
-	1,  // 11: nodepb.NodeService.RegisterNode:input_type -> nodepb.RegisterRequest
-	3,  // 12: nodepb.NodeService.Ping:input_type -> nodepb.PingRequest
-	37, // 13: nodepb.NodeService.HealthCheck:input_type -> google.protobuf.Empty
-	5,  // 14: nodepb.NodeService.GetAuditLogs:input_type -> nodepb.GetAuditLogsRequest
-	8,  // 15: nodepb.NodeService.ListNodesByTenant:input_type -> nodepb.TenantRequest
-	10, // 16: nodepb.NodeService.UpdateNodeMetadata:input_type -> nodepb.UpdateNodeRequest
-	11, // 17: nodepb.NodeService.SetNodeStatus:input_type -> nodepb.NodeStatusRequest
-	12, // 18: nodepb.NodeService.GetNodeByID:input_type -> nodepb.GetNodeRequest
-	22, // 19: nodepb.NodeService.CountActiveNodes:input_type -> nodepb.CountActiveNodesRequest
-	20, // 20: nodepb.NodeService.ListBlacklistedNodes:input_type -> nodepb.ListNodesRequest
-	13, // 21: nodepb.NodeService.BlacklistNode:input_type -> nodepb.NodeID
-	13, // 22: nodepb.NodeService.UnblacklistNode:input_type -> nodepb.NodeID
-	18, // 23: nodepb.NodeService.SearchNodes:input_type -> nodepb.SearchRequest
-	30, // 24: nodepb.NodeService.GetNodeConfig:input_type -> nodepb.GetNodeConfigRequest
-	15, // 25: nodepb.NodeService.StreamCommands:input_type -> nodepb.CommandRequest
-	17, // 26: nodepb.NodeService.ReportCommandResult:input_type -> nodepb.CommandResultRequest
-	24, // 27: nodepb.NodeService.ReportNodeError:input_type -> nodepb.NodeErrorRequest
-	12, // 28: nodepb.NodeService.GetNodeStatusHistory:input_type -> nodepb.GetNodeRequest
-	29, // 29: nodepb.NodeService.AnnotateNode:input_type -> nodepb.AnnotateNodeRequest
-	25, // 30: nodepb.NodeService.TriggerNodeAction:input_type -> nodepb.NodeActionRequest
-	2,  // 31: nodepb.NodeService.RegisterNode:output_type -> nodepb.RegisterResponse
-	4,  // 32: nodepb.NodeService.Ping:output_type -> nodepb.PingResponse
-	4,  // 33: nodepb.NodeService.HealthCheck:output_type -> nodepb.PingResponse
-	7,  // 34: nodepb.NodeService.GetAuditLogs:output_type -> nodepb.GetAuditLogsResponse
-	9,  // 35: nodepb.NodeService.ListNodesByTenant:output_type -> nodepb.NodeListResponse
-	37, // 36: nodepb.NodeService.UpdateNodeMetadata:output_type -> google.protobuf.Empty
-	37, // 37: nodepb.NodeService.SetNodeStatus:output_type -> google.protobuf.Empty
-	14, // 38: nodepb.NodeService.GetNodeByID:output_type -> nodepb.Node
-	23, // 39: nodepb.NodeService.CountActiveNodes:output_type -> nodepb.CountActiveNodesResponse
-	21, // 40: nodepb.NodeService.ListBlacklistedNodes:output_type -> nodepb.ListNodesResponse
-	37, // 41: nodepb.NodeService.BlacklistNode:output_type -> google.protobuf.Empty
-	37, // 42: nodepb.NodeService.UnblacklistNode:output_type -> google.protobuf.Empty
-	19, // 43: nodepb.NodeService.SearchNodes:output_type -> nodepb.SearchResponse
-	31, // 44: nodepb.NodeService.GetNodeConfig:output_type -> nodepb.GetNodeConfigResponse
-	16, // 45: nodepb.NodeService.StreamCommands:output_type -> nodepb.Command
-	37, // 46: nodepb.NodeService.ReportCommandResult:output_type -> google.protobuf.Empty
-	37, // 47: nodepb.NodeService.ReportNodeError:output_type -> google.protobuf.Empty
-	26, // 48: nodepb.NodeService.GetNodeStatusHistory:output_type -> nodepb.StatusHistoryResponse
-	37, // 49: nodepb.NodeService.AnnotateNode:output_type -> google.protobuf.Empty
-	37, // 50: nodepb.NodeService.TriggerNodeAction:output_type -> google.protobuf.Empty
-	31, // [31:51] is the sub-list for method output_type
-	11, // [11:31] is the sub-list for method input_type
-	11, // [11:11] is the sub-list for extension type_name
-	11, // [11:11] is the sub-list for extension extendee
-	0,  // [0:11] is the sub-list for field type_name
+	27, // 6: nodepb.UpdateNodeConfigRequest.custom_labels:type_name -> nodepb.UpdateNodeConfigRequest.CustomLabelsEntry
+	28, // 7: nodepb.NodeConfigResponse.custom_labels:type_name -> nodepb.NodeConfigResponse.CustomLabelsEntry
+	1,  // 8: nodepb.NodeService.RegisterNode:input_type -> nodepb.RegisterRequest
+	3,  // 9: nodepb.NodeService.Ping:input_type -> nodepb.PingRequest
+	5,  // 10: nodepb.NodeService.GetAuditLogs:input_type -> nodepb.GetAuditLogsRequest
+	8,  // 11: nodepb.NodeService.ListNodesByTenant:input_type -> nodepb.TenantRequest
+	10, // 12: nodepb.NodeService.UpdateNodeMetadata:input_type -> nodepb.UpdateNodeRequest
+	11, // 13: nodepb.NodeService.SetNodeStatus:input_type -> nodepb.NodeStatusRequest
+	12, // 14: nodepb.NodeService.GetNodeByID:input_type -> nodepb.GetNodeRequest
+	22, // 15: nodepb.NodeService.CountActiveNodes:input_type -> nodepb.CountActiveNodesRequest
+	20, // 16: nodepb.NodeService.ListBlacklistedNodes:input_type -> nodepb.ListNodesRequest
+	13, // 17: nodepb.NodeService.BlacklistNode:input_type -> nodepb.NodeID
+	13, // 18: nodepb.NodeService.UnblacklistNode:input_type -> nodepb.NodeID
+	18, // 19: nodepb.NodeService.SearchNodes:input_type -> nodepb.SearchRequest
+	24, // 20: nodepb.NodeService.UpdateNodeConfig:input_type -> nodepb.UpdateNodeConfigRequest
+	13, // 21: nodepb.NodeService.DeleteNodeConfig:input_type -> nodepb.NodeID
+	12, // 22: nodepb.NodeService.GetNodeConfig:input_type -> nodepb.GetNodeRequest
+	13, // 23: nodepb.NodeService.RestartNode:input_type -> nodepb.NodeID
+	13, // 24: nodepb.NodeService.UpdateAgent:input_type -> nodepb.NodeID
+	13, // 25: nodepb.NodeService.DeployNode:input_type -> nodepb.NodeID
+	2,  // 26: nodepb.NodeService.RegisterNode:output_type -> nodepb.RegisterResponse
+	4,  // 27: nodepb.NodeService.Ping:output_type -> nodepb.PingResponse
+	7,  // 28: nodepb.NodeService.GetAuditLogs:output_type -> nodepb.GetAuditLogsResponse
+	9,  // 29: nodepb.NodeService.ListNodesByTenant:output_type -> nodepb.NodeListResponse
+	29, // 30: nodepb.NodeService.UpdateNodeMetadata:output_type -> google.protobuf.Empty
+	29, // 31: nodepb.NodeService.SetNodeStatus:output_type -> google.protobuf.Empty
+	14, // 32: nodepb.NodeService.GetNodeByID:output_type -> nodepb.Node
+	23, // 33: nodepb.NodeService.CountActiveNodes:output_type -> nodepb.CountActiveNodesResponse
+	21, // 34: nodepb.NodeService.ListBlacklistedNodes:output_type -> nodepb.ListNodesResponse
+	29, // 35: nodepb.NodeService.BlacklistNode:output_type -> google.protobuf.Empty
+	29, // 36: nodepb.NodeService.UnblacklistNode:output_type -> google.protobuf.Empty
+	19, // 37: nodepb.NodeService.SearchNodes:output_type -> nodepb.SearchResponse
+	29, // 38: nodepb.NodeService.UpdateNodeConfig:output_type -> google.protobuf.Empty
+	29, // 39: nodepb.NodeService.DeleteNodeConfig:output_type -> google.protobuf.Empty
+	25, // 40: nodepb.NodeService.GetNodeConfig:output_type -> nodepb.NodeConfigResponse
+	29, // 41: nodepb.NodeService.RestartNode:output_type -> google.protobuf.Empty
+	29, // 42: nodepb.NodeService.UpdateAgent:output_type -> google.protobuf.Empty
+	29, // 43: nodepb.NodeService.DeployNode:output_type -> google.protobuf.Empty
+	26, // [26:44] is the sub-list for method output_type
+	8,  // [8:26] is the sub-list for method input_type
+	8,  // [8:8] is the sub-list for extension type_name
+	8,  // [8:8] is the sub-list for extension extendee
+	0,  // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_node_proto_init() }
@@ -2328,7 +1959,7 @@ func file_node_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_node_proto_rawDesc), len(file_node_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   36,
+			NumMessages:   28,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

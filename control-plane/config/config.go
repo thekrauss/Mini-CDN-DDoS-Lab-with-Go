@@ -33,6 +33,7 @@ type Config struct {
 		RefreshTokenExpiry time.Duration `mapstructure:"refresh_token_expiry"`
 		Issuer             string        `mapstructure:"issuer"`
 	}
+
 	Database struct {
 		Host     string
 		Port     int
@@ -41,54 +42,72 @@ type Config struct {
 		Name     string
 		SSLMode  string
 	}
+
 	Redis struct {
 		Host     string
 		Port     int
 		Password string
 		DB       int
 	}
+
 	AuthService struct {
 		Host string
 		Port int
 	}
+
 	Metrics struct {
 		PrometheusEnabled bool `mapstructure:"prometheus_enabled"`
 		PrometheusPort    int  `mapstructure:"prometheus_port"`
 	}
+
 	Logging struct {
 		Level  string
 		Format string
 		File   string
 	}
+
 	Tenancy struct {
 		MultiTenant   bool
 		DefaultTenant string
 	}
+
 	Security struct {
 		MaxFailedAttempts int           `mapstructure:"max_failed_attempts"`
 		LockoutDuration   time.Duration `mapstructure:"lockout_duration"`
 		AllowedOrigins    []string      `mapstructure:"allowed_origins"`
 	}
+
 	Tracking struct {
 		EnableIPLogging        bool `mapstructure:"enable_ip_logging"`
 		EnableUserAgentLogging bool `mapstructure:"enable_user_agent_logging"`
 	}
-	RolesA      []string `mapstructure:"roles_a"`
-	RolesB      []string `mapstructure:"roles_b"`
+
+	RolesA []string `mapstructure:"roles_a"`
+	RolesB []string `mapstructure:"roles_b"`
+
 	GoogleCloud struct {
 		SecretManager struct {
 			GCloudKey string `mapstructure:"gcloud_key"`
 		} `mapstructure:"secret_manager"`
+		PubSub struct {
+			ProjectID        string `mapstructure:"project_id"`
+			TopicName        string `mapstructure:"topic_name"`
+			SubscriptionName string `mapstructure:"subscription_name"`
+		} `mapstructure:"pubsub"`
 	} `mapstructure:"google_cloud"`
+
 	AppPort              int  `mapstructure:"app_port"`
 	UseCloudSecrets      bool `mapstructure:"use_cloud_secrets"`
 	UseCloudSecretsForDB bool `mapstructure:"use_cloud_secrets_for_db"`
 	GCloudKeyPath        string
-	Email                struct {
+
+	Email struct {
 		SMTPHost     string `mapstructure:"smtp_host"`
 		SMTPPort     int    `mapstructure:"smtp_port"`
 		SMTPUser     string `mapstructure:"smtp_user"`
 		SMTPPassword string `mapstructure:"smtp_password"`
+		FromEmail    string `mapstructure:"from_email"`
+		FromName     string `mapstructure:"from_name"`
 	}
 
 	Firebase struct {
@@ -104,13 +123,13 @@ type Config struct {
 		MaxNodesPerTenant    int     `mapstructure:"max_nodes_per_tenant"`
 	}
 
-	Agent AgentConfig `mapstructure:"agent"`
-}
-
-type AgentConfig struct {
-	DefaultPingInterval    int  `mapstructure:"default_ping_interval"`
-	DefaultMetricsInterval int  `mapstructure:"default_metrics_interval"`
-	EnableDynamicConfig    bool `mapstructure:"enable_dynamic_config"`
+	Temporal struct {
+		Enabled    bool   `mapstructure:"enabled"`
+		Address    string `mapstructure:"address"`    // ex: "localhost:7233"
+		Namespace  string `mapstructure:"namespace"`  // ex: "cdn-platform"
+		TaskQueue  string `mapstructure:"task_queue"` // ex: "cdn-workflows"
+		LogHistory bool   `mapstructure:"log_history"`
+	}
 }
 
 var AppConfig Config

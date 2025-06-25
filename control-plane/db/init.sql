@@ -16,6 +16,14 @@ CREATE TABLE IF NOT EXISTS nodes (
     UNIQUE (hostname, tenant_id)
 );
 
+CREATE TABLE IF NOT EXISTS node_configs (
+    node_id UUID PRIMARY KEY REFERENCES nodes(id) ON DELETE CASCADE,
+    ping_interval INT DEFAULT 10,
+    metrics_interval INT DEFAULT 30,
+    dynamic_config BOOLEAN DEFAULT FALSE,
+    custom_labels JSONB DEFAULT '{}'::JSONB
+);
+
 
 -- Métriques collectées par agent
 CREATE TABLE IF NOT EXISTS node_metrics (

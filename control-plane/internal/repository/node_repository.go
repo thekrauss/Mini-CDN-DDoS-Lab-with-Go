@@ -7,22 +7,69 @@ import (
 	"github.com/google/uuid"
 )
 
+//
+// ─── STRUCTURES PRINCIPALES ─────────────────────────────────────────────────────
+//
+
 type Node struct {
 	ID              string    `json:"id"`
-	Name            string    `json:"name"`             //  (ex: "cdn-eu-west-1")
-	IP              string    `json:"ip"`               //  IP publique ou interne du nœud
-	TenantID        string    `json:"tenant_id"`        // ID du client propriétaire (multi-tenant)
-	Status          string    `json:"status"`           // statut du node (alive, unreachable, disabled)
-	LastSeen        time.Time `json:"last_seen"`        // date du dernier heartbeat reçu
-	CreatedAt       time.Time `json:"created_at"`       // date d'enregistrement du nœud
-	UpdatedAt       time.Time `json:"updated_at"`       // date de dernière mise à jour
-	Location        string    `json:"location"`         // (ex: "Paris", "eu-west-1")
-	Provider        string    `json:"provider"`         //  (aws, gcp, ovh, on-prem)
-	SoftwareVersion string    `json:"software_version"` // version de l'agent exécuté sur le nœud
-	IsBlacklisted   bool      `json:"is_blacklisted"`   //  si le nœud est temporairement désactivé (DDoS, infra)
-	Tags            []string  `json:"tags"`             // mots-clés libres pour filtrage, UI, regroupement logique
-	OS              string    `json:"os"`
+	Name            string    `json:"name"`             // Nom logique (ex: "cdn-eu-west-1")
+	IP              string    `json:"ip"`               // IP publique ou privée
+	TenantID        string    `json:"tenant_id"`        // Multi-tenant
+	Status          string    `json:"status"`           // online, offline, degraded
+	LastSeen        time.Time `json:"last_seen"`        // Dernier heartbeat
+	CreatedAt       time.Time `json:"created_at"`       // Date création
+	UpdatedAt       time.Time `json:"updated_at"`       // Dernière mise à jour
+	Location        string    `json:"location"`         // Ville ou zone (ex: Paris)
+	Provider        string    `json:"provider"`         // aws, ovh, gcp, etc.
+	SoftwareVersion string    `json:"software_version"` // Version de l'agent
+	IsBlacklisted   bool      `json:"is_blacklisted"`   // Exclu temporairement ?
+	Tags            []string  `json:"tags"`             // Pour UI, filtrage
+	OS              string    `json:"os"`               // OS du node
 }
+
+type NodeConfig struct {
+	NodeID          string            `json:"node_id"`          // identifiant du nœud
+	PingInterval    int               `json:"ping_interval"`    // fréquence des ping() en secondes
+	MetricsInterval int               `json:"metrics_interval"` // fréquence des sendMetrics() en secondes
+	DynamicConfig   bool              `json:"dynamic_config"`   // true si config récupérée dynamiquement
+	CustomLabels    map[string]string `json:"custom_labels"`    // paires clé/valeur pour tags ou méta
+}
+
+type NodeMetrics struct {
+	NodeID      string    `json:"node_id"`
+	TenantID    string    `json:"tenant_id"`
+	Timestamp   time.Time `json:"timestamp"`
+	CPU         float64   `json:"cpu"`
+	Memory      float64   `json:"memory"`
+	BandwidthRx int64     `json:"bandwidth_rx"`
+	BandwidthTx int64     `json:"bandwidth_tx"`
+	Connections int       `json:"connections"`
+	DiskIO      int64     `json:"disk_io"`
+	Uptime      int64     `json:"uptime"`
+	Status      string    `json:"status"`
+}
+
+type NodeStatus string
+
+const (
+	NodeOnline   NodeStatus = "online"
+	NodeOffline  NodeStatus = "offline"
+	NodeDegraded NodeStatus = "degraded"
+)
+
+type NodeFilter struct {
+	TenantID string
+	Query    string
+	Status   *NodeStatus
+	TagKey   string
+	TagValue string
+	IP       string
+}
+
+//
+// ─── UTILISATEUR (REDIS) ─────────────────────────────────────────────────────────
+//
 
 type UtilisateurRedis struct {
 	IDUtilisateur string
@@ -37,6 +84,10 @@ type UtilisateurRedis struct {
 	IsActive      bool
 	Status        string
 }
+
+//
+// ─── AUDIT ───────────────────────────────────────────────────────────────────────
+//
 
 type AuditLog struct {
 	ID        uuid.UUID
@@ -82,14 +133,6 @@ type NodeFilter struct {
 	IP       string
 }
 
-type NodeConfig struct {
-	NodeID          string
-	PingInterval    int  // secondes
-	MetricsInterval int  // secondes
-	DynamicConfig   bool // true si le mode dynamique est activé
-	CustomLabels    map[string]string
-}
-
 type NodeStatus string
 
 const (
@@ -99,32 +142,39 @@ const (
 )
 
 type NodeRepository interface {
-	// CRUD de base
+	// CRUD
 	CreateNode(ctx context.Context, node *Node) error
 	GetNodeByID(ctx context.Context, id string) (*Node, error)
 	UpdateHeartbeat(ctx context.Context, id string, seenAt time.Time) error
 	ListNodesByTenant(ctx context.Context, tenantID string) ([]*Node, error)
 	DeleteNode(ctx context.Context, id string) error
 
-	// Fonctions avancées
-	UpdateNodeMetadata(ctx context.Context, id string, name string, ip string, tags map[string]string) error //renommer, changer IP, ou tags
-	SearchNodes(ctx context.Context, filter NodeFilter) ([]*Node, error)                                     //filtres pour l’interface admin (status, IP, nom, tag…)
-	CountActiveNodes(ctx context.Context, tenantID string, since time.Duration) (int, error)                 //pour usage SaaS : quotas, stats
+	// Node Config
+	UpdateNodeConfig(ctx context.Context, node *NodeConfig) error
+	DeleteNodeConfig(ctx context.Context, nodeID string) error
+	GetNodeConfig(ctx context.Context, nodeID string) (*NodeConfig, error)
+
+	// Recherche / Filtrage
+	UpdateNodeMetadata(ctx context.Context, id string, name string, ip string, tags map[string]string) error
+	SearchNodes(ctx context.Context, filter NodeFilter) ([]*Node, error)
+	CountActiveNodes(ctx context.Context, tenantID string, since time.Duration) (int, error)
 
 	// Statut / Orchestration
-	SetNodeStatus(ctx context.Context, id string, status string) error //ajoute de statut online, degraded, offline
+	SetNodeStatus(ctx context.Context, id string, status string) error
 	SetNodeBlacklistStatus(ctx context.Context, nodeID string, isBlacklisted bool) error
 	ListBlacklistedNodes(ctx context.Context, tenantID string) ([]*Node, error)
+	GetInactiveNodes(ctx context.Context, olderThan time.Duration) ([]*Node, error)
+	MarkAllNodesOffline(ctx context.Context) error
 
-	GetInactiveNodes(ctx context.Context, olderThan time.Duration) ([]*Node, error) //détection automatique des nœuds morts
-	MarkAllNodesOffline(ctx context.Context) error                                  //Réinitialisation périodique
+	// Sécurité / Multi-tenant
+	IsIPAlreadyRegistered(ctx context.Context, ip string) (bool, error)
+	AssignToTenant(ctx context.Context, nodeID string, tenantID string) error
 
-	// Sécurité / Enregistrement
-	IsIPAlreadyRegistered(ctx context.Context, ip string) (bool, error)       // limite les enregistrements
-	AssignToTenant(ctx context.Context, nodeID string, tenantID string) error //migration d’un node à un client
-
+	// Audit / Logs
 	InsertAuditLog(ctx context.Context, log *AuditLog) error
 	GetAuditLogs(ctx context.Context, filter AuditLogFilter) ([]*AuditLog, int, error)
+
+	// Métriques
 	StoreNodeMetrics(ctx context.Context, metrics *NodeMetrics) error
 
 	GetNodeConfig(ctx context.Context, nodeID string) (*NodeConfig, error)

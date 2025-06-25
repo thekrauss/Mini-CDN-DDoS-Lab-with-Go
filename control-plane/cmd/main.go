@@ -14,6 +14,7 @@ import (
 	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/pkg/monitoring"
 	pkg "github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/pkg/redis"
 	pb "github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/proto"
+	"go.temporal.io/sdk/client"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/config"
@@ -69,6 +70,20 @@ func main() {
 		}()
 	}
 
+	// Initialisation client Temporal
+	var temporalClient client.Client
+	if cfg.Temporal.Enabled {
+		temporalClient, err = client.NewClient(client.Options{
+			HostPort:  cfg.Temporal.Address,
+			Namespace: cfg.Temporal.Namespace,
+		})
+		if err != nil {
+			log.Fatalf("Erreur connexion Temporal: %v", err)
+		}
+		log.Println("Client Temporal initialisé")
+		defer temporalClient.Close()
+	}
+
 	// gRPC
 	grpcAddr := cfg.Server.Host + ":" + strconv.Itoa(cfg.Server.GRPCPort)
 	lis, err := net.Listen("tcp", grpcAddr)
@@ -83,11 +98,12 @@ func main() {
 
 	hub := ws.NewHub()
 
-	grpcServer := newGRPCServer(cfg, authClient)
+	grpcServer := newGRPCServer(cfg)
 	nodeServer := &services.NodeService{
-		Store:      store,
-		AuthClient: authClient,
-		Hub:        hub,
+		Store:          store,
+		AuthClient:     authClient,
+		Hub:            hub,
+		TemporalClient: temporalClient,
 	}
 	pb.RegisterNodeServiceServer(grpcServer, nodeServer)
 
@@ -137,10 +153,11 @@ func main() {
 	waitForShutdown(grpcServer, gwServer)
 }
 
-func newGRPCServer(cfg *config.Config, authClient authpb.AuthServiceClient) *grpc.Server {
+func newGRPCServer(cfg *config.Config) *grpc.Server {
 	return grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
 			middleware.LoggingMiddleware(),
+			//middleware.CheckPermissionInterceptor(authClient),
 			middleware.AuthMiddleware(cfg),
 			middleware.RateLimitingMiddleware(),
 			middleware.TimeoutMiddleware(),
@@ -150,6 +167,9 @@ func newGRPCServer(cfg *config.Config, authClient authpb.AuthServiceClient) *grp
 		grpc.ChainStreamInterceptor(
 			middleware.CheckPermissionStreamInterceptor(authClient),
 		),
+		// grpc.ChainStreamInterceptor(
+		// 	middleware.CheckPermissionStreamInterceptor(authClient),
+		// ),
 		grpc.KeepaliveParams(keepalive.ServerParameters{
 			MaxConnectionIdle:     15 * time.Minute,
 			Timeout:               5 * time.Second,
