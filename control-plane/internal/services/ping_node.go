@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/internal/repository"
+	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/pkg/auth"
 	"github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/pkg/monitoring"
 	pkg "github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/pkg/redis"
 	pb "github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/control-plane/proto"
@@ -39,15 +40,15 @@ import (
 
 func (s *NodeService) Ping(ctx context.Context, req *pb.PingRequest) (*pb.PingResponse, error) {
 
-	// // authentification par contexte
-	// claims, err := auth.ExtractJWTFromContext(ctx)
-	// if err != nil {
-	// 	return nil, status.Errorf(codes.Unauthenticated, "Token invalide ou expiré")
-	// }
+	// authentification par contexte
+	claims, err := auth.ExtractJWTFromContext(ctx)
+	if err != nil {
+		return nil, status.Errorf(codes.Unauthenticated, "Token invalide ou expiré")
+	}
 
-	// if err := s.CheckAdminPermissions(ctx, claims, PermPingNode); err != nil {
-	// 	return nil, err
-	// }
+	if err := s.CheckAdminPermissions(ctx, claims, PermPingNode); err != nil {
+		return nil, err
+	}
 
 	monitoring.PingCounter.Inc()
 
