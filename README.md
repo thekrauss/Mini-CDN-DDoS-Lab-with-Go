@@ -1,6 +1,6 @@
 
 ```
-                        [ Interface Web (Next.js) ]
+                            [  Interface  ]
                                   |
                        REST (secure) via API Gateway
                                   |
