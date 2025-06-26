@@ -1,0 +1,254 @@
+syntax = "proto3";
+
+package kubepb;
+
+option go_package = "github.com/thekrauss/Mini-CDN-DDoS-Lab-with-Go/kube-manager/proto";
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+// ───────────────────────────────
+// SERVICE
+// ───────────────────────────────
+service KubeManagerService {
+
+  // Provisionner un cluster
+  rpc CreateCluster(CreateClusterRequest) returns (OperationResponse) {
+    option (google.api.http) = {
+      post: "/v1/clusters"
+      body: "*"
+    };
+  }
+
+  // Déployer une application (ex: Helm Chart)
+  rpc DeployApp(DeployAppRequest) returns (OperationResponse) {
+    option (google.api.http) = {
+      post: "/v1/clusters/{cluster_id}/apps"
+      body: "*"
+    };
+  }
+
+  // Ajouter un nœud au cluster
+  rpc ScaleCluster(ScaleClusterRequest) returns (OperationResponse) {
+    option (google.api.http) = {
+      post: "/v1/clusters/{cluster_id}/scale"
+      body: "*"
+    };
+  }
+
+  // Supprimer un cluster
+  rpc DeleteCluster(ClusterIDRequest) returns (OperationResponse) {
+    option (google.api.http) = {
+      delete: "/v1/clusters/{cluster_id}"
+    };
+  }
+
+  // Récupérer l'état d’un cluster
+  rpc GetClusterStatus(ClusterIDRequest) returns (ClusterStatusResponse) {
+    option (google.api.http) = {
+      get: "/v1/clusters/{cluster_id}/status"
+    };
+  }
+
+  // Lister les clusters par tenant
+  rpc ListClustersByTenant(TenantRequest) returns (ClusterListResponse) {
+    option (google.api.http) = {
+      get: "/v1/clusters"
+    };
+  }
+
+  // Logs ou historique
+  rpc GetClusterLogs(ClusterIDRequest) returns (ClusterLogResponse) {
+    option (google.api.http) = {
+      get: "/v1/clusters/{cluster_id}/logs"
+    };
+  }
+
+  // Redémarrage d'un nœud ou d'un composant
+  rpc RestartComponent(RestartComponentRequest) returns (OperationResponse) {
+    option (google.api.http) = {
+      post: "/v1/clusters/{cluster_id}/restart"
+      body: "*"
+    };
+  }
+
+    // Exporter une configuration kubeconfig ou helm values
+    rpc ExportClusterConfig(ClusterIDRequest) returns (ClusterConfigResponse) {
+    option (google.api.http) = {
+        get: "/v1/clusters/{cluster_id}/export"
+    };
+    }
+
+    // Appliquer une configuration cluster (kubeadm, etc.)
+    rpc ApplyClusterConfig(ApplyClusterConfigRequest) returns (OperationResponse) {
+        option (google.api.http) = {
+            post: "/v1/clusters/{cluster_id}/config"
+            body: "*"
+        };
+    }
+
+    rpc GetClusterOperations(ClusterIDRequest) returns (ClusterOperationsResponse) {
+        option (google.api.http) = {
+            get: "/v1/clusters/{cluster_id}/operations"
+        };
+    }
+
+    // Lister les utilisateurs du cluster
+    rpc ListClusterUsers(ClusterIDRequest) returns (ClusterUsersResponse) {
+        option (google.api.http) = {
+            get: "/v1/clusters/{cluster_id}/users"
+        };
+    }
+
+    // Ajouter un utilisateur (avec rôle)
+    rpc AddClusterUser(AddClusterUserRequest) returns (OperationResponse) {
+        option (google.api.http) = {
+            post: "/v1/clusters/{cluster_id}/users"
+            body: "*"
+        };
+    }
+
+    rpc UpgradeCluster(UpgradeClusterRequest) returns (OperationResponse) {
+        option (google.api.http) = {
+            post: "/v1/clusters/{cluster_id}/upgrade"
+            body: "*"
+        };
+    }
+
+    rpc GetNodeHealth(NodeHealthRequest) returns (NodeHealthResponse) {
+        option (google.api.http) = {
+            get: "/v1/clusters/{cluster_id}/nodes/{node_id}/health"
+        };
+    }
+
+}
+
+//
+// ─── MESSAGES ───────────────────────────────────────────────
+//
+
+message CreateClusterRequest {
+  string tenant_id = 1;
+  string name = 2;
+  string region = 3;
+  string k8s_version = 4;
+  int32 node_count = 5;
+  string provider = 6; // ex: "bare-metal", "aws", "gcp"
+  map<string, string> tags = 7;
+}
+
+message ClusterIDRequest {
+  string cluster_id = 1;
+}
+
+message ScaleClusterRequest {
+  string cluster_id = 1;
+  int32 additional_nodes = 2;
+}
+
+message DeployAppRequest {
+  string cluster_id = 1;
+  string chart_name = 2;
+  string namespace = 3;
+  map<string, string> values = 4; // valeurs du chart
+}
+
+message RestartComponentRequest {
+  string cluster_id = 1;
+  string component = 2; // ex: "kubelet", "dns", "scheduler"
+  string node_id = 3;
+}
+
+message Cluster {
+  string id = 1;
+  string tenant_id = 2;
+  string name = 3;
+  string region = 4;
+  string status = 5;
+  string provider = 6;
+  string k8s_version = 7;
+  int32 node_count = 8;
+  string created_at = 9;
+  string updated_at = 10;
+  map<string, string> tags = 11;
+}
+
+message ClusterStatusResponse {
+  string cluster_id = 1;
+  string status = 2; // ex: provisioning, healthy, degraded, failed
+  int32 node_count = 3;
+  map<string, string> components_status = 4;
+  string last_check = 5;
+}
+
+message ClusterListResponse {
+  repeated Cluster clusters = 1;
+}
+
+message ClusterLogResponse {
+  string cluster_id = 1;
+  repeated string logs = 2;
+}
+
+message TenantRequest {
+  string tenant_id = 1;
+}
+
+message OperationResponse {
+  string message = 1;
+  string operation_id = 2;
+}
+
+message ClusterConfigResponse {
+  string cluster_id = 1;
+  string kubeconfig = 2;
+  map<string, string> app_configs = 3;
+}
+
+message ApplyClusterConfigRequest {
+  string cluster_id = 1;
+  string kubeadm_config = 2;
+  map<string, string> app_configs = 3;
+}
+
+message ClusterOperationsResponse {
+  repeated ClusterOperation operations = 1;
+}
+
+message ClusterOperation {
+  string id = 1;
+  string type = 2; // create, scale, delete, deploy, etc.
+  string status = 3; // pending, success, failed
+  string started_at = 4;
+  string ended_at = 5;
+}
+
+message AddClusterUserRequest {
+  string cluster_id = 1;
+  string user_id = 2;
+  string role = 3; // ex: admin, viewer
+}
+
+message ClusterUsersResponse {
+  repeated ClusterUser users = 1;
+}
+
+message ClusterUser {
+  string user_id = 1;
+  string role = 2;
+  string added_at = 3;
+}
+message UpgradeClusterRequest {
+  string cluster_id = 1;
+  string new_k8s_version = 2;
+}
+
+message NodeHealthRequest {
+  string cluster_id = 1;
+  string node_id = 2;
+}
+
+message NodeHealthResponse {
+  string status = 1;
+  map<string, string> metrics = 2;
+}
